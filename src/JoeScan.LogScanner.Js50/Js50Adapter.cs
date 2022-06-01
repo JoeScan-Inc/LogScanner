@@ -256,6 +256,14 @@ public class Js50Adapter : IScannerAdapter
                     headConfig.Window.Bottom,
                     headConfig.Window.Left,
                     headConfig.Window.Right));
+                logger.Debug($"Setting Alignment for head {scanHead.ID} to ShiftX: {headConfig.Alignment.ShiftX}" 
+                + $" ShiftY: {headConfig.Alignment.ShiftY} "
+                + $" RollDeg: {headConfig.Alignment.RollDegrees}"
+                + $" Orientation: {headConfig.Alignment.Orientation}");
+                scanHead.SetAlignment(headConfig.Alignment.RollDegrees,
+                    headConfig.Alignment.ShiftX,
+                    headConfig.Alignment.ShiftY,
+                    headConfig.Alignment.Orientation);
             }
             logger.Debug("Done setting up ScanSystem");
             return system;
