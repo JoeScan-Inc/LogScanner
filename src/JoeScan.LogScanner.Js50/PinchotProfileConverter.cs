@@ -14,7 +14,7 @@ public static class PinchotProfileConverter
             LaserIndex = (uint)pProfile.Laser,
             //TODO: cast from double?
             LaserOnTimeUs = (ushort)pProfile.LaserOnTime,
-            EncoderValues = new Dictionary<uint, long>() { { 0, pProfile.EncoderValues[0] } },
+            EncoderValues = pProfile.EncoderValues.ToDictionary(q=>(uint)q.Key,q=>q.Value),
             SequenceNumber = 0, // not available in Pinchot 13
             //TODO: ulong cast ok?
             TimeStampNs = (ulong)pProfile.Timestamp, 
