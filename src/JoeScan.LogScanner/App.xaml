@@ -1,0 +1,46 @@
+﻿<Application
+    x:Class="JoeScan.LogScanner.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+    xmlns:logScanner="clr-namespace:JoeScan.LogScanner">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary>
+                    <logScanner:AppBootstrapper x:Key="Bootstrapper" />
+                </ResourceDictionary>
+                <ResourceDictionary>
+                    <FontFamily x:Key="InterUI">pack://application:,,,/Fonts/#Inter Medium</FontFamily>
+                    <FontFamily x:Key="InterThin">pack://application:,,,/Fonts/#Inter Thin</FontFamily>
+                    <FontFamily x:Key="InterLight">pack://application:,,,/Fonts/#Inter Light</FontFamily>
+                    <FontFamily x:Key="InterUIBlack">pack://application:,,,/Fonts/#Inter Black</FontFamily>
+                    <FontFamily x:Key="InterUIBold">pack://application:,,,/Fonts/#Inter Bold</FontFamily>
+                </ResourceDictionary>
+                <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/dark.xaml" />
+                <!-- <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/light.xaml" /> -->
+                <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/ToastNotifications.Messages;component/Themes/Default.xaml" />
+
+                <ResourceDictionary>
+                    <Color x:Key="{x:Static adonisUi:Colors.AccentColor}">#FFD600</Color>
+                    <CornerRadius x:Key="{x:Static adonisUi:Dimensions.CornerRadius}">3</CornerRadius>
+                    <Thickness x:Key="{x:Static adonisUi:Dimensions.BorderThickness}">1</Thickness>
+                </ResourceDictionary>
+                <ResourceDictionary>
+                    <Style
+                        x:Key="GroupBoxHeaderText"
+                        BasedOn="{StaticResource {x:Type TextBlock}}"
+                        TargetType="TextBlock">
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="FontFamily" Value="{StaticResource InterLight}" />
+                        <Setter Property="Margin" Value="10,3,3,3" />
+
+
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

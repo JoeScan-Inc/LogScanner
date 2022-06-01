@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JoeScan.LogScanner.Core\JoeScan.LogScanner.Core.csproj" />
+    <ProjectReference Include="..\JoeScan.LogScanner.Js25\JoeScan.LogScanner.Js25.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="LogScannerDump_2013-05-29-16-34-14.prof">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ReplayAdapter.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

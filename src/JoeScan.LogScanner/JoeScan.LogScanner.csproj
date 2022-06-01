@@ -1,0 +1,81 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\icon.png" />
+    <None Remove="Assets\logo.png" />
+    <None Remove="C:\Users\fabian\.nuget\packages\nlog.config\4.7.13\contentFiles\any\any\NLog.config" />
+    <None Remove="Fonts\Inter-Black.ttf" />
+    <None Remove="Fonts\Inter-Bold.ttf" />
+    <None Remove="Fonts\Inter-ExtraBold.ttf" />
+    <None Remove="Fonts\Inter-ExtraLight.ttf" />
+    <None Remove="Fonts\Inter-Light.ttf" />
+    <None Remove="Fonts\Inter-Medium.ttf" />
+    <None Remove="Fonts\Inter-Regular.ttf" />
+    <None Remove="Fonts\Inter-SemiBold.ttf" />
+    <None Remove="Fonts\Inter-Thin.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AdonisUI" Version="1.17.1" />
+    <PackageReference Include="AdonisUI.ClassicTheme" Version="1.17.1" />
+    <PackageReference Include="Autofac" Version="6.3.0" />
+    <PackageReference Include="Autofac.Extras.NLog" Version="4.0.0" />
+    <PackageReference Include="Caliburn.Micro" Version="4.0.173" />
+    <PackageReference Include="GitVersion.MsBuild" Version="5.10.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="gong-wpf-dragdrop" Version="3.1.1" />
+    <PackageReference Include="HelixToolkit.Core.Wpf" Version="2.20.2" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="OxyPlot.Core" Version="2.1.0" />
+    <PackageReference Include="OxyPlot.Wpf" Version="2.1.0" />
+    <PackageReference Include="ToastNotifications.Messages.Net5" Version="3.0.1" />
+    <PackageReference Include="ToastNotifications.Net5" Version="3.0.0" />
+    <PackageReference Include="UnitsNet" Version="4.130.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JoeScan.LogScanner.Core\JoeScan.LogScanner.Core.csproj" />
+    <ProjectReference Include="..\JoeScan.LogScanner.Js25\JoeScan.LogScanner.Js25.csproj" />
+    <ProjectReference Include="..\JoeScan.LogScanner.Js50\JoeScan.LogScanner.Js50.csproj" />
+    <ProjectReference Include="..\JoeScan.LogScanner.Replay\JoeScan.LogScanner.Replay.csproj" />
+    <ProjectReference Include="..\JoeScan.LogScanner.Shared\JoeScan.LogScanner.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Themes\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\icon.png" />
+    <Resource Include="Assets\logo.png" />
+    <Resource Include="Fonts\Inter-Black.ttf" />
+    <Resource Include="Fonts\Inter-Bold.ttf" />
+    <Resource Include="Fonts\Inter-ExtraBold.ttf" />
+    <Resource Include="Fonts\Inter-ExtraLight.ttf" />
+    <Resource Include="Fonts\Inter-Light.ttf" />
+    <Resource Include="Fonts\Inter-Medium.ttf" />
+    <Resource Include="Fonts\Inter-Regular.ttf" />
+    <Resource Include="Fonts\Inter-SemiBold.ttf" />
+    <Resource Include="Fonts\Inter-Thin.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="LogScanner.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
