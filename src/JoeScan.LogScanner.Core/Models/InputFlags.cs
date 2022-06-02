@@ -5,7 +5,7 @@
 /// flag type, as Pinchot does not have such capabilities
 /// </summary>
 [Flags]
-public enum InputFlags
+public enum InputFlags : int
 {
     None = 0,
     EncoderB = 1,

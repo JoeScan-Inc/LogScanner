@@ -4,7 +4,7 @@
 /// placeholder class for Js-25 flags
 /// </summary>
 [Flags]
-public enum ScanFlags
+public enum ScanFlags : int
 {
     None = 0,
     Overrun = 1,
