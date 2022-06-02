@@ -85,6 +85,8 @@ namespace JoeScan.LogScanner.Core.Models
 
             };
             var linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
+            var dumper = new RawProfileDumper(logger);
+            scannerAdapter.AvailableProfiles.LinkTo(dumper.DumpBlock,linkOptions);
             //  a block that modifies the Profiles with a bounding box - it goes first if the units dont't need to 
             // be converted, and second if they do
             var boundingBoxBlock = new TransformBlock<Profile, Profile>(BoundingBox.UpdateBoundingBox, blockOptions);
@@ -94,14 +96,14 @@ namespace JoeScan.LogScanner.Core.Models
             {
                 var unitConverterBlock =
                     new TransformBlock<Profile, Profile>((p) => UnitConverter.Convert(ScannerAdapter.Units, Units, p));
-                // scannerAdapter.AvailableProfiles is the source block where the profiles originate
-                scannerAdapter.AvailableProfiles.LinkTo(unitConverterBlock, linkOptions);
+                // dumper.DumpBlock is a pass-through from the source block where the profiles originate, scannerAdapter.AvailableProfiles
+                dumper.DumpBlock.LinkTo(unitConverterBlock, linkOptions);
                 unitConverterBlock.LinkTo(boundingBoxBlock, linkOptions);
             }
             else
             {
-                // scannerAdapter.AvailableProfiles is the source block where the profiles originate
-                scannerAdapter.AvailableProfiles.LinkTo(boundingBoxBlock, linkOptions);
+                // dumper.DumpBlock is a pass-through from the source block where the profiles originate, scannerAdapter.AvailableProfiles
+                dumper.DumpBlock.LinkTo(boundingBoxBlock, linkOptions);
             }
 
             // then we transform profiles by using a flights-and-window filter 
