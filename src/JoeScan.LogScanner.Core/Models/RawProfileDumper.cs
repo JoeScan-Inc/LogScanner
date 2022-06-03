@@ -10,7 +10,6 @@ public class RawProfileDumper
     public TransformBlock<Profile,Profile> DumpBlock { get;  }
     public string OutputDir { get; set; } = String.Empty;
     public string BaseName { get; set; } = String.Empty;
-    private bool acceptNewProfiles = false;
 
     private BlockingCollection<Profile>? dumpQueue  = null;
 
@@ -22,7 +21,7 @@ public class RawProfileDumper
 
     public void StartDumping()
     {
-        if (acceptNewProfiles)
+        if (dumpQueue != null)
         {
             return;
         }
@@ -52,7 +51,6 @@ public class RawProfileDumper
             dumpQueue = new BlockingCollection<Profile>();
             using var fs = new FileStream(fileName, FileMode.Create);
             using var writer = new BinaryWriter(fs);
-            acceptNewProfiles = true;
             while (!dumpQueue.IsCompleted)
             {
                 Profile? p = null;
@@ -74,7 +72,6 @@ public class RawProfileDumper
             }
 
             logger.Debug("Dumper queue empty, exiting task.");
-            acceptNewProfiles = false;
             dumpQueue = null;
         });
     }
@@ -87,17 +84,16 @@ public class RawProfileDumper
 
     public void StopDumping()
     {
-        if (acceptNewProfiles)
+        if (dumpQueue!= null)
         {
-            acceptNewProfiles = false;
-            dumpQueue!.CompleteAdding();
+            dumpQueue.CompleteAdding();
         }
     }
     private Profile ProcessProfile(Profile p)
     {
-        if (acceptNewProfiles)
+        if (dumpQueue!=null && !dumpQueue.IsAddingCompleted)
         {
-            dumpQueue!.Add(p);
+            dumpQueue.Add(p);
         }
         return p;
     }
