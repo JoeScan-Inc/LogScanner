@@ -4,7 +4,6 @@ using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Helpers;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
-using Nini.Config;
 using NLog;
 using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
@@ -13,6 +12,7 @@ namespace JoeScan.LogScanner.Replay;
 
 public class ReplayAdapter : IScannerAdapter
 {
+    public IReplayAdapterConfig Config { get; }
     private CancellationTokenSource? cts;
     private Thread? thread;
     
@@ -40,12 +40,11 @@ public class ReplayAdapter : IScannerAdapter
     }
 
     public bool IsConfigured => true;
-    public IConfigSource Config { get; set; }
     public ILogger Logger { get; set; }
     private List<LegacyProfile> LegacyProfiles { get; set; } = new();
 
 
-    public ReplayAdapter([KeyFilter("ReplayAdapter.ini")] IConfigSource config, ILogger? logger = null)
+    public ReplayAdapter(IReplayAdapterConfig config, ILogger? logger = null)
     {
         Config = config;
         // get injected logger if there is one
@@ -143,7 +142,7 @@ public class ReplayAdapter : IScannerAdapter
         string simFile;
         try
         {
-            simFile = Config.Configs["Replay"].GetString("File");
+            simFile = Config.File;
         }
         catch (Exception e)
         {

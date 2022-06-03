@@ -2,7 +2,6 @@
 using JoeScan.LogScanner.Core.Events;
 using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Interfaces;
-using Nini.Config;
 using NLog;
 using System.Threading.Tasks.Dataflow;
 
@@ -12,7 +11,7 @@ namespace JoeScan.LogScanner.Core.Models
     {
         private readonly IUserNotifier notifier;
         public IFlightsAndWindowFilter Filter { get; }
-        public IConfigSource Config { get; }
+        public ICoreConfig Config { get; }
         public IScannerAdapter ScannerAdapter { get; }
         public ILogger Logger { get; }
         public ILogAssembler LogAssembler { get; }
@@ -56,7 +55,7 @@ namespace JoeScan.LogScanner.Core.Models
 
         #region Lifecycle
 
-        public LogScannerEngine([KeyFilter("Core.ini")] IConfigSource config,
+        public LogScannerEngine(ICoreConfig config,
             IScannerAdapter scannerAdapter,
             IFlightsAndWindowFilter filter,
             ILogger logger,
@@ -71,7 +70,7 @@ namespace JoeScan.LogScanner.Core.Models
             LogAssembler = logAssembler;
 
             //TODO: make this more robust
-            Units = Enum.Parse<UnitSystem>(config.Configs["General"].GetString("Units", "Inches"));
+            Units = Config.Units;
 
             ScannerAdapter.ScanningStarted += (sender, args) => OnScanningStarted(args);
             ScannerAdapter.ScanningStopped += (sender, args) => OnScanningStopped(args);

@@ -7,7 +7,6 @@ using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.Js25.Enums;
 using JoeScan.LogScanner.Js25.Interfaces;
-using Nini.Config;
 using NLog;
 using System.Net;
 using System.Threading.Tasks.Dataflow;
@@ -48,15 +47,16 @@ public class Js25Adapter : IScannerAdapter
 
     #region Injected Properties
 
-    public IConfigSource Config { get; }
+    public IJs25AdapterConfig Config { get; }
     public ILogger Logger { get; }
 
     #endregion
 
     #region Lifecycle
 
-    public Js25Adapter([KeyFilter("Js25Adapter.ini")] IConfigSource config, ILogger logger = null)
+    public Js25Adapter(IJs25AdapterConfig config, ILogger logger = null)
     {
+        AvailableProfiles = new BufferBlock<Profile>();
         Config = config;
         // get injected logger if there is one
         Logger = logger ?? LogManager.GetCurrentClassLogger();
@@ -115,25 +115,22 @@ public class Js25Adapter : IScannerAdapter
     public void Configure()
     {
         Logger.Debug("Reconfigure()");
-        if (Config.Configs.Contains("ScanThread"))
-        {
-            IConfig c = Config.Configs["Js25Adapter"];
-            // load configuration here
+        
             // InternalProfileQueueLength
-            var internalProfileQueueLength = c.GetInt("InternalProfileQueueLength", 10);
+            var internalProfileQueueLength = Config.InternalProfileQueueLength;
             Logger.Info($"InternalProfileQueueLength: {internalProfileQueueLength}");
             AvailableProfiles = new BufferBlock<Profile>();
             //EncoderUpdateIncrement
-            encoderUpdateIncrement = c.GetInt("EncoderUpdateIncrement", 1000);
+            encoderUpdateIncrement = Config.EncoderUpdateIncrement;
             Logger.Info($"EncoderUpdateIncrement: {encoderUpdateIncrement}");
             //MaxRequestedProfileCount
-            maxRequestedProfileCount = c.GetInt("MaxRequestedProfileCount", 4);
+            maxRequestedProfileCount = Config.MaxRequestedProfileCount;
             Logger.Info($"MaxRequestedProfileCount: {maxRequestedProfileCount}");
             // BaseAddress
             string baseAddressString = String.Empty;
             try
             {
-                baseAddressString = c.GetString("BaseAddress", "");
+                baseAddressString = Config.BaseAddress;
                 baseAddress = IPAddress.Parse(baseAddressString);
                 Logger.Info($"BaseAddress: {baseAddress}");
             }
@@ -145,7 +142,7 @@ public class Js25Adapter : IScannerAdapter
             }
 
             // CableIdList
-            string idsString = c.GetString("CableIdList", "");
+            string idsString = Config.CableIdList;
             string[] idStrings = idsString.Split(new[] { ',' });
             try
             {
@@ -160,7 +157,7 @@ public class Js25Adapter : IScannerAdapter
             }
 
             // ParamFile
-            paramFile = c.GetString("ParamFile", "");
+            paramFile = Config.ParamFile;
             if (String.IsNullOrEmpty(paramFile))
             {
                 var msg = $"Could not parse ParamFile: \"{paramFile}\".";
@@ -176,34 +173,20 @@ public class Js25Adapter : IScannerAdapter
                 throw new ApplicationException(msg);
             }
             Logger.Info($"ParamFile: {paramFile}");
-            string syncModeString = c.GetString("SyncMode", "");
-            try
-            {
-                syncMode = Enum.Parse<SyncMode>(syncModeString);
+           
+            
+                syncMode = Config.SyncMode;
                 Logger.Info($"SyncMode: {syncMode}");
-            }
-            catch (Exception e)
-            {
-                var msg = $"Could not parse SyncMode: \"{syncModeString}\".";
-                Logger.Error(e, msg);
-                throw new ApplicationException(msg);
-            }
+           
 
             if (syncMode == SyncMode.PulseSyncMode)
             {
-                pulseMasterId = c.GetInt("PulseMasterId", 0);
+                pulseMasterId = Config.PulseMasterId;
                 Logger.Info($"PulseMasterId: {pulseMasterId}");
             }
 
             IsConfigured = true;
-        }
-        else
-        {
-            IsConfigured = false;
-            var msg = $"Config file does not contain a \"[Js25Adapter]\" section.";
-            Logger.Error(msg);
-            throw new ApplicationException(msg);
-        }
+       
     }
 
     #endregion
@@ -253,7 +236,7 @@ public class Js25Adapter : IScannerAdapter
             lastEncoderUpdatePos = 0;
             OnScanningStarted(EventArgs.Empty);
             //TODO: switch based on config
-            switch (EnumHelper.FromString<SyncMode>(Config.Configs["ScanThread"].GetString("SyncMode")))
+            switch (Config.SyncMode)
             {
                 case SyncMode.EncoderSyncMode:
                     EnterEncoderSyncMode();
@@ -261,7 +244,7 @@ public class Js25Adapter : IScannerAdapter
                 case SyncMode.PulseSyncMode:
                     EnterPulseSyncMode();
                     //TODO: rename to make clear it is ms or us 
-                    StartPulseMaster(Config.Configs["ScanThread"].GetInt("SyncMode"));
+                    StartPulseMaster(Config.PulseInterval);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
