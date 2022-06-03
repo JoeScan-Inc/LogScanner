@@ -10,14 +10,14 @@ using JoeScan.LogScanner.Notifications;
 using JoeScan.LogScanner.StatusBar;
 using JoeScan.LogScanner.Toolbar;
 using JoeScan.LogScanner.TopAndSide;
-using Nini.Config;
 using System.Windows;
+using JoeScan.LogScanner.Config;
 
 namespace JoeScan.LogScanner.Shell;
 
 public class ShellViewModel : Screen
 {
-    public IConfigSource Config { get; }
+    public ILogScannerConfig Config { get; }
     public StatusBarViewModel StatusBar { get; }
     public ToolbarViewModel Toolbar { get; }
     public TopAndSideViewModel TopAndSide { get; }
@@ -29,7 +29,7 @@ public class ShellViewModel : Screen
     public IUserNotifier Notifier { get; }
 
     public ShellViewModel(
-        [KeyFilter("LogScanner.ini")] IConfigSource config,
+         ILogScannerConfig config,
         StatusBarViewModel statusBar,
         ToolbarViewModel toolbar,
         TopAndSideViewModel topAndSide,

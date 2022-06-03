@@ -1,6 +1,6 @@
 ﻿using Autofac;
+using Config.Net;
 using JoeScan.LogScanner.Core.Interfaces;
-using Nini.Config;
 
 namespace JoeScan.LogScanner.Js25
 {
@@ -9,7 +9,9 @@ namespace JoeScan.LogScanner.Js25
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<Js25Adapter>().As<IScannerAdapter>();
-            builder.Register(c => new IniConfigSource("Js25Adapter.ini")).Keyed<IConfigSource>("Js25Adapter.ini").SingleInstance();
+            builder.Register(c => new ConfigurationBuilder<IJs25AdapterConfig>()
+                .UseIniFile("Js25Adapter.ini")
+                .Build()).SingleInstance();
         }
 
         

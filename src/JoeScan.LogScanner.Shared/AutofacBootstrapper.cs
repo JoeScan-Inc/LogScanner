@@ -46,21 +46,19 @@ public class AutofacBootstrapper : BootstrapperBase
             //  registered as self
             .AsSelf()
             //  always create a new one
-            .InstancePerDependency()
-            // and apply Attribute Filtering, as we need it to properly resolve all our ini files
-            .WithAttributeFiltering();
+            .InstancePerDependency();
         // views
         builder.RegisterAssemblyTypes(AssemblySource.Instance.ToArray())
             //  must be a type with a name that ends with View
             .Where(type => type.Name.EndsWith("View"))
             //  must be in a namespace that ends in Views
-            .Where(type => !EnforceNamespaceConvention || (!(string.IsNullOrWhiteSpace(type.Namespace)) && type.Namespace.EndsWith("Views")))
+            .Where(type =>
+                !EnforceNamespaceConvention ||
+                (!(string.IsNullOrWhiteSpace(type.Namespace)) && type.Namespace.EndsWith("Views")))
             //  registered as self
             .AsSelf()
             //  always create a new one
-            .InstancePerDependency()
-            // and apply Attribute Filtering, as we need it to properly resolve all our ini files
-            .WithAttributeFiltering();
+            .InstancePerDependency();
         builder.Register<IWindowManager>(c => CreateWindowManager()).InstancePerLifetimeScope();
         //  register the single event aggregator for this container
         builder.Register<IEventAggregator>(c => CreateEventAggregator()).InstancePerLifetimeScope();

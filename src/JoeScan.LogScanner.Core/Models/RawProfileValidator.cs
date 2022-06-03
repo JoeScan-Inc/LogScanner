@@ -1,15 +1,14 @@
 ﻿using Autofac.Features.AttributeFilters;
 using JoeScan.LogScanner.Core.Interfaces;
-using Nini.Config;
 using NLog;
 
 namespace JoeScan.LogScanner.Core.Models;
 
 class RawProfileValidator : IRawProfileValidator
 {
-    public IConfigSource Config { get; }
+    public ICoreConfig Config { get; }
 
-    public RawProfileValidator([KeyFilter("Core.ini")] IConfigSource config,
+    public RawProfileValidator(ICoreConfig config,
         ILogger logger)
     {
         Config = config;

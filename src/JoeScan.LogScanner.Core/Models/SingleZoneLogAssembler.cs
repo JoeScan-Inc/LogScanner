@@ -14,7 +14,7 @@ public class SingleZoneLogAssembler : ILogAssembler
         IRawProfileValidator profileValidator,
         IPieceNumberProvider numerator,
         ILogger logger,
-        SingleZoneLogAssemblerConfig config)
+        ICoreConfig config)
     {
         Config = config;
         ProfileValidator = profileValidator;
@@ -25,6 +25,7 @@ public class SingleZoneLogAssembler : ILogAssembler
 
         accumulatedProfiles = new LinkedList<Profile>();
         SetCurrentState(LogAssemblerState.Idle);
+        config.SingleZoneLogAssemblerConfig.StopLogCount = 3;
     }
 
     #endregion
@@ -43,9 +44,9 @@ public class SingleZoneLogAssembler : ILogAssembler
     public void AddProfile(Profile p)
     {
         bool isValidProfile;
-        if (Config.UseLogPresenceSignal)
+        if (Config.SingleZoneLogAssemblerConfig.UseLogPresenceSignal)
         {
-            isValidProfile = ProfileValidator.IsValid(p) && Config.StartScanInverted
+            isValidProfile = ProfileValidator.IsValid(p) && Config.SingleZoneLogAssemblerConfig.StartScanInverted
                 ? !p.Inputs.HasFlag(InputFlags.StartScan)
                 : p.Inputs.HasFlag(InputFlags.StartScan);
         }
@@ -75,7 +76,7 @@ public class SingleZoneLogAssembler : ILogAssembler
                     break;
                 }
 
-                if (accumulatedProfiles.Count > Config.StartLogCount)
+                if (accumulatedProfiles.Count > Config.SingleZoneLogAssemblerConfig.StartLogCount)
                 {
                     SetCurrentState(LogAssemblerState.Collecting);
                 }
@@ -120,10 +121,10 @@ public class SingleZoneLogAssembler : ILogAssembler
                 // a chance to calculate on the fly
 
                 // check how many consecutive empty profiles we had so far while collecting
-                if (consecutiveNoLogProfiles > Config.StopLogCount)
+                if (consecutiveNoLogProfiles > Config.SingleZoneLogAssemblerConfig.StopLogCount)
                 {
                     // looks like we have reached the end of a log, or the end of a piece of debris
-                    if (scannedSoFar > Config.MinLogLength)
+                    if (scannedSoFar > Config.SingleZoneLogAssemblerConfig.MinLogLength)
                     {
                         // we  have a bona fide log
                         // signal and break
@@ -135,7 +136,7 @@ public class SingleZoneLogAssembler : ILogAssembler
                     break;
                 }
 
-                if (scannedSoFar >= Config.MaxLogLength)
+                if (scannedSoFar >= Config.SingleZoneLogAssemblerConfig.MaxLogLength)
                 {
                     LogReady();
                     SetCurrentState(LogAssemblerState.Idle);
@@ -160,9 +161,9 @@ public class SingleZoneLogAssembler : ILogAssembler
             if (last.Value.ScanHeadId == profile.ScanHeadId)
             {
                 reversed = profile.EncoderValues[0] - last.Value.EncoderValues[0] < 0;
-                stopped = Math.Abs((profile.EncoderValues[0] * Config.EncoderPulseInterval)
-                                   - (last.Value.EncoderValues[0] * Config.EncoderPulseInterval)) <
-                          Config.MinProfileSpacing;
+                stopped = Math.Abs((profile.EncoderValues[0] * Config.SingleZoneLogAssemblerConfig.EncoderPulseInterval)
+                                   - (last.Value.EncoderValues[0] * Config.SingleZoneLogAssemblerConfig.EncoderPulseInterval)) <
+                          Config.SingleZoneLogAssemblerConfig.MinProfileSpacing;
                 break;
             }
 
@@ -178,8 +179,8 @@ public class SingleZoneLogAssembler : ILogAssembler
         while (last != null)
         {
             if (last.Value.ScanHeadId == profile.ScanHeadId &&
-                last.Value.EncoderValues[0] * Config.EncoderPulseInterval >
-                profile.EncoderValues[0] * Config.EncoderPulseInterval)
+                last.Value.EncoderValues[0] * Config.SingleZoneLogAssemblerConfig.EncoderPulseInterval >
+                profile.EncoderValues[0] * Config.SingleZoneLogAssemblerConfig.EncoderPulseInterval)
             {
                 var temp = last.Previous;
                 accumulatedProfiles.Remove(last);
@@ -204,7 +205,7 @@ public class SingleZoneLogAssembler : ILogAssembler
         if (last != null)
         {
             //TODO: does travel direction matter?
-            return (last.EncoderValues[0] - accumulatedProfiles.First().EncoderValues[0]) * Config.EncoderPulseInterval;
+            return (last.EncoderValues[0] - accumulatedProfiles.First().EncoderValues[0]) * Config.SingleZoneLogAssemblerConfig.EncoderPulseInterval;
         }
 
         return 0.0;
@@ -220,7 +221,7 @@ public class SingleZoneLogAssembler : ILogAssembler
     }
     #region Injected Properties
 
-    public SingleZoneLogAssemblerConfig Config { get; }
+    public ICoreConfig Config { get; }
     public IRawProfileValidator ProfileValidator { get; }
     public IPieceNumberProvider Numerator { get; }
     public ILogger Logger { get; }
