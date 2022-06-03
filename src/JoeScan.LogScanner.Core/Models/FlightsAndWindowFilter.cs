@@ -1,17 +1,19 @@
 ﻿using JoeScan.LogScanner.Core.Filters;
 using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Interfaces;
+using Newtonsoft.Json;
 
 namespace JoeScan.LogScanner.Core.Models;
 
-public class FlightsAndWindowFilter
-    : IFlightsAndWindowFilter
+public class FlightsAndWindowFilter : IFlightsAndWindowFilter
 {
-    public Dictionary<uint, PolygonFilter> Filters = new Dictionary<uint, PolygonFilter>();
+    //TODO: for now, we only allow one filter per head, so a dictionary is fine here
+    public Dictionary<uint, IFilterShape> Filters = new Dictionary<uint, IFilterShape>();
 
     public FlightsAndWindowFilter()
     {
 
+        var filters = JsonConvert.DeserializeObject<List<FilterBase>>(File.ReadAllText("rawfilters.json"));
 
     }
 
@@ -19,8 +21,6 @@ public class FlightsAndWindowFilter
     {
         if (Filters.ContainsKey(p.ScanHeadId))
         {
-            // modify the data in place,
-            // see also issue #4
             p.Data = p.Data.Where(q => Filters[p.ScanHeadId].Contains(q)).ToArray();
             BoundingBox.UpdateBoundingBox(p);
         }
@@ -28,5 +28,5 @@ public class FlightsAndWindowFilter
     }
 
     public IEnumerable<uint> FilteredHeads => Filters.Keys;
-    public PolygonFilter this[uint key] => Filters[key];
+    public IFilterShape this[uint key] => Filters[key];
 }

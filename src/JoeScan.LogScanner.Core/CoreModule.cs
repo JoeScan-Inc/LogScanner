@@ -14,9 +14,6 @@ public class CoreModule : Module
         builder.RegisterType<SingleZoneLogAssembler>().As<ILogAssembler>();
         builder.RegisterType<RawProfileValidator>().As<IRawProfileValidator>();
         builder.RegisterType<PieceNumberProvider>().As<IPieceNumberProvider>().SingleInstance();
-
-        // builder.RegisterType<PolygonFilter>().As<IFilterShape>().WithAttributeFiltering().SingleInstance();
-
         builder.RegisterType<FlightsAndWindowFilter>().As<IFlightsAndWindowFilter>().SingleInstance();
         builder.RegisterType<MuteNotifier>().As<IUserNotifier>();
 

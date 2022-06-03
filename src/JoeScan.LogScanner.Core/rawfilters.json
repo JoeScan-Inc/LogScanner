@@ -1,54 +1,31 @@
-{
-  "RawFilters": [
-    {
-      "ScanHeadId": 0,
-      "IncludeArea": [
-        {
-          "X": 0,
-          "Y": -10
-        },
-        {
-          "X": -140,
-          "Y": 35
-        },
-        {
-          "X": -400,
-          "Y": 35
-        },
-        {
-          "X": -400,
-          "Y": 400
-        },
-        {
-          "X": 80,
-          "Y": 400
-        },
-        {
-          "X": 80,
-          "Y": -10
-        }
-      ]
-    },
-    {
-      "ScanHeadId": 1,
-      "IncludeArea": [
-        {
-          "X": -350,
-          "Y": 200
-        },
-        {
-          "X": -350,
-          "Y": 500
-        },
-        {
-          "X": 350,
-          "Y": 500
-        },
-        {
-          "X": 350,
-          "Y": 200
-        }
-      ]
-    }
-  ] 
-}
+[
+  {
+    "Kind": "BoxFilter",
+    "ScanHeadId": 0,
+    "Left": -100,
+    "Right": 100,
+    "Bottom": 0,
+    "Top" :  200 
+  },
+  {
+    "Kind": "BoxFilter",
+    "ScanHeadId": 1
+  },
+  {
+    "Kind": "PolygonFilter",
+    "ScanHeadId": 2,
+    "Vertices": [
+      {
+        "X": -30,
+        "Y": 0
+      },
+      {
+        "X": 40,
+        "Y": 1
+      }
+
+    ] 
+  }
+]
+  
+
