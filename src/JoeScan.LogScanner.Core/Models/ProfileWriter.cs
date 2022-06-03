@@ -11,7 +11,7 @@ namespace JoeScan.LogScanner.Core.Models
     {
          const int FileMagic = 0x010203;
 
-        static void Write(this Profile p, BinaryWriter bw)
+        public static void Write(this Profile p, BinaryWriter bw)
         {
             bw.Write(FileMagic);
             bw.Write((int)p.ScanningFlags);
@@ -30,9 +30,14 @@ namespace JoeScan.LogScanner.Core.Models
             bw.Write(p.Data.Length);
             foreach (var t in p.Data)
             {
-                bw.Write(t.X);
-                bw.Write(t.Y);
-                bw.Write(t.B);
+                // to save disk space, save as 1/100 of an inch 
+                // this lets us map an area of -327" to 327" (-8323mm to 8323mm)
+                // which is sufficient in most cases. Our accuracy is 
+                // limited to 1/100 of an inch, or 0.25 mm - good enough for debugging etc
+                bw.Write((short)(t.X*100.0));
+                bw.Write((short)(t.Y*100.0));
+                // scale brightness to 8 bit
+                bw.Write((byte)t.B);
             }
         }
 
@@ -60,9 +65,10 @@ namespace JoeScan.LogScanner.Core.Models
             p.Data = new Point2D[numPts];
             for (int i = 0; i < numPts; i++)
             {
-                var x = br.ReadDouble();
-                var y = br.ReadDouble();
-                var b = br.ReadDouble();
+                // see scaling remarks above
+                var x = br.ReadInt16() / 100.0;
+                var y = br.ReadInt16() / 100.0;
+                var b = (double) br.ReadByte();
                 p.Data[i] = new Point2D(x, y, b);
             }
             return p;
