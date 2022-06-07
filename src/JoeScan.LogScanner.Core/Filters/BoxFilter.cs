@@ -1,39 +1,44 @@
 ﻿using JoeScan.LogScanner.Core.Geometry;
-using JoeScan.LogScanner.Core.Interfaces;
+using System.Runtime.Serialization;
 
 namespace JoeScan.LogScanner.Core.Filters;
 
-public class BoxFilter : IFilterShape
+public class BoxFilter : FilterBase
 {
-    private Rect rect;
+    public double Left { get; set; }
+    public double Top { get; set; }
+    public double Right { get; set; }
+    public double Bottom { get; set; }
+    public override bool IsValid => isValid;
 
-    public BoxFilter(Rect r)
+    private bool isValid = false;
+    public override IReadOnlyList<Point2D> Outline => new List<Point2D>()
     {
-        rect = r;
-    }
-
-    public bool IntersectsWith(Rect r)
-    {
-        return rect.IntersectsWith(r);
-    }
-
-    public bool Contains(Rect r)
-    {
-        return rect.Contains(r);
-    }
-
-    public IReadOnlyList<Point2D> Outline => new List<Point2D>()
-    {
-        new Point2D(rect.Left, rect.Bottom, 0),
-        new Point2D(rect.Left, rect.Top, 0),
-        new Point2D(rect.Right, rect.Top, 0),
-        new Point2D(rect.Right, rect.Bottom, 0)
+        new Point2D(Left, Bottom, 0),
+        new Point2D(Left, Top, 0),
+        new Point2D(Right, Top, 0),
+        new Point2D(Right, Bottom, 0)
     };
 
-    public uint ScanHeadId { get; }
+    public override string Kind => "BoxFilter";
 
-    public bool Contains(Point2D p)
+    public override bool Contains(Point2D p)
     {
-        return p.X > rect.Left && p.X < rect.Right && p.Y > rect.Bottom && p.Y < rect.Top;
+        if (!isValid)
+        {
+            // an invalid filter will let all points go through
+            return true;
+        }
+        return p.X > Left && p.X < Right && p.Y > Bottom && p.Y < Top;
     }
+
+    // this is called after Json.NET created the object, we check here if 
+    // it is a valid filter
+    [OnDeserialized]
+    internal void OnDeserializedMethod(StreamingContext context)
+    {
+        isValid = Left < Right && Top > Bottom;
+    }
+
+
 }

@@ -15,13 +15,14 @@ public class ReplayAdapter : IScannerAdapter
     public IReplayAdapterConfig Config { get; }
     private CancellationTokenSource? cts;
     private Thread? thread;
-    
+    private bool isRunning;
+
     // simple test adapter that replays profiles from a file for testing 
     // purposes
 
     // we have test data from an install in mm
     public UnitSystem Units => UnitSystem.Millimeters;
-    
+
     public BufferBlock<Profile> AvailableProfiles { get; } =
         new BufferBlock<Profile>(new DataflowBlockOptions
         {
@@ -29,11 +30,30 @@ public class ReplayAdapter : IScannerAdapter
 
         });
 
-    public List<Tuple<int, int>> SequenceList { get; private set; } = new List<Tuple<int, int>>();// this is a list of indexes 
+    public List<Tuple<int, int>> SequenceList { get; private set; } = new List<Tuple<int, int>>(); // this is a list of indexes 
     // into the LegacyProfiles list, sorted by time. The idea is that we run a timer, and post the profiles
     // when their time has come
 
-    public bool IsRunning { get; private set; }
+    public bool IsRunning
+    {
+        get => isRunning;
+        private set
+        {
+            if (isRunning != value)
+            {
+                isRunning = value;
+                if (isRunning)
+                {
+                    OnScanningStarted();
+                }
+                else
+                {
+                    OnScanningStopped();
+                }
+            }
+        }
+    }
+
     public void Configure()
     {
         // nothing to do here
@@ -51,9 +71,9 @@ public class ReplayAdapter : IScannerAdapter
         Logger = logger ?? LogManager.GetCurrentClassLogger();
         IsRunning = false;
     }
-    
 
-    
+
+
     public void Start()
     {
         if (!IsRunning)
@@ -66,13 +86,15 @@ public class ReplayAdapter : IScannerAdapter
 
     private void ThreadMain(CancellationToken ct)
     {
-        FillBuffer();  
+
         try
         {
             IsRunning = true;
+
+            FillBuffer();
             var sw = Stopwatch.StartNew();
             var index = 0;
-           
+
             var gapTimeCount = 0;
             while (!ct.IsCancellationRequested && index < SequenceList.Count)
             {
@@ -80,22 +102,22 @@ public class ReplayAdapter : IScannerAdapter
                 while (sw.ElapsedMilliseconds > SequenceList[index].Item1)
                 {
                     ct.ThrowIfCancellationRequested();
-                   
+
                     AvailableProfiles.Post(LegacyProfiles[SequenceList[index++].Item2].Convert());
-                    if (index >= SequenceList.Count) 
+                    if (index >= SequenceList.Count)
                         break;
                     gapTimeCount = 0;
                 }
-                Thread.Sleep(1); 
+                Thread.Sleep(1);
                 // problem is that the raw test data has gaps 
-            // in between logs, where no profiles were recorded, 
-            // which holds up processing until the next log starts
-            // to combat that we insert empty profiles if there is a time gap of 
-            // more than a few ms
+                // in between logs, where no profiles were recorded, 
+                // which holds up processing until the next log starts
+                // to combat that we insert empty profiles if there is a time gap of 
+                // more than a few ms
                 gapTimeCount++;
                 if (gapTimeCount > 100)
                 {
-                    for(int i=0; i < 20; i++)
+                    for (int i = 0; i < 20; i++)
                     {
                         AvailableProfiles.Post(LegacyProfile.CreateEmpty().Convert());
                     }
@@ -160,10 +182,10 @@ public class ReplayAdapter : IScannerAdapter
                 LegacyProfiles.Add(ReadFromBinaryReader(br));
             }
         }
-        catch (EndOfStreamException )
+        catch (EndOfStreamException)
         {
             //ignore, eof
-        } 
+        }
         catch (Exception e)
         {
             // anything else
@@ -178,7 +200,7 @@ public class ReplayAdapter : IScannerAdapter
     {
         var startValue = new Dictionary<int, int>();
         var sequenceList = new List<Tuple<int, int>>(legacyProfiles.Count);
-        foreach (var (profile,index) in legacyProfiles.WithIndex())
+        foreach (var (profile, index) in legacyProfiles.WithIndex())
         {
             if (!startValue.ContainsKey(profile.CableId))
             {
@@ -195,7 +217,7 @@ public class ReplayAdapter : IScannerAdapter
         SequenceList = sequenceList.OrderBy(q => q.Item1).ToList();
     }
 
-  
+
 
     public Task StartAsync()
     {
@@ -265,7 +287,7 @@ public class ReplayAdapter : IScannerAdapter
         public int TimeInHead { get; set; }
         public double Z { get; set; }
         public InputFlags Inputs { get; set; }
-        public Point2D[]? Data { get; set; } 
+        public Point2D[]? Data { get; set; }
         public Profile Convert()
         {
             var np = new Profile
@@ -299,4 +321,14 @@ public class ReplayAdapter : IScannerAdapter
     }
 
     #endregion
+
+    protected virtual void OnScanningStarted()
+    {
+        ScanningStarted?.Invoke(this, EventArgs.Empty);
+    }
+
+    protected virtual void OnScanningStopped()
+    {
+        ScanningStopped?.Invoke(this, EventArgs.Empty);
+    }
 }

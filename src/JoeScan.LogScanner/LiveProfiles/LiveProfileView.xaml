@@ -25,6 +25,7 @@
                     Margin="3"
                     Padding="3"
                     DockPanel.Dock="Right"
+                    Focusable="False"
                     Style="{StaticResource {x:Type ToggleButton}}">
                     <iconPacks:Material
                         Width="16"
@@ -35,27 +36,37 @@
                     </ToggleButton.ToolTip>
                 </ToggleButton>
                 <ToggleButton
-                    x:Name="EditFilters"
+                    x:Name="ShowFilters"
                     Width="24"
                     Height="24"
                     Margin="3"
                     Padding="3"
                     DockPanel.Dock="Right"
+                    Focusable="False"
                     Style="{StaticResource {x:Type ToggleButton}}">
                     <iconPacks:Material
                         Width="16"
                         Height="16"
-                        Kind="VectorPolygonVariant" />
+                        Kind="Select" />
                     <ToggleButton.ToolTip>
-                        <TextBlock>Edit the current Raw Profile Filter.</TextBlock>
+                        <TextBlock>Show/Hide Raw Profile Filter Outlines.</TextBlock>
                     </ToggleButton.ToolTip>
                 </ToggleButton>
             </DockPanel>
         </GroupBox.Header>
-        <oxy:PlotView
-            Margin="0"
-            Padding="0"
-            Model="{Binding LiveView}" />
-
+        <Grid>
+            <oxy:PlotView
+                Margin="0"
+                Padding="0"
+                Model="{Binding LiveView}" />
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontFamily="{StaticResource InterThin}"
+                FontSize="44"
+                Visibility="{Binding PausedIndicatorVisibility}">
+                Paused
+            </TextBlock>
+        </Grid>
     </GroupBox>
 </UserControl>
