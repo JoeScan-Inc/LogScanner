@@ -1,30 +1,79 @@
 [
   {
     "Kind": "BoxFilter",
-    "ScanHeadId": 0,
-    "Left": -100,
-    "Right": 100,
-    "Bottom": 0,
-    "Top" :  200 
+    "ScanHeadId": 1,
+    "IsEnabled" :  true, 
+    "Left": -300,
+    "Right": 300,
+    "Bottom": 200,
+    "Top" :  500 
   },
+
   {
-    "Kind": "BoxFilter",
-    "ScanHeadId": 1
+    "Kind": "PolygonFilter",
+    "ScanHeadId": 0,
+    "IsEnabled": true,
+    "Vertices": [
+      {
+        "X": 10,
+        "Y": 0
+      },
+      {
+        "X": -150,
+        "Y": 20
+      },
+      {
+        "X": -280,
+        "Y": 60
+      },
+      {
+        "X": -280,
+        "Y": 420
+      },
+      {
+        "X": 10,
+        "Y": 420
+      },
+      {
+        "X": 10,
+        "Y": 0
+      }
+
+
+    ]
   },
   {
     "Kind": "PolygonFilter",
     "ScanHeadId": 2,
+    "IsEnabled": true,
     "Vertices": [
       {
-        "X": -30,
+        "X": -10,
         "Y": 0
       },
       {
-        "X": 40,
-        "Y": 1
+        "X": 150,
+        "Y": 20
+      },
+      {
+        "X": 280,
+        "Y": 60
+      },
+      {
+        "X": 280,
+        "Y": 420
+      },
+      {
+        "X": -10,
+        "Y": 420
+      },
+      {
+        "X": -10,
+        "Y": 0
       }
 
-    ] 
+
+    ]
   }
 ]
   

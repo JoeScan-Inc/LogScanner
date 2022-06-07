@@ -1,5 +1,6 @@
 ﻿using Accessibility;
 using Caliburn.Micro;
+using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.Helpers;
 using OxyPlot;
@@ -13,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks.Dataflow;
+using System.Windows;
 using System.Windows.Threading;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -26,7 +28,14 @@ public sealed class LiveProfileViewModel : Screen
 
     private readonly Dictionary<Tuple<uint, uint>, ScatterSeries> idToSeries = new();
     private readonly DispatcherTimer dispatcherTimer;
+    private bool paused;
+
+    private readonly ConcurrentDictionary<Tuple<uint, uint>, Profile> headCamDict
+        = new ConcurrentDictionary<Tuple<uint, uint>, Profile>();
+
     private readonly int refreshIntervalMs = 50;
+    private bool showFilters = true;
+    private readonly List<Annotation> annotations = new List<Annotation>();
 
 
     #endregion
@@ -34,18 +43,17 @@ public sealed class LiveProfileViewModel : Screen
     #region Pipeline Endpoint
 
     private readonly ActionBlock<Profile> displayActionBlock;
-    private bool paused;
-    private readonly ConcurrentDictionary<Tuple<uint, uint>, Profile> headCamDict
-        = new ConcurrentDictionary<Tuple<uint, uint>, Profile>();
 
     #endregion
 
     #region Lifecycle
 
-    public LiveProfileViewModel(LogScannerEngine engine)
+    public LiveProfileViewModel(LogScannerEngine engine,
+        IFlightsAndWindowFilter filter)
     {
         paused = false;
         Engine = engine;
+        Filter = filter;
         SetupPlotModel();
         dispatcherTimer = new DispatcherTimer
         {
@@ -66,6 +74,7 @@ public sealed class LiveProfileViewModel : Screen
     #region Injected Properties
 
     public LogScannerEngine Engine { get; }
+    public IFlightsAndWindowFilter Filter { get; }
 
     #endregion
 
@@ -78,12 +87,44 @@ public sealed class LiveProfileViewModel : Screen
         get => paused;
         set
         {
-            if (value == paused) return;
+            if (value == paused)
+            {
+                return;
+            }
             paused = value;
+            PausedIndicatorVisibility = paused ? Visibility.Visible : Visibility.Hidden;
+           
             NotifyOfPropertyChange(() => Paused);
+            NotifyOfPropertyChange(() => PausedIndicatorVisibility);
         }
     }
 
+    public bool ShowFilters
+    {
+        get => showFilters;
+        set
+        {
+            if (value != showFilters)
+            {
+                showFilters = value;
+                // in OxyPlot, annotations don't have a visibility, 
+                // so as a workaround, we remove and re-add them from
+                // temporary storage
+                if (showFilters)
+                {
+                    annotations.ForEach(LiveView!.Annotations.Add);
+                }
+                else
+                {
+                    LiveView!.Annotations.Clear();
+                }
+                LiveView.InvalidatePlot(false);
+                NotifyOfPropertyChange(()=>ShowFilters);
+            }
+        }
+    }
+
+    public Visibility PausedIndicatorVisibility { get; set; } = Visibility.Hidden;
     #endregion
 
     #region Private Methods
@@ -106,28 +147,18 @@ public sealed class LiveProfileViewModel : Screen
     {
         // we want to draw profiles from both cameras on a single WX head
         // on separate series, but with similar colors
+        if (Paused)
+        {
+            return;
+        }
         foreach (var key in headCamDict.Keys)
         {
-             var series = GetSeries(key);
-             series.Points.Clear();
+            var series = GetSeries(key);
+            series.Points.Clear();
             series.Points.AddRange(headCamDict[key].Data.Select(q => new ScatterPoint(q.X, q.Y)));
-             LiveView!.InvalidatePlot(true);
-
+            LiveView!.InvalidatePlot(true);
         }
         headCamDict.Clear();
-        // var series = GetSeries(profile.ScanHeadId);
-        // if (paused)
-        // {
-        //     series.Title = $"ID: {profile.ScanHeadId} Enc: {profile.EncoderValues[0]}";
-        //     LiveView.InvalidatePlot(false);
-        // }
-        // else
-        // {
-        //     series.Title = $"ID: {profile.ScanHeadId} Enc: {profile.EncoderValues[0]}";
-        //     series.Points.Clear();
-        //     series.Points.AddRange(profile.Data.Select(q => new ScatterPoint(q.X, q.Y)));
-        //     LiveView.InvalidatePlot(true);
-        // }
     }
 
     private ScatterSeries GetSeries(Tuple<uint, uint> idCameraPair)
@@ -211,16 +242,25 @@ public sealed class LiveProfileViewModel : Screen
             // LabelFormatter = x => null
         };
         LiveView.Axes.Add(rowAxis);
-        var filterOutline = new PolygonAnnotation()
+
+        foreach (var f in Filter.FilteredHeads)
         {
-            Layer = AnnotationLayer.BelowSeries,
-            Fill = OxyColors.Transparent,
-            Stroke = OxyColors.LightGray,
-            StrokeThickness = 1.0,
-            LineStyle = LineStyle.Dash
-        };
-      //  filterOutline.Points.AddRange(Filter.Outline.Select(q => new DataPoint(q.X, q.Y)));
-        LiveView.Annotations.Add(filterOutline);
+            var filterOutline = new PolygonAnnotation()
+            {
+                Layer = AnnotationLayer.BelowSeries,
+                Fill = OxyColors.Transparent,
+                Stroke = ColorDefinitions.OxyColorForCableId(f).ChangeIntensity(0.6),
+                StrokeThickness = 1.0,
+                LineStyle = LineStyle.Dot
+            };
+            filterOutline.Points.AddRange(Filter[f].Outline.Select(q => new DataPoint(q.X, q.Y)));
+            annotations.Add(filterOutline);
+            if (showFilters)
+            {
+                LiveView.Annotations.Add(filterOutline);
+            }
+        }
+        
     }
 
     #endregion

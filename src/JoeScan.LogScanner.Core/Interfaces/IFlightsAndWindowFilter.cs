@@ -7,7 +7,7 @@ public interface IFlightsAndWindowFilter
 {
     Profile Apply(Profile p);
     IEnumerable<uint> FilteredHeads { get; }
-    
+    FilterBase this[uint key] { get; }
 }
 
 

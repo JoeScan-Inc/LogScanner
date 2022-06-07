@@ -1,16 +1,17 @@
 ﻿using JoeScan.LogScanner.Core.Geometry;
+using System.Runtime.Serialization;
 
 namespace JoeScan.LogScanner.Core.Filters;
 
 public class BoxFilter : FilterBase
 {
-    
     public double Left { get; set; }
     public double Top { get; set; }
-     
     public double Right { get; set; }
     public double Bottom { get; set; }
-    
+    public override bool IsValid => isValid;
+
+    private bool isValid = false;
     public override IReadOnlyList<Point2D> Outline => new List<Point2D>()
     {
         new Point2D(Left, Bottom, 0),
@@ -23,8 +24,21 @@ public class BoxFilter : FilterBase
 
     public override bool Contains(Point2D p)
     {
+        if (!isValid)
+        {
+            // an invalid filter will let all points go through
+            return true;
+        }
         return p.X > Left && p.X < Right && p.Y > Bottom && p.Y < Top;
     }
 
-    
+    // this is called after Json.NET created the object, we check here if 
+    // it is a valid filter
+    [OnDeserialized]
+    internal void OnDeserializedMethod(StreamingContext context)
+    {
+        isValid = Left < Right && Top > Bottom;
+    }
+
+
 }
