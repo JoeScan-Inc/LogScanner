@@ -9,33 +9,46 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <GroupBox Padding="0" >
+    <GroupBox Padding="0">
         <GroupBox.Header>
-            <DockPanel LastChildFill="False" MinHeight="30">
-                <Border VerticalAlignment="Center"
-                        BorderBrush="{x:Null}"
-                        DockPanel.Dock="Left">
+            <DockPanel MinHeight="30" LastChildFill="False">
+                <Border
+                    VerticalAlignment="Center"
+                    BorderBrush="{x:Null}"
+                    DockPanel.Dock="Left">
                     <TextBlock Style="{StaticResource GroupBoxHeaderText}">3-D View</TextBlock>
                 </Border>
-                <ToggleButton
+                <Button
                     x:Name="ZoomToFit"
                     Width="24"
                     Height="24"
                     Margin="3"
                     Padding="3"
                     DockPanel.Dock="Right"
-                    Style="{StaticResource {x:Type ToggleButton}}">
+                    Focusable="False">
                     <iconPacks:Material
                         Width="16"
                         Height="16"
                         Kind="ArrowAll" />
-                    
-                </ToggleButton>
+
+                </Button>
+                <ComboBox
+                    MinWidth="80"
+                    Margin="3"
+                    DisplayMemberPath="Value"
+                    DockPanel.Dock="Right"
+                    Focusable="False"
+                    IsEditable="False"
+                    ItemsSource="{Binding ColorMode}"
+                    SelectedValue="{Binding SelectedColorMode, Mode=TwoWay}"
+                    SelectedValuePath="Key" />
+                <Label VerticalAlignment="Center" DockPanel.Dock="Right">Color:</Label>
+
+
             </DockPanel>
         </GroupBox.Header>
         <h:HelixViewport3D
             x:Name="Viewport"
-           
             CameraMode="Inspect"
             CameraRotationMode="Turntable"
             IsHeadLightEnabled="True"

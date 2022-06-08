@@ -1,6 +1,9 @@
 ﻿using Caliburn.Micro;
 using HelixToolkit.Wpf;
 using JoeScan.LogScanner.Core.Models;
+using JoeScan.LogScanner.Helpers;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,18 +15,54 @@ namespace JoeScan.LogScanner.Log3D;
 
 public class Log3DViewModel : Screen
 {
-    private readonly ActionBlock<RawLog> displayActionBlock;
+    #region Injected Properties
+
     public LogScannerEngine Engine { get; }
+    public ILogger Logger { get; }
+
+    #endregion
+
     public HelixViewport3D? Viewport { get; set; }
 
     private Dictionary<uint, PointsVisual3D> pointsVisuals = new Dictionary<uint, PointsVisual3D>();
     int count = 0;
     private Rect3D extents;
+    private PointColorMode selectedColorMode = PointColorMode.ByCableId;
 
-    public Log3DViewModel(LogScannerEngine engine)
+    public enum PointColorMode
+    {
+        ByCableId,
+        ByIntensity,
+        Flat
+    }
+
+    public IObservableCollection<KeyValuePair<PointColorMode, string>> ColorMode { get; }
+        = new BindableCollection<KeyValuePair<PointColorMode, string>>()
+        {
+            new KeyValuePair<PointColorMode, string>(PointColorMode.ByCableId, "By Cable ID"),
+            // new KeyValuePair<PointColorMode, string>(PointColorMode.ByIntensity, "By Laser Intensity"),
+            new KeyValuePair<PointColorMode, string>(PointColorMode.Flat, "Flat")
+        };
+
+    public PointColorMode SelectedColorMode
+    {
+        get => selectedColorMode;
+        set  {
+            if (value != selectedColorMode)
+            {
+                selectedColorMode = value;
+                RefreshDisplay();
+            }
+        }
+    }
+
+    #region Lifecycle
+
+    public Log3DViewModel(LogScannerEngine engine, ILogger logger)
     {
         Engine = engine;
-        displayActionBlock = new ActionBlock<RawLog>(RefreshDisplay, new ExecutionDataflowBlockOptions
+        Logger = logger;
+        var displayActionBlock = new ActionBlock<RawLog>(StoreAndDisplay, new ExecutionDataflowBlockOptions
         {
             TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext()
         });
@@ -31,20 +70,40 @@ public class Log3DViewModel : Screen
 
     }
 
-    private void RefreshDisplay(RawLog p)
+    private void StoreAndDisplay(RawLog p)
+    {
+        CurrentLog = p;
+        RefreshDisplay();
+    }
+
+    private RawLog? CurrentLog { get; set; }
+
+    #endregion
+
+    private void RefreshDisplay()
     {
         Viewport!.Children.Clear();
-        long firstEncoderVal = p.ProfileData.First().EncoderValues[0];
+        if (CurrentLog == null)
+            return;
+        long firstEncoderVal = CurrentLog.ProfileData.First().EncoderValues[0];
         var pointsDict = new Dictionary<uint, Point3DCollection>();
         extents = Rect3D.Empty;
         double minX = 0, minY = 0, maxX = 0, maxY = 0;
-        foreach (var profile in p.ProfileData)
+        foreach (var profile in CurrentLog.ProfileData)
         {
             uint id = profile.ScanHeadId;
             if (!pointsVisuals.ContainsKey(id))
             {
-                //var col = ColorDefinitions.ColorForCableId(id);
                 var col = Colors.SandyBrown;
+                switch (SelectedColorMode)
+                {
+                    case PointColorMode.ByCableId:
+                        col = ColorDefinitions.ColorForCableId(id);
+                        break;
+                    case PointColorMode.ByIntensity:
+                        break;
+                   
+                }
                 pointsVisuals[id] =
                     new PointsVisual3D() { Color = col, Size = 1 };
                 pointsDict[id] = new Point3DCollection(10000);
@@ -67,7 +126,7 @@ public class Log3DViewModel : Screen
         }
         //TODO: I don't think we need extents
         extents = new Rect3D(minX, minY, 0, maxX - minX, maxY - minY,
-            p.ProfileData[^1].EncoderValues[0] - firstEncoderVal);
+            CurrentLog.ProfileData[^1].EncoderValues[0] - firstEncoderVal);
         foreach (var id in pointsVisuals.Keys)
         {
             pointsVisuals[id].Points = pointsDict[id];
@@ -78,14 +137,19 @@ public class Log3DViewModel : Screen
 
     }
 
+    #region IViewAware Implementation
+
     protected override void OnViewAttached(object view, object context)
     {
         if (view is Log3DView lv)
         {
             Viewport = lv.Viewport;
+            Viewport.Orthographic = true;
 
         }
     }
+
+    #endregion
 
     public void ZoomToFit()
     {
