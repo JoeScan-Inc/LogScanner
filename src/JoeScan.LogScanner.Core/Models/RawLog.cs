@@ -19,4 +19,21 @@ public class RawLog
         profileData = profiles.OrderBy(q => q.EncoderValues[0]).ToList();
         TimeScanned = DateTime.Now;
     }
+    // TODO: benchmark and potentially use InsertionSort 
+
+    // private void InsertionSort(int[] arr)
+    // {
+    //     int j, temp;
+    //     for (int i = 1; i <= arr.Length - 1; i++)
+    //     {
+    //         temp = arr[i];
+    //         j = i - 1;
+    //         while (j >= 0 && arr[j] > temp)
+    //         {
+    //             arr[j + 1] = arr[j];
+    //             j--;
+    //         }
+    //         arr[j + 1] = temp;
+    //     }
+    // }
 }

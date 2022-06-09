@@ -16,6 +16,7 @@ public class CoreModule : Module
         builder.RegisterType<PieceNumberProvider>().As<IPieceNumberProvider>().SingleInstance();
         builder.RegisterType<FlightsAndWindowFilter>().As<IFlightsAndWindowFilter>().SingleInstance();
         builder.RegisterType<MuteNotifier>().As<IUserNotifier>();
+        builder.RegisterType<LogModelBuilder>().AsSelf().SingleInstance();
 
         builder.Register(c => new ConfigurationBuilder<ICoreConfig>()
             .UseJsonFile("coreconfig.json")

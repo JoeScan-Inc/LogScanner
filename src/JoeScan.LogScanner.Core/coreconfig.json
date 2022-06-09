@@ -1,3 +1,6 @@
 ﻿{
-  "Units" :  "Millimeters" 
+  "Units": "Millimeters",
+  "LogModelBuilder" : {
+      "SectionInterval":  120 
+  } 
 }

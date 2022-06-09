@@ -9,6 +9,7 @@ namespace JoeScan.LogScanner.Core.Models
 {
     public class LogScannerEngine
     {
+        private readonly LogModelBuilder modelBuilder;
         private readonly IUserNotifier notifier;
         public IFlightsAndWindowFilter Filter { get; }
         public ICoreConfig Config { get; }
@@ -60,8 +61,10 @@ namespace JoeScan.LogScanner.Core.Models
             IFlightsAndWindowFilter filter,
             ILogger logger,
             ILogAssembler logAssembler,
+            LogModelBuilder modelBuilder,
             IUserNotifier notifier)
         {
+            this.modelBuilder = modelBuilder;
             this.notifier = notifier;
             Filter = filter;
             Config = config;
@@ -121,6 +124,8 @@ namespace JoeScan.LogScanner.Core.Models
 
             // next pipeline is for RawLogs, we have the BufferBlock RawLogs from the assembler for that
             LogAssembler.RawLogs.LinkTo(RawLogs);
+            RawLogs.LinkTo(modelBuilder.BuilderBlock);
+
         }
         #endregion
 
