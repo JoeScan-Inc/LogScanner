@@ -41,9 +41,9 @@ public class AppBootstrapper : AutofacBootstrapper
         // -- Adapter Modules --
         // only one adapter should be registered. The adapter module 
         // must provide at least one registration for an IScannerAdapter
-        //builder.RegisterModule<ReplayModule>();
+        builder.RegisterModule<ReplayModule>();
         //builder.RegisterModule<Js25Module>();
-        builder.RegisterModule<Js50Module>();
+        //builder.RegisterModule<Js50Module>();
 
 
         builder.RegisterModule<CoreModule>();

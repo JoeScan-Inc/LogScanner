@@ -69,7 +69,6 @@ namespace JoeScan.LogScanner.Core.Models
             Logger = logger;
             LogAssembler = logAssembler;
 
-            //TODO: make this more robust
             Units = Config.Units;
 
             ScannerAdapter.ScanningStarted += (sender, args) => OnScanningStarted(args);
