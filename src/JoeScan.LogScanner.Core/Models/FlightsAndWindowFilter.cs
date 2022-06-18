@@ -1,4 +1,5 @@
-﻿using JoeScan.LogScanner.Core.Filters;
+﻿using JoeScan.LogScanner.Core.Config;
+using JoeScan.LogScanner.Core.Filters;
 using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Interfaces;
 using Newtonsoft.Json;
@@ -8,14 +9,17 @@ namespace JoeScan.LogScanner.Core.Models;
 
 public class FlightsAndWindowFilter : IFlightsAndWindowFilter
 {
+    public IConfigLocator ConfigLocator { get; }
+
     //TODO: for now, we only allow one filter per head, so a dictionary is fine here
     public Dictionary<uint, FilterBase> Filters = new Dictionary<uint, FilterBase>();
 
-    public FlightsAndWindowFilter(ILogger logger)
+    public FlightsAndWindowFilter(IConfigLocator configLocator, ILogger logger)
     {
+        ConfigLocator = configLocator;
         try
         {
-            var filters = JsonConvert.DeserializeObject<List<FilterBase>>(File.ReadAllText("rawfilters.json"));
+            var filters = JsonConvert.DeserializeObject<List<FilterBase>>(File.ReadAllText(Path.Combine(ConfigLocator.GetConfigLocation(),"rawfilters.json")));
          
             if (filters != null)
             {
