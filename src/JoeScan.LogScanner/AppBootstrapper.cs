@@ -13,9 +13,11 @@ using System;
 using System.Windows;
 using Config.Net;
 using JoeScan.LogScanner.Config;
+using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.Js25;
 using JoeScan.LogScanner.Js50;
 using JoeScan.LogScanner.Replay;
+using System.IO;
 using ToastNotifications;
 using ToastNotifications.Lifetime;
 using ToastNotifications.Position;
@@ -31,9 +33,9 @@ public class AppBootstrapper : AutofacBootstrapper
 
     protected override void ConfigureContainer(ContainerBuilder builder)
     {
-        //TODO: use config file locator instead of hardcoding the path here
+
         builder.Register(c => new ConfigurationBuilder<ILogScannerConfig>()
-            .UseJsonFile("LogScannerConfig.json")
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetConfigLocation(),"LogScannerConfig.json"))
             .Build()).SingleInstance();
 
         // -- Adapter Modules --
