@@ -110,7 +110,7 @@ public class Js25Adapter : IScannerAdapter
         return Task.Run(Stop);
     }
 
-    public string Name => "JS-20/JS-25 Adapter";
+    public string Name => "JS-20/JS-25 Single Zone";
 
     public void Configure()
     {

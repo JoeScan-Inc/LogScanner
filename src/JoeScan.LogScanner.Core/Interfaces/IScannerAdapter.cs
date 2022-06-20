@@ -27,9 +27,9 @@ public interface IScannerAdapter
 
     string Name { get; }
 
-    public event EventHandler ScanningStarted;
-    public event EventHandler ScanningStopped;
-    public event EventHandler ScanErrorEncountered;
-    public event EventHandler<EncoderUpdateArgs> EncoderUpdated;
+    public event EventHandler? ScanningStarted;
+    public event EventHandler? ScanningStopped;
+    public event EventHandler? ScanErrorEncountered;
+    public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
 
 }

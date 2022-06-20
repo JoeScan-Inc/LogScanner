@@ -1,5 +1,6 @@
 ﻿using NLog;
 using System.Collections.Concurrent;
+using System.IO.Compression;
 using System.Threading.Tasks.Dataflow;
 
 namespace JoeScan.LogScanner.Core.Models;
@@ -49,8 +50,12 @@ public class RawProfileDumper
         Task.Run(() =>
         {
             dumpQueue = new BlockingCollection<Profile>();
+            
+          
             using var fs = new FileStream(fileName, FileMode.Create);
-            using var writer = new BinaryWriter(fs);
+            using var gzip = new GZipStream(fs, CompressionMode.Compress);
+            using var writer = new BinaryWriter(gzip);
+            var count = 0L;
             while (!dumpQueue.IsCompleted)
             {
                 Profile? p = null;
@@ -68,17 +73,32 @@ public class RawProfileDumper
                 if (p != null)
                 {
                     p.Write(writer);
+                    count++;
                 }
             }
 
             logger.Debug("Dumper queue empty, exiting task.");
+            gzip.Close();
             dumpQueue = null;
+            if (count == 0)
+            {
+                // didn't record anything, delete file
+                try
+                {
+                    File.Delete(fileName);
+                }
+                catch (Exception )
+                {
+                    //unused
+                }
+            }
         });
     }
 
     private string CreateOutputFileName()
     {
         var t = DateTime.Now;
+        // TODO: do a File.Exists to catch cases where the seconds are not enough to distin
         return Path.Combine(OutputDir, $"{BaseName}{t.Year}_{t.Month}_{t.Day}_{t.Hour}_{t.Minute}_{t.Second}.raw");
     }
 

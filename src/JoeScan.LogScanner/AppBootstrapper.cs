@@ -39,20 +39,20 @@ public class AppBootstrapper : AutofacBootstrapper
             .Build()).SingleInstance();
 
         // -- Adapter Modules --
-        // only one adapter should be registered. The adapter module 
-        // must provide at least one registration for an IScannerAdapter
         builder.RegisterModule<ReplayModule>();
-        //builder.RegisterModule<Js25Module>();
-        //builder.RegisterModule<Js50Module>();
-
-
+        builder.RegisterModule<Js25Module>();
+        builder.RegisterModule<Js50Module>();
+        
+        // the actual log scanner engine is in CoreModule
         builder.RegisterModule<CoreModule>();
+        // logging
         builder.RegisterModule<NLogModule>();
+        // UI controls. We use the AutofacBootstrapper which registers all ViewModels and Views automatically,
+        // these are just special to warrant re-registration because we want to force them to be singletons
         builder.RegisterType<StatusBarViewModel>().AsSelf().SingleInstance();
         builder.RegisterType<ToolbarViewModel>().AsSelf().SingleInstance();
         builder.RegisterType<TopAndSideViewModel>().AsSelf().SingleInstance();
-        // builder.RegisterType<LiveProfileViewModel>().As<ILogAssembler>().SingleInstance();
-       // builder.RegisterType<FlightsAndWindowFilter>().As<IFlightsAndWindowFilter>();
+       
         // wrap the Notifier in a service 
         builder.Register(c => new NotifierService(new Notifier(cfg => {
             cfg.PositionProvider = new WindowPositionProvider(
