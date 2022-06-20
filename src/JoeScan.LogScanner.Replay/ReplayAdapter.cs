@@ -12,27 +12,57 @@ namespace JoeScan.LogScanner.Replay;
 
 public class ReplayAdapter : IScannerAdapter
 {
-    public IReplayAdapterConfig Config { get; }
+    #region Injected Properties
+
+    private IReplayAdapterConfig Config { get; }
+    public ILogger Logger { get; set; }
+
+    #endregion
+
+    #region Private Fields
+
     private CancellationTokenSource? cts;
     private Thread? thread;
     private bool isRunning;
 
+    #endregion
+
     // simple test adapter that replays profiles from a file for testing 
     // purposes
 
-    // we have test data from an install in mm
-    public UnitSystem Units => UnitSystem.Millimeters;
+    // we have test data from a JS-25 install in mm
 
-    public BufferBlock<Profile> AvailableProfiles { get; } =
-        new BufferBlock<Profile>(new DataflowBlockOptions
-        {
-            BoundedCapacity = 1
+    #region Private Properties
 
-        });
-
-    public List<Tuple<int, int>> SequenceList { get; private set; } = new List<Tuple<int, int>>(); // this is a list of indexes 
+    private List<Tuple<int, int>> SequenceList { get; set; } = new List<Tuple<int, int>>(); // this is a list of indexes 
     // into the LegacyProfiles list, sorted by time. The idea is that we run a timer, and post the profiles
     // when their time has come
+
+    private List<LegacyProfile> LegacyProfiles { get; set; } = new();
+
+    #endregion
+
+    #region Lifecycle
+
+    public ReplayAdapter(IReplayAdapterConfig config, ILogger? logger = null)
+    {
+        Config = config;
+        // get injected logger if there is one
+        Logger = logger ?? LogManager.GetCurrentClassLogger();
+        IsRunning = false;
+    }
+
+    #endregion
+
+
+    #region IScannerAdapter implementation
+
+    public void Configure()
+    {
+        // nothing to do here
+    }
+
+    public bool IsConfigured => true;
 
     public bool IsRunning
     {
@@ -54,25 +84,13 @@ public class ReplayAdapter : IScannerAdapter
         }
     }
 
-    public void Configure()
-    {
-        // nothing to do here
-    }
+    public BufferBlock<Profile> AvailableProfiles { get; } =
+        new BufferBlock<Profile>(new DataflowBlockOptions
+        {
+            BoundedCapacity = 1
+        });
 
-    public bool IsConfigured => true;
-    public ILogger Logger { get; set; }
-    private List<LegacyProfile> LegacyProfiles { get; set; } = new();
-
-
-    public ReplayAdapter(IReplayAdapterConfig config, ILogger? logger = null)
-    {
-        Config = config;
-        // get injected logger if there is one
-        Logger = logger ?? LogManager.GetCurrentClassLogger();
-        IsRunning = false;
-    }
-
-
+    public UnitSystem Units => UnitSystem.Millimeters;
 
     public void Start()
     {
@@ -84,13 +102,43 @@ public class ReplayAdapter : IScannerAdapter
         }
     }
 
+    public Task StartAsync()
+    {
+        return Task.Run(Start);
+    }
+
+    public void Stop()
+    {
+        if (cts != null)
+        {
+            cts.Cancel();
+            thread!.Join();
+            OnScanningStopped();
+        }
+    }
+
+    public Task StopAsync()
+    {
+        return Task.Run(Stop);
+    }
+
+    public string Name => "Replay";
+
+    public event EventHandler? ScanningStarted;
+    public event EventHandler? ScanningStopped;
+    public event EventHandler? ScanErrorEncountered;
+    public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
+
+    #endregion
+
+    // embedded helper class to read the binary format of some old logscanner implementations
+    #region Private Methods
+
     private void ThreadMain(CancellationToken ct)
     {
-
         try
         {
             IsRunning = true;
-
             FillBuffer();
             var sw = Stopwatch.StartNew();
             var index = 0;
@@ -124,8 +172,6 @@ public class ReplayAdapter : IScannerAdapter
                     gapTimeCount = 0;
                 }
             }
-
-
         }
         catch (OperationCanceledException)
         {
@@ -150,7 +196,6 @@ public class ReplayAdapter : IScannerAdapter
             {
                 await AvailableProfiles.SendAsync(legacyProfile.Convert()).ConfigureAwait(false);
                 await Task.Delay(1).ConfigureAwait(false);
-
             }
         }
         finally
@@ -196,54 +241,9 @@ public class ReplayAdapter : IScannerAdapter
         BuildTimingIndex(LegacyProfiles);
     }
 
-    private void BuildTimingIndex(List<LegacyProfile> legacyProfiles)
+    private static LegacyProfile ReadFromBinaryReader(BinaryReader br, bool ignoreInputs = false)
     {
-        var startValue = new Dictionary<int, int>();
-        var sequenceList = new List<Tuple<int, int>>(legacyProfiles.Count);
-        foreach (var (profile, index) in legacyProfiles.WithIndex())
-        {
-            if (!startValue.ContainsKey(profile.CableId))
-            {
-                startValue[profile.CableId] = profile.SendLocation; // could also use time in head
-            }
-
-            var timeDiff = profile.SendLocation - startValue[profile.CableId];
-            if (timeDiff >= 0)
-            {
-                sequenceList.Add(new Tuple<int, int>(timeDiff, index));
-            }
-        }
-
-        SequenceList = sequenceList.OrderBy(q => q.Item1).ToList();
-    }
-
-
-
-    public Task StartAsync()
-    {
-        return Task.Run(Start);
-    }
-
-    public void Stop()
-    {
-
-    }
-
-    public Task StopAsync()
-    {
-        return Task.Run(Stop);
-    }
-
-    public string Name => "Replay";
-
-    public event EventHandler? ScanningStarted;
-    public event EventHandler? ScanningStopped;
-    public event EventHandler? ScanErrorEncountered;
-    public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
-
-    // embedded helper class to read the binary format of some old logscanner implementations
-    public static LegacyProfile ReadFromBinaryReader(BinaryReader br, bool ignoreInputs = false)
-    {
+        // ReSharper disable once UseObjectOrCollectionInitializer
         var sp = new LegacyProfile();
         sp.CableId = br.ReadInt32();
         sp.ScanningFlags = (ScanFlags)br.ReadInt32();
@@ -271,6 +271,28 @@ public class ReplayAdapter : IScannerAdapter
         sp.Data = l.ToArray();
         return sp;
     }
+
+    private void BuildTimingIndex(List<LegacyProfile> legacyProfiles)
+    {
+        var startValue = new Dictionary<int, int>();
+        var sequenceList = new List<Tuple<int, int>>(legacyProfiles.Count);
+        foreach (var (profile, index) in legacyProfiles.WithIndex())
+        {
+            if (!startValue.ContainsKey(profile.CableId))
+            {
+                startValue[profile.CableId] = profile.SendLocation; // could also use time in head
+            }
+
+            var timeDiff = profile.SendLocation - startValue[profile.CableId];
+            if (timeDiff >= 0)
+            {
+                sequenceList.Add(new Tuple<int, int>(timeDiff, index));
+            }
+        }
+        SequenceList = sequenceList.OrderBy(q => q.Item1).ToList();
+    }
+
+    #endregion
 
     #region Internal Helper
 
@@ -322,6 +344,8 @@ public class ReplayAdapter : IScannerAdapter
 
     #endregion
 
+    #region Event Invocation
+
     protected virtual void OnScanningStarted()
     {
         ScanningStarted?.Invoke(this, EventArgs.Empty);
@@ -331,4 +355,6 @@ public class ReplayAdapter : IScannerAdapter
     {
         ScanningStopped?.Invoke(this, EventArgs.Empty);
     }
+
+    #endregion
 }

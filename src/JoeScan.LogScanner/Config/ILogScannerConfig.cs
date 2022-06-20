@@ -2,5 +2,5 @@
 
 public interface ILogScannerConfig
 {
-    
+    string ActiveAdapter { get; set; }
 }
