@@ -30,6 +30,8 @@ namespace JoeScan.LogScanner.Core.Models
             bw.Write(p.Data.Length);
             foreach (var t in p.Data)
             {
+                //BUG: profiles can be in mm too, in that case, we will overflow short when scaling
+                
                 // to save disk space, save as 1/100 of an inch 
                 // this lets us map an area of -327" to 327" (-8323mm to 8323mm)
                 // which is sufficient in most cases. Our accuracy is 
