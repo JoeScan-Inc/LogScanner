@@ -1,6 +1,7 @@
 ﻿using Caliburn.Micro;
 using HelixToolkit.Wpf;
 using JoeScan.LogScanner.Core.Models;
+using JoeScan.LogScanner.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -43,8 +44,8 @@ public class Log3DViewModel : Screen
             uint id = profile.ScanHeadId;
             if (!pointsVisuals.ContainsKey(id))
             {
-                //var col = ColorDefinitions.ColorForCableId(id);
-                var col = Colors.SandyBrown;
+                var col = ColorDefinitions.ColorForCableId(id);
+               // var col = Colors.SandyBrown;
                 pointsVisuals[id] =
                     new PointsVisual3D() { Color = col, Size = 1 };
                 pointsDict[id] = new Point3DCollection(10000);
@@ -61,8 +62,8 @@ public class Log3DViewModel : Screen
                     maxX = p2D.X;
                 if (p2D.Y > maxY)
                     maxY = p2D.Y;
-
-                pointsDict[id].Add(new Point3D(p2D.X, p2D.Y, (profile.EncoderValues[0] - firstEncoderVal)));
+                //TODO: get profile Z position from RawLog, this is a bad hack just to show some point data
+                pointsDict[id].Add(new Point3D(p2D.X, p2D.Y, (profile.EncoderValues[0] - firstEncoderVal) * 0.045));
             }
         }
         //TODO: I don't think we need extents
