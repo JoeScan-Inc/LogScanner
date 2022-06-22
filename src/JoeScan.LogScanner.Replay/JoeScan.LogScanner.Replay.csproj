@@ -16,12 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="LogScannerDump_2013-05-29-16-34-14.prof">
+    <None Update="2022_6_21_21_0_51.raw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="ReplayAdapter.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
 </Project>
