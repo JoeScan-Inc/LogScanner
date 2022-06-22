@@ -1,10 +1,13 @@
 ﻿using JoeScan.LogScanner.Core.Geometry;
+using System.Diagnostics;
 
 namespace JoeScan.LogScanner.Core.Models;
 /// <summary>
 /// This is a generic profile, representing a single scan. It is assumed to be in
 /// mill coordinate system already.
 /// </summary>
+[DebuggerDisplay("Id = {ScanHeadId}, NumPoints = {Data.Length}, Enc = {EncoderValues[0]}")]
+
 public class Profile
 {
     /// <summary>
