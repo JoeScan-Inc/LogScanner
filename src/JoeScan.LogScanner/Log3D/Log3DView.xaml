@@ -46,8 +46,7 @@
             ZoomExtentsWhenLoaded="True">
             <h:HelixViewport3D.DefaultCamera>
 
-                <PerspectiveCamera
-                    FieldOfView="30"
+                <OrthographicCamera
                     LookDirection="-4000,0,3000"
                     NearPlaneDistance="0.001"
                     Position="4000,100,3000"
