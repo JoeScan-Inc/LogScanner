@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JoeScan.LogScanner.Core.Models
 {
-    internal static class ProfileReaderWriter
+    public static class ProfileReaderWriter
     {
          const int FileMagic = 0x010203;
 
@@ -41,7 +41,7 @@ namespace JoeScan.LogScanner.Core.Models
             }
         }
 
-        static Profile? Read(BinaryReader br)
+        public static Profile? Read(BinaryReader br)
         {
             if (br.ReadInt32() != FileMagic)
             {

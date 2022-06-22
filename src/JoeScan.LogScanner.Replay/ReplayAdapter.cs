@@ -6,6 +6,7 @@ using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using NLog;
 using System.Diagnostics;
+using System.IO.Compression;
 using System.Threading.Tasks.Dataflow;
 
 namespace JoeScan.LogScanner.Replay;
@@ -13,10 +14,8 @@ namespace JoeScan.LogScanner.Replay;
 public class ReplayAdapter : IScannerAdapter
 {
     #region Injected Properties
-
     private IReplayAdapterConfig Config { get; }
     public ILogger Logger { get; set; }
-
     #endregion
 
     #region Private Fields
@@ -38,7 +37,7 @@ public class ReplayAdapter : IScannerAdapter
     // into the LegacyProfiles list, sorted by time. The idea is that we run a timer, and post the profiles
     // when their time has come
 
-    private List<LegacyProfile> LegacyProfiles { get; set; } = new();
+    private List<Profile> PlaybackProfiles { get; set; } = new();
 
     #endregion
 
@@ -87,7 +86,9 @@ public class ReplayAdapter : IScannerAdapter
     public BufferBlock<Profile> AvailableProfiles { get; } =
         new BufferBlock<Profile>(new DataflowBlockOptions
         {
-            BoundedCapacity = 1
+            // unlimited capacity, otherwise the BufferBlock will decline profiles
+            // when subsequent steps can't keep up
+            BoundedCapacity = -1
         });
 
     public UnitSystem Units => UnitSystem.Millimeters;
@@ -140,37 +141,20 @@ public class ReplayAdapter : IScannerAdapter
         {
             IsRunning = true;
             FillBuffer();
-            var sw = Stopwatch.StartNew();
             var index = 0;
-
-            var gapTimeCount = 0;
-            while (!ct.IsCancellationRequested && index < SequenceList.Count)
+            while (index < PlaybackProfiles.Count)
             {
-                // post all profiles that are due
-                while (sw.ElapsedMilliseconds > SequenceList[index].Item1)
-                {
-                    ct.ThrowIfCancellationRequested();
+                ct.ThrowIfCancellationRequested();
+                var profile = PlaybackProfiles[index];
 
-                    AvailableProfiles.Post(LegacyProfiles[SequenceList[index++].Item2].Convert());
-                    if (index >= SequenceList.Count)
-                        break;
-                    gapTimeCount = 0;
-                }
-                Thread.Sleep(1);
-                // problem is that the raw test data has gaps 
-                // in between logs, where no profiles were recorded, 
-                // which holds up processing until the next log starts
-                // to combat that we insert empty profiles if there is a time gap of 
-                // more than a few ms
-                gapTimeCount++;
-                if (gapTimeCount > 100)
+                if (!AvailableProfiles.Post(profile))
                 {
-                    for (int i = 0; i < 20; i++)
-                    {
-                        AvailableProfiles.Post(LegacyProfile.CreateEmpty().Convert());
-                    }
-                    gapTimeCount = 0;
+                    Logger.Error("Dropped profile.");
                 }
+
+
+                index++;
+                Thread.Sleep(1);
             }
         }
         catch (OperationCanceledException)
@@ -186,23 +170,7 @@ public class ReplayAdapter : IScannerAdapter
             IsRunning = false;
         }
     }
-
-    private async void PostToBuffer()
-    {
-        IsRunning = true;
-        try
-        {
-            foreach (var legacyProfile in LegacyProfiles)
-            {
-                await AvailableProfiles.SendAsync(legacyProfile.Convert()).ConfigureAwait(false);
-                await Task.Delay(1).ConfigureAwait(false);
-            }
-        }
-        finally
-        {
-            IsRunning = false;
-        }
-    }
+    
 
     private void FillBuffer()
     {
@@ -219,12 +187,13 @@ public class ReplayAdapter : IScannerAdapter
 
         try
         {
+            PlaybackProfiles.Clear();
             using var fs = new FileStream(simFile, FileMode.Open);
-            using var br = new BinaryReader(fs);
-
+            using GZipStream zip = new GZipStream(fs, CompressionMode.Decompress, true);
+            using var br = new BinaryReader(zip);
             while (true)
             {
-                LegacyProfiles.Add(ReadFromBinaryReader(br));
+                PlaybackProfiles.Add(ProfileReaderWriter.Read(br));
             }
         }
         catch (EndOfStreamException)
@@ -237,113 +206,8 @@ public class ReplayAdapter : IScannerAdapter
             Logger.Fatal(e, $"Failed to open/read replay file: {simFile}");
             throw;
         }
-
-        BuildTimingIndex(LegacyProfiles);
     }
-
-    private static LegacyProfile ReadFromBinaryReader(BinaryReader br, bool ignoreInputs = false)
-    {
-        // ReSharper disable once UseObjectOrCollectionInitializer
-        var sp = new LegacyProfile();
-        sp.CableId = br.ReadInt32();
-        sp.ScanningFlags = (ScanFlags)br.ReadInt32();
-        sp.LaserIndex = br.ReadInt32();
-        sp.LaserOnTime = br.ReadInt32();
-        sp.Location = br.ReadInt32();
-        sp.SendLocation = br.ReadInt32();
-        sp.SequenceNumber = br.ReadInt32();
-        sp.TimeInHead = br.ReadInt32();
-        sp.Z = br.ReadDouble();
-        if (!ignoreInputs)
-        {
-            // older versions had a bug and didn't save the inputs flag into the profile
-            sp.Inputs = (InputFlags)br.ReadInt32();
-        }
-        int dataLength = br.ReadInt32();
-        var l = new List<Point2D>(dataLength);
-        for (int i = 0; i < dataLength; i++)
-        {
-            var x = br.ReadInt16() / 10.0;
-            var y = br.ReadInt16() / 10.0;
-            var b = br.ReadInt16() / (short.MaxValue - 1);
-            l.Add(new Point2D() { X = x, Y = y, B = b });
-        }
-        sp.Data = l.ToArray();
-        return sp;
-    }
-
-    private void BuildTimingIndex(List<LegacyProfile> legacyProfiles)
-    {
-        var startValue = new Dictionary<int, int>();
-        var sequenceList = new List<Tuple<int, int>>(legacyProfiles.Count);
-        foreach (var (profile, index) in legacyProfiles.WithIndex())
-        {
-            if (!startValue.ContainsKey(profile.CableId))
-            {
-                startValue[profile.CableId] = profile.SendLocation; // could also use time in head
-            }
-
-            var timeDiff = profile.SendLocation - startValue[profile.CableId];
-            if (timeDiff >= 0)
-            {
-                sequenceList.Add(new Tuple<int, int>(timeDiff, index));
-            }
-        }
-        SequenceList = sequenceList.OrderBy(q => q.Item1).ToList();
-    }
-
     #endregion
-
-    #region Internal Helper
-
-    [DebuggerDisplay("Id = {CableId}, NumPoints = {Data.Length}, Z={Z}")]
-    public class LegacyProfile
-    {
-        public int CableId { get; set; }
-        public ScanFlags ScanningFlags { get; set; }
-        public int LaserIndex { get; set; }
-        public int LaserOnTime { get; set; }
-        public int Location { get; set; }
-        public int SendLocation { get; set; }
-        public int SequenceNumber { get; set; }
-        public int TimeInHead { get; set; }
-        public double Z { get; set; }
-        public InputFlags Inputs { get; set; }
-        public Point2D[]? Data { get; set; }
-        public Profile Convert()
-        {
-            var np = new Profile
-            {
-                Data = new Point2D[Data.Length],
-                ScanHeadId = (uint)CableId,
-                Camera = 1,
-                EncoderValues =
-                    {
-                        [0] = Location
-                    },
-                ScanningFlags = (ScanFlags)((int)ScanningFlags), // we get away with this because the first 3 elements in
-                                                                 // the enum for the new scan flags are the same
-                LaserIndex = 1,
-                LaserOnTimeUs = (ushort)LaserOnTime, //TODO: verify range
-                SequenceNumber = (uint)SequenceNumber, //TODO: verify range and handle rollover
-                TimeStampNs = (ulong)(TimeInHead * 1E6),
-                Inputs = (InputFlags)((int)Inputs)
-            };
-            Array.Copy(Data, np.Data, np.Data.Length);
-
-            return np;
-
-        }
-
-        public static LegacyProfile CreateEmpty()
-        {
-            return new LegacyProfile() { CableId = 0, Data = Array.Empty<Point2D>() };
-        }
-
-    }
-
-    #endregion
-
     #region Event Invocation
 
     protected virtual void OnScanningStarted()
