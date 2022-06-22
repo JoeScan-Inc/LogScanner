@@ -17,6 +17,7 @@ using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.Js25;
 using JoeScan.LogScanner.Js50;
 using JoeScan.LogScanner.Replay;
+using JoeScan.LogScanner.SyntheticDataAdapter;
 using System.IO;
 using ToastNotifications;
 using ToastNotifications.Lifetime;
@@ -42,6 +43,7 @@ public class AppBootstrapper : AutofacBootstrapper
         builder.RegisterModule<ReplayModule>();
         builder.RegisterModule<Js25Module>();
         builder.RegisterModule<Js50Module>();
+        builder.RegisterModule<SyntheticDataModule>();
         
         // the actual log scanner engine is in CoreModule
         builder.RegisterModule<CoreModule>();
