@@ -36,8 +36,11 @@ public class Js50Adapter : IScannerAdapter
     public UnitSystem Units { get; }
     public bool IsConfigured => config != null;
 
+    // If we give a finite BoundedCapacity, the BufferBlock will discard Profiles 
+    // i.e Post() will return false. -1 means unlimited buffering - hopefully the 
+    // subsequent steps are fast enough not to make this a memory hog
     public BufferBlock<Profile> AvailableProfiles { get; } =
-        new BufferBlock<Profile>(new DataflowBlockOptions() { BoundedCapacity = 1 });
+        new BufferBlock<Profile>(new DataflowBlockOptions() { BoundedCapacity = -1 });
 
     public void Configure()
     {
