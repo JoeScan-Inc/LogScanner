@@ -89,24 +89,7 @@ namespace JoeScan.LogScanner.Core.Models
         }
         #endregion
 
-        #region Private Methods
-
-        private void FeedToAssembler(Profile profile)
-        {
-            LogAssembler.AddProfile(profile);
-        }
-
-        private void CheckForActiveAdapter()
-        {
-            if (ActiveAdapter == null)
-            {
-                string msg = "No active adapter set.";
-                Logger.Error(msg);
-                throw new ApplicationException(msg);
-            }
-        }
-
-        #endregion
+        
 
         #region Runtime
 
@@ -146,17 +129,25 @@ namespace JoeScan.LogScanner.Core.Models
             }
 
             ActiveAdapter = adapter;
-            // hook up to new adapter
-            ActiveAdapter.ScanningStarted += ActiveAdapterOnScanningStarted;
-            ActiveAdapter.ScanningStopped += ActiveAdapterOnScanningStopped;
-            ActiveAdapter.ScanErrorEncountered += ActiveAdapterOnScanErrorEncountered;
-            ActiveAdapter.EncoderUpdated += ActiveAdapterOnEncoderUpdated;
+            if (ActiveAdapter != null)
+            {
+                // hook up to new adapter
+                ActiveAdapter.ScanningStarted += ActiveAdapterOnScanningStarted;
+                ActiveAdapter.ScanningStopped += ActiveAdapterOnScanningStopped;
+                ActiveAdapter.ScanErrorEncountered += ActiveAdapterOnScanErrorEncountered;
+                ActiveAdapter.EncoderUpdated += ActiveAdapterOnEncoderUpdated;
+            }
+            else
+            {
+                return;
+            }
 
-            // set up processing pipeline, we can do all this in parallel
+            // set up processing pipeline, we can do all this in parallel, but the
+            // profiles must arrive in original order
             var blockOptions = new ExecutionDataflowBlockOptions()
             {
                 MaxDegreeOfParallelism = 3,
-
+                EnsureOrdered = true
             };
             var linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
             dumper = new RawProfileDumper(Logger);
@@ -191,7 +182,8 @@ namespace JoeScan.LogScanner.Core.Models
             // the UI components that want a live stream
             filterTransformBlock.LinkTo(RawProfiles, linkOptions);
             // end the pipeline by feeding the profiles to the log assembler
-            var pipelineEndBlock = new ActionBlock<Profile>(FeedToAssembler);
+            var pipelineEndBlock = new ActionBlock<Profile>(FeedToAssembler,
+                new ExecutionDataflowBlockOptions(){EnsureOrdered = true, MaxDegreeOfParallelism = 1});
             RawProfiles.LinkTo(pipelineEndBlock);
             
             // next pipeline is for RawLogs, we have the BufferBlock RawLogs from the assembler for that
@@ -259,6 +251,24 @@ namespace JoeScan.LogScanner.Core.Models
         {
             dumper.StopDumping();
             notifier.Success("Stopped dumping raw profiles.");
+        }
+
+        #endregion
+        #region Private Methods
+
+        private void FeedToAssembler(Profile profile)
+        {
+            LogAssembler.AddProfile(profile);
+        }
+
+        private void CheckForActiveAdapter()
+        {
+            if (ActiveAdapter == null)
+            {
+                string msg = "No active adapter set.";
+                Logger.Error(msg);
+                throw new ApplicationException(msg);
+            }
         }
 
         #endregion
