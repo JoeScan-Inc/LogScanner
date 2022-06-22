@@ -8,7 +8,7 @@ namespace JoeScan.LogScanner.Core.Models;
 /// </summary>
 [DebuggerDisplay("Id = {ScanHeadId}, NumPoints = {Data.Length}, Enc = {EncoderValues[0]}")]
 
-public class Profile
+public class Profile : ICloneable
 {
     /// <summary>
     /// Private Constructor
@@ -70,4 +70,11 @@ public class Profile
 
     // TODO: add container to hold filtered data instead of throwing it away
 
+    public object Clone()
+    {
+        var p = (Profile)MemberwiseClone();
+        p.Data = new Point2D[Data.Length];
+        Array.Copy(Data, 0, p.Data, 0, Data.Length);
+        return p;
+    }
 }

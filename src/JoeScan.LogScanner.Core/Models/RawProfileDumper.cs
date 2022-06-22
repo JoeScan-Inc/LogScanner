@@ -17,7 +17,8 @@ public class RawProfileDumper
     public RawProfileDumper(ILogger logger)
     {
         this.logger = logger;
-        DumpBlock = new TransformBlock<Profile, Profile>(ProcessProfile);
+        DumpBlock = new TransformBlock<Profile, Profile>(ProcessProfile,
+            new ExecutionDataflowBlockOptions() { BoundedCapacity = -1, EnsureOrdered = true, MaxDegreeOfParallelism = 1 });
     }
 
     public void StartDumping()
@@ -98,7 +99,7 @@ public class RawProfileDumper
     private string CreateOutputFileName()
     {
         var t = DateTime.Now;
-        // TODO: do a File.Exists to catch cases where the seconds are not enough to distin
+        // TODO: do a File.Exists to catch cases where the seconds are not enough to distinct
         return Path.Combine(OutputDir, $"{BaseName}{t.Year}_{t.Month}_{t.Day}_{t.Hour}_{t.Minute}_{t.Second}.raw");
     }
 
@@ -113,7 +114,7 @@ public class RawProfileDumper
     {
         if (dumpQueue!=null && !dumpQueue.IsAddingCompleted)
         {
-            dumpQueue.Add(p);
+            dumpQueue.Add((Profile)p.Clone());
         }
         return p;
     }
