@@ -12,7 +12,7 @@ public class CoreModule : Module
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterType<LogScannerEngine>().AsSelf().SingleInstance();
-        builder.RegisterType<SingleZoneLogAssembler>().As<ILogAssembler>();
+        builder.RegisterType<SingleZoneLogAssembler>().As<ILogAssembler>().SingleInstance();
         builder.RegisterType<RawProfileValidator>().As<IRawProfileValidator>();
         builder.RegisterType<PieceNumberProvider>().As<IPieceNumberProvider>().SingleInstance();
 
