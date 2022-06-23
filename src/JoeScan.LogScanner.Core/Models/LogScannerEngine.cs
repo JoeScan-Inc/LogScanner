@@ -14,6 +14,7 @@ namespace JoeScan.LogScanner.Core.Models
         public IFlightsAndWindowFilter Filter { get; }
         public ICoreConfig Config { get; }
         private readonly IEnumerable<IScannerAdapter> availableAdapters;
+        private IDisposable? unlinker;
         public IReadOnlyList<IScannerAdapter> AvailableAdapters => new List<IScannerAdapter>(availableAdapters);
         public IScannerAdapter? ActiveAdapter { get; private set; }
         private ILogger Logger { get; }
@@ -86,7 +87,49 @@ namespace JoeScan.LogScanner.Core.Models
             {
                  logger.Debug($"Available Adapter: {a.Name} ");
             }
+
+            SetupPipeline();
         }
+
+        private void SetupPipeline()
+        {
+            var blockOptions = new ExecutionDataflowBlockOptions()
+            {
+                MaxDegreeOfParallelism = 3,
+                EnsureOrdered = true
+            };
+            var linkOptions = new DataflowLinkOptions
+            {
+                PropagateCompletion = true
+            };
+
+            dumper = new RawProfileDumper(Logger);
+            dumper.OutputDir = "C:\\tmp\\rawdumps";
+
+            var unitConverterBlock = new TransformBlock<Profile, Profile>((p) => UnitConverter.Convert(ActiveAdapter.Units, Units, p));
+            // dumper.DumpBlock is a pass-through from the source block where the profiles originate, scannerAdapter.AvailableProfiles
+            dumper.DumpBlock.LinkTo(unitConverterBlock, linkOptions);
+            var boundingBoxBlock = new TransformBlock<Profile, Profile>(BoundingBox.UpdateBoundingBox, blockOptions);
+            unitConverterBlock.LinkTo(boundingBoxBlock, linkOptions);
+            // then we transform profiles by using a flights-and-window filter 
+            var filterTransformBlock = new TransformBlock<Profile, Profile>(Filter.Apply, blockOptions);
+            // the output of the bounding box block is linked to the filter block
+            boundingBoxBlock.LinkTo(filterTransformBlock, linkOptions);
+            // the engine also has a broadcast block, basically a tee that distributes all incoming 
+            // profiles to all connected further processing steps
+            // in our case, we use it for distributing the profiles both to the assembler as well as to 
+            // the UI components that want a live stream
+            filterTransformBlock.LinkTo(RawProfiles, linkOptions);
+            // end the pipeline by feeding the profiles to the log assembler
+            var pipelineEndBlock = new ActionBlock<Profile>(FeedToAssembler,
+                new ExecutionDataflowBlockOptions() { EnsureOrdered = true, MaxDegreeOfParallelism = 1 });
+            RawProfiles.LinkTo(pipelineEndBlock);
+
+            // next pipeline is for RawLogs, we have the BufferBlock RawLogs from the assembler for that
+            LogAssembler.RawLogs.LinkTo(RawLogs);
+            
+        }
+
         #endregion
 
         
@@ -126,7 +169,12 @@ namespace JoeScan.LogScanner.Core.Models
                 ActiveAdapter.ScanningStopped -= ActiveAdapterOnScanningStopped;
                 ActiveAdapter.ScanErrorEncountered -= ActiveAdapterOnScanErrorEncountered;
                 ActiveAdapter.EncoderUpdated -= ActiveAdapterOnEncoderUpdated;
+                // unlinker is a Disposable that represents the link from the ActiveAdapter - deleting it 
+                // unlinks the current adapter from the pipeline start
+                unlinker!.Dispose();
             }
+
+            
 
             ActiveAdapter = adapter;
             if (ActiveAdapter != null)
@@ -136,60 +184,16 @@ namespace JoeScan.LogScanner.Core.Models
                 ActiveAdapter.ScanningStopped += ActiveAdapterOnScanningStopped;
                 ActiveAdapter.ScanErrorEncountered += ActiveAdapterOnScanErrorEncountered;
                 ActiveAdapter.EncoderUpdated += ActiveAdapterOnEncoderUpdated;
+                // entry point, the AvailableProfiles is the source of all profiles. 
+                unlinker = ActiveAdapter.AvailableProfiles.LinkTo(dumper.DumpBlock, new DataflowLinkOptions
+                {
+                    PropagateCompletion = true
+                });
             }
             else
             {
                 return;
             }
-
-            // set up processing pipeline, we can do all this in parallel, but the
-            // profiles must arrive in original order
-            var blockOptions = new ExecutionDataflowBlockOptions()
-            {
-                MaxDegreeOfParallelism = 3,
-                EnsureOrdered = true
-            };
-            var linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
-            dumper = new RawProfileDumper(Logger);
-            // entry point, the AvailableProfiles is the source of all profiles
-            ActiveAdapter.AvailableProfiles.LinkTo(dumper.DumpBlock, linkOptions);
-            //  a block that modifies the Profiles with a bounding box - it goes first if the units dont't need to 
-            // be converted, and second if they do
-            var boundingBoxBlock = new TransformBlock<Profile, Profile>(BoundingBox.UpdateBoundingBox, blockOptions);
-            // only create a unit converter block if the units in the adapter are different from
-            // the engine units
-            if (Units != ActiveAdapter.Units)
-            {
-                var unitConverterBlock =
-                    new TransformBlock<Profile, Profile>((p) => UnitConverter.Convert(ActiveAdapter.Units, Units, p));
-                // dumper.DumpBlock is a pass-through from the source block where the profiles originate, scannerAdapter.AvailableProfiles
-                dumper.DumpBlock.LinkTo(unitConverterBlock, linkOptions);
-                unitConverterBlock.LinkTo(boundingBoxBlock, linkOptions);
-            }
-            else
-            {
-                // dumper.DumpBlock is a pass-through from the source block where the profiles originate, scannerAdapter.AvailableProfiles
-                dumper.DumpBlock.LinkTo(boundingBoxBlock, linkOptions);
-            }
-
-            // then we transform profiles by using a flights-and-window filter 
-            var filterTransformBlock = new TransformBlock<Profile, Profile>(Filter.Apply, blockOptions);
-            // the output of the bounding box block is linked to the filter block
-            boundingBoxBlock.LinkTo(filterTransformBlock, linkOptions);
-            // the engine also has a broadcast block, basically a tee that distributes all incoming 
-            // profiles to all connected further processing steps
-            // in our case, we use it for distributing the profiles both to the assembler as well as to 
-            // the UI components that want a live stream
-            filterTransformBlock.LinkTo(RawProfiles, linkOptions);
-            // end the pipeline by feeding the profiles to the log assembler
-            var pipelineEndBlock = new ActionBlock<Profile>(FeedToAssembler,
-                new ExecutionDataflowBlockOptions(){EnsureOrdered = true, MaxDegreeOfParallelism = 1});
-            RawProfiles.LinkTo(pipelineEndBlock);
-            
-            // next pipeline is for RawLogs, we have the BufferBlock RawLogs from the assembler for that
-            LogAssembler.RawLogs.LinkTo(RawLogs);
-            //TODO: read from config
-            dumper.OutputDir = "C:\\tmp\\rawdumps";
             OnAdapterChanged();
         }
 
