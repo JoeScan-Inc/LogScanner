@@ -49,6 +49,7 @@
     <ProjectReference Include="..\JoeScan.LogScanner.Js50\JoeScan.LogScanner.Js50.csproj" />
     <ProjectReference Include="..\JoeScan.LogScanner.Replay\JoeScan.LogScanner.Replay.csproj" />
     <ProjectReference Include="..\JoeScan.LogScanner.Shared\JoeScan.LogScanner.Shared.csproj" />
+    <ProjectReference Include="..\JoeScan.LogScanner.SyntheticDataAdapter\JoeScan.LogScanner.SyntheticDataAdapter.csproj" />
   </ItemGroup>
 
   <ItemGroup>
