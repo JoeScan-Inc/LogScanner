@@ -1,7 +1,7 @@
 ﻿{
   "Units": "Millimeters",
   "SingleZoneLogAssemblerConfig": {
-    "EncoderPulseInterval": 0.045,
-    "MinProfileSpacing" :  1.0 
+    "EncoderPulseInterval": 0.06756,
+    "MinProfileSpacing": 1.0
   }
 }

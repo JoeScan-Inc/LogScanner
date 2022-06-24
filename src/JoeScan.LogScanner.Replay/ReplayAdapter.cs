@@ -91,7 +91,7 @@ public class ReplayAdapter : IScannerAdapter
             BoundedCapacity = -1
         });
 
-    public UnitSystem Units => UnitSystem.Millimeters;
+    public UnitSystem Units => UnitSystem.Inches;
 
     public void Start()
     {
