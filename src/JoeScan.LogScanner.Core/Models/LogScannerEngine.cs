@@ -10,6 +10,7 @@ namespace JoeScan.LogScanner.Core.Models
     public class LogScannerEngine
     {
         private readonly IUserNotifier notifier;
+        private readonly ILogArchiver archiver;
         private RawProfileDumper dumper;
         public IFlightsAndWindowFilter Filter { get; }
         public ICoreConfig Config { get; }
@@ -19,9 +20,9 @@ namespace JoeScan.LogScanner.Core.Models
         public IScannerAdapter? ActiveAdapter { get; private set; }
         private ILogger Logger { get; }
         public ILogAssembler LogAssembler { get; }
-        public BroadcastBlock<Profile> RawProfiles { get; private set; } 
+        public BroadcastBlock<Profile> RawProfilesBroadcastBlock { get; private set; } 
             = new BroadcastBlock<Profile>(profile => profile);
-        public BroadcastBlock<RawLog> RawLogs { get; } 
+        public BroadcastBlock<RawLog> RawLogsBroadcastBlock { get; } 
             = new BroadcastBlock<RawLog>(r => r);
         public UnitSystem Units { get; }
         public bool IsRunning => ActiveAdapter is { IsRunning: true };
@@ -73,9 +74,11 @@ namespace JoeScan.LogScanner.Core.Models
             IFlightsAndWindowFilter filter,
             ILogger logger,
             ILogAssembler logAssembler,
-            IUserNotifier notifier)
+            IUserNotifier notifier,
+            ILogArchiver archiver)
         {
             this.notifier = notifier;
+            this.archiver = archiver;
             Filter = filter;
             Config = config;
             this.availableAdapters = availableAdapters;
@@ -119,15 +122,16 @@ namespace JoeScan.LogScanner.Core.Models
             // profiles to all connected further processing steps
             // in our case, we use it for distributing the profiles both to the assembler as well as to 
             // the UI components that want a live stream
-            filterTransformBlock.LinkTo(RawProfiles, linkOptions);
+            filterTransformBlock.LinkTo(RawProfilesBroadcastBlock, linkOptions);
             // end the pipeline by feeding the profiles to the log assembler
             var pipelineEndBlock = new ActionBlock<Profile>(FeedToAssembler,
                 new ExecutionDataflowBlockOptions() { EnsureOrdered = true, MaxDegreeOfParallelism = 1 });
-            RawProfiles.LinkTo(pipelineEndBlock);
+            RawProfilesBroadcastBlock.LinkTo(pipelineEndBlock);
 
             // next pipeline is for RawLogs, we have the BufferBlock RawLogs from the assembler for that
-            LogAssembler.RawLogs.LinkTo(RawLogs);
-            
+            LogAssembler.RawLogs.LinkTo(RawLogsBroadcastBlock);
+            // the archiver gets to see all raw logs
+            RawLogsBroadcastBlock.LinkTo(new ActionBlock<RawLog>((l) => archiver.ArchiveLog(l)));
         }
 
         #endregion

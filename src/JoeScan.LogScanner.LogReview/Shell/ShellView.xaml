@@ -1,0 +1,33 @@
+﻿<controls:AdonisWindow
+    x:Class="JoeScan.LogScanner.LogReview.Shell.ShellView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:JoeScan.LogScanner.LogReview.Shell"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="JoeScan LogReview"
+    Width="1920"
+    Height="1080"
+    IconVisibility="Collapsed"
+    PlaceTitleBarOverContent="False"
+    TextElement.FontSize="13"
+    TextElement.FontWeight="Regular"
+    TextOptions.TextFormattingMode="Ideal"
+    TextOptions.TextRenderingMode="Auto"
+    TitleVisibility="Collapsed"
+    mc:Ignorable="d">
+    <Window.Style>
+        <Style BasedOn="{StaticResource {x:Type Window}}" TargetType="Window" />
+    </Window.Style>
+    <controls:AdonisWindow.TitleBarContent>
+        <DockPanel>
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                DockPanel.Dock="Left"
+                Text="{Binding Title}" />
+        </DockPanel>
+    </controls:AdonisWindow.TitleBarContent>
+    <Grid />
+</controls:AdonisWindow>

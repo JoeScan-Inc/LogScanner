@@ -28,6 +28,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Adapters", "Adapters", "{AA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner.SyntheticDataAdapter", "JoeScan.LogScanner.SyntheticDataAdapter\JoeScan.LogScanner.SyntheticDataAdapter.csproj", "{FB0839CF-7925-47A4-A8DE-3184513FF374}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner.LogReview", "JoeScan.LogScanner.LogReview\JoeScan.LogScanner.LogReview.csproj", "{2F4DB1CA-166F-4C55-90ED-65190E94FCD8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +72,10 @@ Global
 		{FB0839CF-7925-47A4-A8DE-3184513FF374}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB0839CF-7925-47A4-A8DE-3184513FF374}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB0839CF-7925-47A4-A8DE-3184513FF374}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F4DB1CA-166F-4C55-90ED-65190E94FCD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F4DB1CA-166F-4C55-90ED-65190E94FCD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F4DB1CA-166F-4C55-90ED-65190E94FCD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F4DB1CA-166F-4C55-90ED-65190E94FCD8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -28,7 +28,7 @@ public class Log3DViewModel : Screen
         {
             TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext()
         });
-        engine.RawLogs.LinkTo(displayActionBlock);
+        engine.RawLogsBroadcastBlock.LinkTo(displayActionBlock);
 
     }
 

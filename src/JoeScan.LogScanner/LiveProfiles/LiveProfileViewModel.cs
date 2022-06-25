@@ -63,7 +63,7 @@ public sealed class LiveProfileViewModel : Screen
         Engine.ScanningStarted += (_, _) => dispatcherTimer.Start();
         Engine.ScanningStopped += (_, _) => dispatcherTimer.Stop();
         displayActionBlock = new ActionBlock<Profile>(StoreProfiles);
-        Engine.RawProfiles.LinkTo(displayActionBlock);
+        Engine.RawProfilesBroadcastBlock.LinkTo(displayActionBlock);
     }
 
     #endregion
