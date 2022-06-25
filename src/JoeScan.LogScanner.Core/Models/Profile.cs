@@ -19,8 +19,11 @@ public class Profile : ICloneable
         ScanningFlags = ScanFlags.None;
         EncoderValues = new Dictionary<uint, long>();
         Inputs = InputFlags.None;
+        Units = UnitSystem.Inches;
         // rest is 0-initialized
     }
+
+    public UnitSystem Units { get; init; }
 
     public Point2D[] Data { get; set; }
     /// <summary>

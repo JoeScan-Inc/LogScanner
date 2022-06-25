@@ -119,7 +119,7 @@ public class Js25Adapter : IScannerAdapter
             // InternalProfileQueueLength
             var internalProfileQueueLength = Config.InternalProfileQueueLength;
             Logger.Info($"InternalProfileQueueLength: {internalProfileQueueLength}");
-            AvailableProfiles = new BufferBlock<Profile>();
+            AvailableProfiles = new BufferBlock<Profile>(new DataflowBlockOptions(){BoundedCapacity = -1, EnsureOrdered = true});
             //EncoderUpdateIncrement
             encoderUpdateIncrement = Config.EncoderUpdateIncrement;
             Logger.Info($"EncoderUpdateIncrement: {encoderUpdateIncrement}");
@@ -396,6 +396,7 @@ public class Js25Adapter : IScannerAdapter
 
     private Profile Convert(JCamNet5.Profile p, short cableId)
     {
+        //TODO: set the Unit based on param.dat
         var np = new Profile();
         {
             np.Data = p.Select(q => new Point2D(q.X, q.Y, q.Brightness)).ToArray();

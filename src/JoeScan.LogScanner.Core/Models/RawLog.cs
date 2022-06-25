@@ -25,19 +25,48 @@ public class RawLog
     
 }
 
-public static class RawLogWriter
+public static class RawLogReaderWriter
 {
-    private const int magic = 0x01;
+    private const int currentVersion = 0x01;
     public static void Write(this RawLog r, BinaryWriter bw)        
     {
-        bw.Write(magic); 
-        bw.Write(r.LogNumber); 
-        bw.Write(r.Id.ToByteArray()); //16 bytes
-        bw.Write(r.ProfileData.Count);
+        bw.Write(currentVersion); // 32 bit int
+        bw.Write(r.LogNumber); // 32 bit int
+        bw.Write(r.Id.ToByteArray()); // 16 byte array
+        bw.Write(r.TimeScanned.ToBinary()); // 64 bits encoding datetime and ticks
+        bw.Write(r.ProfileData.Count); //32 bit int
+
         foreach (var profile in r.ProfileData)
         {
             profile.Write(bw);
         }
         bw.Flush();
+    }
+
+    public static RawLog Read(BinaryReader br)
+    {
+        var version = br.ReadInt32();
+        if (version != currentVersion)
+        {
+            throw new Exception($"Version mismatch: File is version {version}.");
+        }
+        var number = br.ReadInt32();
+        var guid = new Guid(br.ReadBytes(16));
+        var datetime = DateTime.FromBinary(br.ReadInt64());
+        var count = br.ReadInt32();
+        var l = new List<Profile>();
+        for (int i = 0; i < count; i++)
+        {
+            var p = ProfileReaderWriter.Read(br);
+            if (p != null)
+            {
+                l.Add(p);
+            }
+            else
+            {
+                throw new Exception("Failed to read profile from stream.");
+            }
+        }
+        return new RawLog(number, l) { Id = guid, TimeScanned = datetime };
     }
 }
