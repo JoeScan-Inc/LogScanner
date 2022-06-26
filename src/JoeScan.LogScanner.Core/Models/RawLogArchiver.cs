@@ -36,7 +36,7 @@ public class RawLogArchiver : ILogArchiver
             }
         }
 
-        var fileName = Path.Combine(config.Location, $"RawLog_{rawLog.LogNumber:0000}.loga");
+        var fileName = Path.Combine(config.Location, $"RawLog_{rawLog.LogNumber:0000}.{RawLogReaderWriter.DefaultExtension}");
         using var fs = new FileStream(fileName, FileMode.Create);
         using var gzip = new GZipStream(fs, CompressionMode.Compress);
         using var writer = new BinaryWriter(gzip);

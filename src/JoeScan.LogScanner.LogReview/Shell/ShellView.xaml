@@ -29,5 +29,12 @@
                 Text="{Binding Title}" />
         </DockPanel>
     </controls:AdonisWindow.TitleBarContent>
-    <Grid />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ContentControl x:Name="ToolBar" />
+    </Grid>
 </controls:AdonisWindow>

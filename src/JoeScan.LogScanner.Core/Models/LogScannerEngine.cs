@@ -107,7 +107,9 @@ namespace JoeScan.LogScanner.Core.Models
             };
 
             dumper = new RawProfileDumper(Logger);
-            dumper.OutputDir = "C:\\tmp\\rawdumps";
+            dumper.OutputDir = Config.RawDumperConfig.RawDumpLocation;
+            
+            
 
             var unitConverterBlock = new TransformBlock<Profile, Profile>((p) => UnitConverter.Convert(ActiveAdapter.Units, Units, p));
             // dumper.DumpBlock is a pass-through from the source block where the profiles originate, scannerAdapter.AvailableProfiles
@@ -193,6 +195,7 @@ namespace JoeScan.LogScanner.Core.Models
                 {
                     PropagateCompletion = true
                 });
+                dumper.IsEnabled = !ActiveAdapter!.IsReplay;
             }
             else
             {

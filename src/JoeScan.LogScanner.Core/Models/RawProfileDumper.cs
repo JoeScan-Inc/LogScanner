@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.IO.Compression;
 using System.Threading.Tasks.Dataflow;
+using Castle.Core;
 
 namespace JoeScan.LogScanner.Core.Models;
 
@@ -14,6 +15,7 @@ public class RawProfileDumper
 
     private BlockingCollection<Profile>? dumpQueue  = null;
 
+    public bool IsEnabled { get; set; } = true;
     public RawProfileDumper(ILogger logger)
     {
         this.logger = logger;
@@ -23,15 +25,17 @@ public class RawProfileDumper
 
     public void StartDumping()
     {
-        if (dumpQueue != null)
+
+        if (dumpQueue != null || !IsEnabled )
         {
             return;
         }
         // check for file being open and such here
         if (OutputDir == String.Empty)
         {
-            var msg = "Output directory must not be empty.";
-            throw new ApplicationException();
+            var msg = "Output directory must not be empty. Dumping disabled.";
+            logger.Warn(msg);
+            return;
         }
 
         if (!Directory.Exists(OutputDir))
@@ -42,8 +46,8 @@ public class RawProfileDumper
             }
             catch (Exception ex)
             {
-                logger.Error($"Failed to create directory: {OutputDir}: {ex.Message}");
-                throw;
+                logger.Error($"Failed to create directory: {OutputDir}: {ex.Message}. Dumping disabled.");
+                return;
             }
         }
 
@@ -112,7 +116,7 @@ public class RawProfileDumper
     }
     private Profile ProcessProfile(Profile p)
     {
-        if (dumpQueue!=null && !dumpQueue.IsAddingCompleted)
+        if (dumpQueue!=null && !dumpQueue.IsAddingCompleted && IsEnabled)
         {
             dumpQueue.Add((Profile)p.Clone());
         }

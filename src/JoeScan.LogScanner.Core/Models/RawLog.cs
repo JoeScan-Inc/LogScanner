@@ -1,4 +1,6 @@
-﻿namespace JoeScan.LogScanner.Core.Models;
+﻿using System.IO.Compression;
+
+namespace JoeScan.LogScanner.Core.Models;
 
 public class RawLog
 {
@@ -28,6 +30,8 @@ public class RawLog
 public static class RawLogReaderWriter
 {
     private const int currentVersion = 0x01;
+    public static string DefaultExtension => "loga";
+
     public static void Write(this RawLog r, BinaryWriter bw)        
     {
         bw.Write(currentVersion); // 32 bit int
@@ -68,5 +72,13 @@ public static class RawLogReaderWriter
             }
         }
         return new RawLog(number, l) { Id = guid, TimeScanned = datetime };
+    }
+
+    public static RawLog Read(string fileName)
+    {
+        using var fs = new FileStream(fileName, FileMode.Open);
+        using var gzip = new GZipStream(fs, CompressionMode.Decompress);
+        using var reader = new BinaryReader(gzip);
+        return Read(reader);
     }
 }

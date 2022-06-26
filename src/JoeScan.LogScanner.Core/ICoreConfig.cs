@@ -9,6 +9,7 @@ public interface ICoreConfig
     ISingleZoneLogAssemblerConfig SingleZoneLogAssemblerConfig { get; }
 
     IRawLogArchiverConfig RawLogArchiverConfig { get; }
+    IRawDumperConfig RawDumperConfig { get; }
 
 }
 
@@ -41,4 +42,9 @@ public interface IRawLogArchiverConfig
   
     //TODO: delete oldest, set max number of archived logs
 
+}
+
+public interface IRawDumperConfig
+{
+    string RawDumpLocation { get; set; }
 }

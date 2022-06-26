@@ -5,6 +5,9 @@
     "MinProfileSpacing": 1.0
   },
   "RawLogArchiverConfig": {
-    "Location": "C:/tmp/test/rawlogs/" 
+    "Location": "C:/tmp/test/rawlogs/"
+  },
+  "RawDumperConfig": {
+    "RawDumpLocation" : "C:/tmp/test/rawdumps" 
   } 
 }
