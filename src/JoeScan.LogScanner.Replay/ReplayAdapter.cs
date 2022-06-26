@@ -63,6 +63,7 @@ public class ReplayAdapter : IScannerAdapter
 
     public bool IsConfigured => true;
 
+    public bool IsReplay => true;
     public bool IsRunning
     {
         get => isRunning;

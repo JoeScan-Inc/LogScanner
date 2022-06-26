@@ -34,6 +34,7 @@ public class Js50Adapter : IScannerAdapter
     #region IScannerAdapter Implementation
     public string Name => $"JS-50 (Pinchot v{Pinchot.VersionInformation.Version})";
     public UnitSystem Units { get; }
+    public bool IsReplay => false;
     public bool IsConfigured => config != null;
 
     // If we give a finite BoundedCapacity, the BufferBlock will discard Profiles 

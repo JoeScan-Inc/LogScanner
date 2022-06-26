@@ -70,8 +70,8 @@ public class Js25Adapter : IScannerAdapter
     public UnitSystem Units { get; }
     public BufferBlock<Profile> AvailableProfiles { get; private set; }
     public bool IsRunning { get; private set; }
-    
 
+    public bool IsReplay => false;
     public bool IsConfigured { get; private set; }
 
     public void Start()
