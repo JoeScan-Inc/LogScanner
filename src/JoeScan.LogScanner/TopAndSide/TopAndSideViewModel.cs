@@ -1,11 +1,11 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.Helpers;
 using JoeScan.LogScanner.Interfaces;
 using OxyPlot;
 using OxyPlot.Axes;
 using System.Threading;
 using System.Threading.Tasks;
+using JoeScan.LogScanner.Shared.Helpers;
 
 namespace JoeScan.LogScanner.TopAndSide
 {

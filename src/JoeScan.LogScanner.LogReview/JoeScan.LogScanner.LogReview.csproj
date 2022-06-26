@@ -22,6 +22,8 @@
     <PackageReference Include="HelixToolkit.Core.Wpf" Version="2.20.2" />
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
     <PackageReference Include="MvvmDialogs" Version="8.0.0" />
+    <PackageReference Include="OxyPlot.Core" Version="2.1.0" />
+    <PackageReference Include="OxyPlot.Wpf" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +33,12 @@
 
   <ItemGroup>
     <Folder Include="Settings\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="OxyPlot.Wpf">
+      <HintPath>..\..\..\..\..\..\.nuget\packages\oxyplot.wpf\2.1.0\lib\netcoreapp3.1\OxyPlot.Wpf.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

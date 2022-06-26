@@ -2,7 +2,6 @@
 using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.Helpers;
 using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
@@ -16,6 +15,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks.Dataflow;
 using System.Windows;
 using System.Windows.Threading;
+using JoeScan.LogScanner.Shared.Helpers;
 
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable MemberCanBePrivate.Global
