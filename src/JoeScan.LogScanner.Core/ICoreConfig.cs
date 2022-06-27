@@ -8,6 +8,9 @@ public interface ICoreConfig
     UnitSystem Units { get; }
     ISingleZoneLogAssemblerConfig SingleZoneLogAssemblerConfig { get; }
 
+    IRawLogArchiverConfig RawLogArchiverConfig { get; }
+    IRawDumperConfig RawDumperConfig { get; }
+
 }
 
 public interface ISingleZoneLogAssemblerConfig
@@ -31,4 +34,17 @@ public interface ISingleZoneLogAssemblerConfig
     int StartLogCount { get; set; }
     [DefaultValue(1.0)]
     double EncoderPulseInterval { get; set; }
+}
+
+public interface IRawLogArchiverConfig
+{
+    string Location { get; set; }
+  
+    //TODO: delete oldest, set max number of archived logs
+
+}
+
+public interface IRawDumperConfig
+{
+    string RawDumpLocation { get; set; }
 }

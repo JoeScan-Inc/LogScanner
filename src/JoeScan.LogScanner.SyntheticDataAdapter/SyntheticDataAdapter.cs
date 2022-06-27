@@ -33,6 +33,7 @@ public class SyntheticDataAdapter : IScannerAdapter
         IsConfigured = true;
     }
 
+    public bool IsReplay => true;
     public bool IsConfigured { get; private set; }
     public void Start()
     {

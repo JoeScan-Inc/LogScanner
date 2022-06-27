@@ -15,6 +15,7 @@ public class CoreModule : Module
         builder.RegisterType<SingleZoneLogAssembler>().As<ILogAssembler>().SingleInstance();
         builder.RegisterType<RawProfileValidator>().As<IRawProfileValidator>();
         builder.RegisterType<PieceNumberProvider>().As<IPieceNumberProvider>().SingleInstance();
+        builder.RegisterType<RawLogArchiver>().As<ILogArchiver>().SingleInstance();
 
         builder.RegisterType<FlightsAndWindowFilter>().As<IFlightsAndWindowFilter>().SingleInstance();
         // the MuteNotifier is a no-op class. If a GUI or console app wants to use/display notifications 

@@ -1,13 +1,13 @@
 ﻿using Caliburn.Micro;
 using HelixToolkit.Wpf;
 using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using JoeScan.LogScanner.Shared.Helpers;
 
 namespace JoeScan.LogScanner.Log3D;
 
@@ -28,7 +28,7 @@ public class Log3DViewModel : Screen
         {
             TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext()
         });
-        engine.RawLogs.LinkTo(displayActionBlock);
+        engine.RawLogsBroadcastBlock.LinkTo(displayActionBlock);
 
     }
 
