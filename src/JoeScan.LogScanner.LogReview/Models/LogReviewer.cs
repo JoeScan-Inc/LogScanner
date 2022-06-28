@@ -10,6 +10,23 @@ public class LogReviewer : PropertyChangedBase
 {
     public ILogger Logger { get; }
 
+    #region Bound Properties
+
+    public RawLog? CurrentLog
+    {
+        get => currentLog;
+        set
+        {
+            if (Equals(value, currentLog)) return;
+            currentLog = value;
+            NotifyOfPropertyChange(() => CurrentLog);
+            OnLogChanged();
+        }
+    }
+
+    public string CurrentFile { get; set; } = String.Empty;
+    #endregion
+
     #region Lifecycle
 
     public LogReviewer(ILogger logger)
@@ -29,23 +46,6 @@ public class LogReviewer : PropertyChangedBase
 
     private RawLog? currentLog;
 
-    #endregion
-
-    #region Bound Properties
-
-    public RawLog? CurrentLog
-    {
-        get => currentLog;
-        set
-        {
-            if (Equals(value, currentLog)) return;
-            currentLog = value;
-            NotifyOfPropertyChange(() => CurrentLog);
-            OnLogChanged();
-        }
-    }
-
-    public string CurrentFile { get; set; }
     #endregion
 
     #region Event Invocation

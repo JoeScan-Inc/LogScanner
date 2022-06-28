@@ -7,6 +7,7 @@ using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using OxyPlot.Legends;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace JoeScan.LogScanner.LogReview.CrossSection;
 
@@ -14,19 +15,18 @@ public class CrossSectionViewModel : Screen
 {
     public LogReviewer Reviewer { get; }
     public ILogger Logger { get; }
-
     public PlotModel CrossSectionPlotModel { get; set; }
 
     public CrossSectionViewModel(LogReviewer reviewer, ILogger logger)
     {
         Reviewer = reviewer;
         Logger = logger;
-        SetupPlot();
+        CrossSectionPlotModel = SetupPlot();
     }
 
-    private void SetupPlot()
+    private PlotModel SetupPlot()
     {
-        CrossSectionPlotModel = new PlotModel
+        var model = new PlotModel
         {
             PlotType = PlotType.Cartesian,
             Background = OxyColorsForStyle.PlotBackgroundColor,
@@ -34,7 +34,7 @@ public class CrossSectionViewModel : Screen
             PlotAreaBorderThickness = new OxyThickness(0),
             PlotMargins = new OxyThickness(-10)
         };
-        CrossSectionPlotModel.Legends.Add(new Legend
+        model.Legends.Add(new Legend
         {
             LegendPosition = LegendPosition.TopRight,
             LegendTextColor = OxyColorsForStyle.LegendTextColor
@@ -58,7 +58,7 @@ public class CrossSectionViewModel : Screen
             TextColor = OxyColorsForStyle.AxisTextColor,
             // LabelFormatter = x => null
         };
-        CrossSectionPlotModel.Axes.Add(columnAxis);
+        model.Axes.Add(columnAxis);
 
         var rowAxis = new LinearAxis
         {
@@ -79,9 +79,9 @@ public class CrossSectionViewModel : Screen
             TextColor = OxyColorsForStyle.AxisTextColor,
             // LabelFormatter = x => null
         };
-        CrossSectionPlotModel.Axes.Add(rowAxis);
+        model.Axes.Add(rowAxis);
 
-       
+        return model;
 
     }
 }

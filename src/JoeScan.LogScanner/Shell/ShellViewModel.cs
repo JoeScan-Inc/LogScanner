@@ -32,6 +32,8 @@ public class ShellViewModel : Screen
     public LogScannerEngine Engine { get; }
     public IUserNotifier Notifier { get; }
 
+    public string Title => "JoeScan LogScanner";
+
     public ShellViewModel(
         ILogger logger,
         ILogScannerConfig config,
