@@ -14,7 +14,7 @@ public class CoreModule : Module
         builder.RegisterType<LogScannerEngine>().AsSelf().SingleInstance();
         builder.RegisterType<SingleZoneLogAssembler>().As<ILogAssembler>().SingleInstance();
         builder.RegisterType<RawProfileValidator>().As<IRawProfileValidator>();
-        builder.RegisterType<PieceNumberProvider>().As<IPieceNumberProvider>().SingleInstance();
+        builder.RegisterType<PieceNumberProvider>().As<IPieceNumberProvider>().SingleInstance().OnRelease(instance=>instance.Dispose());
         builder.RegisterType<RawLogArchiver>().As<ILogArchiver>().SingleInstance();
 
         builder.RegisterType<FlightsAndWindowFilter>().As<IFlightsAndWindowFilter>().SingleInstance();

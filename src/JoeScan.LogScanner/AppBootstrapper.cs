@@ -32,9 +32,13 @@ public class AppBootstrapper : AutofacBootstrapper
         DisplayRootViewFor<ShellViewModel>();
     }
 
+    protected override void OnExit(object sender, EventArgs e)
+    {
+        Container.Dispose();
+    }
+
     protected override void ConfigureContainer(ContainerBuilder builder)
     {
-
         builder.Register(c => new ConfigurationBuilder<ILogScannerConfig>()
             .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetConfigLocation(),"LogScannerConfig.json"))
             .Build()).SingleInstance();
