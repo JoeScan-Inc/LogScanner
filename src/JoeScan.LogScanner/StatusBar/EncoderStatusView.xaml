@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="JoeScan.LogScanner.StatusBar.EncoderStatusView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:JoeScan.LogScanner.StatusBar"
+             mc:Ignorable="d" 
+             d:DesignHeight="45" d:DesignWidth="260">
+    <DockPanel  LastChildFill="False">
+        <TextBox
+            x:Name="EncoderValue"
+            MinWidth="160"
+            Margin="3"
+            DockPanel.Dock="Right"
+            IsReadOnly="True" />
+        <Label VerticalContentAlignment="Center" DockPanel.Dock="Right">Encoder:</Label>
+
+    </DockPanel>
+</UserControl>

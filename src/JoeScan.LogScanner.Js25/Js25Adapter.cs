@@ -434,7 +434,8 @@ public class Js25Adapter : IScannerAdapter
             if (p.EncoderValues[0] > lastEncoderUpdatePos + encoderUpdateIncrement)
             {
                 lastEncoderUpdatePos = p.EncoderValues[0];
-                OnEncoderUpdated(new EncoderUpdateArgs(lastEncoderUpdatePos, p.TimeStampNs));
+                // TODO: fix with new EncoderUpdateArgs
+              //  OnEncoderUpdated(new EncoderUpdateArgs(lastEncoderUpdatePos, p.TimeStampNs));
             }
         }
     }

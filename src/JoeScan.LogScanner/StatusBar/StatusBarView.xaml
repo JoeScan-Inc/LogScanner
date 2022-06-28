@@ -29,5 +29,6 @@
             DockPanel.Dock="Right"
             IsReadOnly="True" />
         <Label VerticalContentAlignment="Center" DockPanel.Dock="Right">Units:</Label>
+        <ContentControl DockPanel.Dock="Right" x:Name="EncStatus"></ContentControl>
     </DockPanel>
 </UserControl>
