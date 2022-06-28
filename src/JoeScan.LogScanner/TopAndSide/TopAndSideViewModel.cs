@@ -1,6 +1,5 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.Interfaces;
 using OxyPlot;
 using OxyPlot.Axes;
 using System.Threading;
@@ -11,7 +10,7 @@ namespace JoeScan.LogScanner.TopAndSide
 {
 
 
-    public class TopAndSideViewModel : Screen, ILogDataConsumer
+    public class TopAndSideViewModel : Screen
     {
         private LogData currentLog;
         public PlotModel TopView { get; private set; }
