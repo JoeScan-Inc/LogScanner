@@ -1,6 +1,17 @@
 ﻿{
   "Units": "Millimeters",
-  "LogModelBuilder" : {
-      "SectionInterval":  120 
-  } 
+
+  "SingleZoneLogAssemblerConfig": {
+    "EncoderPulseInterval": 0.06756,
+    "MinProfileSpacing": 1.0
+  },
+  "RawLogArchiverConfig": {
+    "Location": "C:/tmp/test/rawlogs/"
+  },
+  "RawDumperConfig": {
+    "RawDumpLocation": "C:/tmp/test/rawdumps"
+  },
+  "LogModelBuilder": {
+    "SectionInterval": 120
+  }
 }

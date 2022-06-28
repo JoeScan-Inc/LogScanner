@@ -10,6 +10,10 @@ public interface ICoreConfig
     ISingleZoneLogAssemblerConfig SingleZoneLogAssemblerConfig { get; }
     [Option(Alias = "LogModelBuilder")]
     ILogModelBuilderConfig LogModelBuilderConfig { get; }
+
+    IRawLogArchiverConfig RawLogArchiverConfig { get; }
+    IRawDumperConfig RawDumperConfig { get; }
+
 }
 
 public interface ISingleZoneLogAssemblerConfig
@@ -39,4 +43,17 @@ public interface ILogModelBuilderConfig
 {
     [Option(Alias = "SectionInterval", DefaultValue = "100.0")]
     double SectionInterval { get; set; }
+}
+
+public interface IRawLogArchiverConfig
+{
+    string Location { get; set; }
+  
+    //TODO: delete oldest, set max number of archived logs
+
+}
+
+public interface IRawDumperConfig
+{
+    string RawDumpLocation { get; set; }
 }

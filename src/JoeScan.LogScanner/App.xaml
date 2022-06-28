@@ -35,12 +35,9 @@
                         <Setter Property="VerticalAlignment" Value="Center" />
                         <Setter Property="FontFamily" Value="{StaticResource InterLight}" />
                         <Setter Property="Margin" Value="10,3,3,3" />
-
-
                     </Style>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
-
         </ResourceDictionary>
     </Application.Resources>
 </Application>

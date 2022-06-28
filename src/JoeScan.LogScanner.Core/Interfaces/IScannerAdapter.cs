@@ -27,9 +27,13 @@ public interface IScannerAdapter
 
     string Name { get; }
 
-    public event EventHandler ScanningStarted;
-    public event EventHandler ScanningStopped;
-    public event EventHandler ScanErrorEncountered;
-    public event EventHandler<EncoderUpdateArgs> EncoderUpdated;
+    public event EventHandler? ScanningStarted;
+    public event EventHandler? ScanningStopped;
+    public event EventHandler? ScanErrorEncountered;
+    public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
+
+    // we use this flag to indicate that it is replayed or synthetic data, 
+    // mostly to avoid that the raw dumper fills up the disk with garbage
+    public bool IsReplay { get; }
 
 }

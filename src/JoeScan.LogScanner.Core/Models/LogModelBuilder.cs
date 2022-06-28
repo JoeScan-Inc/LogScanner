@@ -35,7 +35,7 @@ public class LogModelBuilder
 
         double nextSection = Config.LogModelBuilderConfig.SectionInterval;
         // startoffset is index into keys where real data begins
-        var sections = log.ProfileData.GroupBy( q=>q.)
+      //  var sections = log.ProfileData.GroupBy( q=>q.)
         return model;
     }
 

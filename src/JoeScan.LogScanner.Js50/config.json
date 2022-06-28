@@ -2,10 +2,10 @@
   "ScanRate": 200.0,
   "DataFormat": "XYHalfLMHalf",
   "Units": "Inches",
-  "EncoderPulseInterval" :  0.2, 
+  "EncoderPulseInterval": 0.2,
   "ScanHeads": [
     {
-      "Serial": 20282,
+      "Serial": 20669,
       "Id": 0,
       "Name": "Top",
       "MinLaserOn": 100,
@@ -13,20 +13,20 @@
       "MaxLaserOn": 5000,
       "ScanPhaseOffset": 0,
       "Alignment": {
-        "ShiftX": 12.0,
-        "ShiftY": -1.0,
-        "RollDegrees": 120.001,
-        "Orientation": "CableIsUpstream"
+        "ShiftX": 0.299,
+        "ShiftY": -6.604,
+        "RollDegrees": 0.232,
+        "Orientation": "CableIsDownstream"
       },
       "Window": {
-        "Top": 20,
-        "Bottom": 10,
-        "Left": -10,
-        "Right": 10
+        "Top": 31,
+        "Bottom": -2,
+        "Left": -15,
+        "Right": 15
       }
     },
     {
-      "Serial": 20283,
+      "Serial": 20673,
       "Id": 1,
       "Name": "Left",
       "MinLaserOn": 100,
@@ -34,20 +34,20 @@
       "MaxLaserOn": 5000,
       "ScanPhaseOffset": 500,
       "Alignment": {
-        "ShiftX": 12.0,
-        "ShiftY": -1.0,
-        "RollDegrees": 90.001,
-        "Orientation": "CableIsUpstream"
+        "ShiftX": -16.28,
+        "ShiftY": 19.357,
+        "RollDegrees": -114.8,
+        "Orientation": "CableIsDownstream"
       },
       "Window": {
-        "Top": 20,
-        "Bottom": 1,
+        "Top": 30,
+        "Bottom": -2,
         "Left": -10,
-        "Right": 0
+        "Right": 10
       }
     },
     {
-      "Serial": 20284,
+      "Serial": 20674,
       "Id": 2,
       "Name": "Right",
       "MinLaserOn": 100,
@@ -55,15 +55,15 @@
       "MaxLaserOn": 5000,
       "ScanPhaseOffset": 1000,
       "Alignment": {
-        "ShiftX": 12.0,
-        "ShiftY": -1.0,
-        "RollDegrees": 90.001,
-        "Orientation": "CableIsUpstream"
+        "ShiftX": 16.847,
+        "ShiftY": 19.264,
+        "RollDegrees": 115.01,
+        "Orientation": "CableIsDownstream"
       },
       "Window": {
-        "Top": 20,
-        "Bottom": 1,
-        "Left": 0,
+        "Top": 25,
+        "Bottom": -2,
+        "Left": -30,
         "Right": 10
       }
     }
