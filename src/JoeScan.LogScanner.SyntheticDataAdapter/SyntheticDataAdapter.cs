@@ -1,4 +1,5 @@
 ﻿using JoeScan.LogScanner.Core.Events;
+using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
@@ -78,28 +79,29 @@ public class SyntheticDataAdapter : IScannerAdapter
 
     protected virtual void OnScanningStarted()
     {
-        ScanningStarted?.Invoke(this, EventArgs.Empty);
+        ScanningStarted?.Raise(this, EventArgs.Empty);
     }
 
     protected virtual void OnScanningStopped()
     {
-        ScanningStopped?.Invoke(this, EventArgs.Empty);
+        ScanningStopped?.Raise(this, EventArgs.Empty);
     }
 
     protected virtual void OnScanErrorEncountered()
     {
-        ScanErrorEncountered?.Invoke(this, EventArgs.Empty);
+        ScanErrorEncountered?.Raise(this, EventArgs.Empty);
     }
 
     protected virtual void OnEncoderUpdated(EncoderUpdateArgs e)
     {
-        EncoderUpdated?.Invoke(this, e);
+        EncoderUpdated?.Raise(this, e);
     }
 
     private void ThreadMain(CancellationToken ct)
     {
         try
         {
+            long simEncoder = 0;
             var dg = new DataGenerator(6);
             IsRunning = true;
             OnScanningStarted();
@@ -111,6 +113,7 @@ public class SyntheticDataAdapter : IScannerAdapter
                     AvailableProfiles.Post(profile);
                 }
                 Thread.Sleep(1);
+                OnEncoderUpdated(new EncoderUpdateArgs(0,0,0,0,0,0,simEncoder++,0));
             }
         }
         catch (OperationCanceledException)

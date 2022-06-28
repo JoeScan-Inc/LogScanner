@@ -11,7 +11,7 @@ public class Js50Module : Module
     {
         builder.RegisterModule<CoreModule>();
         builder.RegisterType<Js50Adapter>().As<IScannerAdapter>();
-
+        builder.RegisterType<ScanSyncReceiverThread>().AsSelf();
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Autofac.Features.AttributeFilters;
 using JoeScan.LogScanner.Core.Events;
+using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Interfaces;
 using NLog;
@@ -33,7 +34,7 @@ namespace JoeScan.LogScanner.Core.Models
         public event EventHandler ScanningStarted;
         public event EventHandler ScanningStopped;
         public event EventHandler ScanErrorEncountered;
-        public event EventHandler EncoderUpdated;
+        public event EventHandler<EncoderUpdateArgs> EncoderUpdated;
         public event EventHandler AdapterChanged;
 
         #endregion
@@ -42,27 +43,27 @@ namespace JoeScan.LogScanner.Core.Models
 
         protected virtual void OnAdapterChanged()
         {
-            AdapterChanged?.Invoke(this, EventArgs.Empty);
+            AdapterChanged?.Raise(this, EventArgs.Empty);
         }
 
         private void ActiveAdapterOnScanningStarted(object? sender, EventArgs e)
         {
-            ScanningStarted?.Invoke(this, e);
+            ScanningStarted?.Raise(this, e);
         }
 
         private void ActiveAdapterOnScanningStopped(object? sender, EventArgs e)
         {
-            ScanningStopped?.Invoke(this,e);
+            ScanningStopped?.Raise(this,e);
         }
 
         private void ActiveAdapterOnScanErrorEncountered(object? sender, EventArgs e)
         {
-            ScanErrorEncountered?.Invoke(this, e);
+            ScanErrorEncountered?.Raise(this, e);
         }
 
         private void ActiveAdapterOnEncoderUpdated(object? sender, EncoderUpdateArgs e)
         {
-            EncoderUpdated?.Invoke(this, e);
+            EncoderUpdated?.Raise(this, e);
         }
 
         #endregion

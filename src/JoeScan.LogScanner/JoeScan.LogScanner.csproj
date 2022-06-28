@@ -54,6 +54,7 @@
 
   <ItemGroup>
     <Folder Include="Config\" />
+    <Folder Include="Interfaces\" />
     <Folder Include="Themes\" />
   </ItemGroup>
 
