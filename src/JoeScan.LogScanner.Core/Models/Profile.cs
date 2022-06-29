@@ -23,7 +23,7 @@ public class Profile : ICloneable
         // rest is 0-initialized
     }
 
-    public UnitSystem Units { get; init; }
+    public UnitSystem Units { get; set; }
 
     public Point2D[] Data { get; set; }
     /// <summary>
