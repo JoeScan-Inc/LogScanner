@@ -3,7 +3,8 @@
 
   "SingleZoneLogAssemblerConfig": {
     "EncoderPulseInterval": 0.06756,
-    "MinProfileSpacing": 1.0
+    "MinProfileSpacing": 1.0,
+    "MinLogLength" :  500 
   },
   "RawLogArchiverConfig": {
     "Location": "C:/tmp/test/rawlogs/"
@@ -13,5 +14,9 @@
   },
   "LogModelBuilder": {
     "SectionInterval": 120
-  }
+  },
+  "LogSectionBuilder": {
+    "FilterOutliers": "true",
+    "OutlierFilterMaxDistance" :  30 
+  } 
 }

@@ -23,6 +23,8 @@ public class CoreModule : Module
         // the CoreModule was registered
         builder.RegisterType<MuteNotifier>().As<IUserNotifier>();
         builder.RegisterType<LogModelBuilder>().AsSelf().SingleInstance();
+        builder.RegisterType<LogSectionBuilder>().AsSelf().SingleInstance();
+
 
         builder.RegisterType<DefaultConfigLocator>().As<IConfigLocator>();
         // this is a bit of a mouthful and almost java-like, but: 

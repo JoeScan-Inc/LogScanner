@@ -2,6 +2,11 @@
 
 public class LogModel
 {
+    internal LogModel()
+    {
+
+    }
+
     /// <summary>
     /// Data and measurements at each section
     /// </summary>
@@ -20,7 +25,7 @@ public class LogModel
     /// <summary>
     /// The interval between sections in millimeters.
     /// </summary>
-    public double Interval { get; private set; }
+    public double Interval { get; init; }
 
     /// <summary>
     /// Log length in millimeters.
