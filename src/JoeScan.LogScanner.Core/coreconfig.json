@@ -13,7 +13,7 @@
     "RawDumpLocation": "C:/tmp/test/rawdumps"
   },
   "LogModelBuilder": {
-    "SectionInterval": 120
+    "SectionInterval": 100
   },
   "LogSectionBuilder": {
     "FilterOutliers": "true",

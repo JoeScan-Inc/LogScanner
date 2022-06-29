@@ -87,5 +87,7 @@ public interface ISectionBuilderConfig
     double LogMaximumPositionY { get; set; }
     [DefaultValue(-300.0)]
     double LogMinimumPositionY { get; set; }
+    [DefaultValue(5.0)]
+    double MaxFitError { get; set; }
 
 }

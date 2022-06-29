@@ -6,17 +6,15 @@ namespace JoeScan.LogScanner.Core.Models;
 
 public class LogModelBuilder
 {
+    #region Injected Fields
+
+    private readonly ILogger logger;
     private readonly ICoreConfig config;
     private readonly LogSectionBuilder sectionBuilder;
-    private readonly ILogger logger;
-
-    #region Injected Properties
-
-
 
     #endregion
 
-    public TransformBlock<RawLog, LogModel> BuilderBlock { get; } 
+    public TransformBlock<RawLog, LogModel> BuilderBlock { get; }
 
     #region Lifecycle
 
@@ -27,10 +25,10 @@ public class LogModelBuilder
         this.config = config;
         this.sectionBuilder = sectionBuilder;
         this.logger = logger;
-        BuilderBlock = new TransformBlock<RawLog, LogModel>(Build, 
-            new ExecutionDataflowBlockOptions(){EnsureOrdered = true, SingleProducerConstrained = true, MaxDegreeOfParallelism = 2});
+        BuilderBlock = new TransformBlock<RawLog, LogModel>(Build,
+            new ExecutionDataflowBlockOptions() { EnsureOrdered = true, SingleProducerConstrained = true, MaxDegreeOfParallelism = 2 });
     }
-    
+
     #endregion
 
     public LogModel Build(RawLog log)
@@ -40,8 +38,8 @@ public class LogModelBuilder
         var encoderPulseInterval = config.SingleZoneLogAssemblerConfig.EncoderPulseInterval;
         logger.Debug($"Building new LogModel from RawLog #{log.LogNumber}");
         logger.Debug($"Using SectionInterval {interval} {config.Units}");
-        
-        var model =  new LogModel { LogNumber = log.LogNumber, TimeScanned = log.TimeScanned, Interval = interval};
+        List<LogSection> sections = new List<LogSection>();
+        List<LogSection> rejectedSections = new List<LogSection>();
         var firstEncVal = log.ProfileData[0].EncoderValues[0];
 
         // this will contain the z position of each profile - for the JS-25 we will need more work as the encoder may be de-synced
@@ -64,11 +62,11 @@ public class LogModelBuilder
                     var s = sectionBuilder.Build(currentRawSection, nextSection - interval / 2.0);
                     if (s.IsValid)
                     {
-                        model.Sections.Add(s);
+                        sections.Add(s);
                     }
                     else
                     {
-                        model.RejectedSections.Add(s);
+                        rejectedSections.Add(s);
                     }
                 }
                 do
@@ -90,15 +88,18 @@ public class LogModelBuilder
         var s2 = sectionBuilder.Build(currentRawSection, nextSection - interval / 2);
         if (s2.IsValid)
         {
-            model.Sections.Add(s2);
+            sections.Add(s2);
         }
         else
         {
-            model.RejectedSections.Add(s2);
+            rejectedSections.Add(s2);
         }
 
         var elapsed = sw.ElapsedMilliseconds;
         logger.Debug($"Log Model Generation took: {elapsed} ms");
+        // var fitErrors = model.Sections.Select(s => s.FitError).ToArray();
+        var model = new LogModel(log.LogNumber, interval, log.TimeScanned, config.SectionBuilderConfig.MaxFitError,
+            config.SingleZoneLogAssemblerConfig.EncoderPulseInterval) { Sections = sections, RejectedSections = rejectedSections };
         return model;
 
     }

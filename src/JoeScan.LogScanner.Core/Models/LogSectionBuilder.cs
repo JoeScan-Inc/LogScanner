@@ -47,7 +47,7 @@ public class LogSectionBuilder
             BarkAllowance = config.SectionBuilderConfig.BarkAllowance,
             BoundingBox = boundingBox,
             EllipseModel = ellipseModel,
-            FilteredPoints = filteredPoints,
+            AcceptedPoints = filteredPoints,
             RejectedPoints = rejectedPoints,
             ModeledProfile = modeledProfile
         };

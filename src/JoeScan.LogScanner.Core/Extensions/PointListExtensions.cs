@@ -21,6 +21,23 @@ namespace JoeScan.LogScanner.Core.Extensions
             }
             return ptArray;
         }
+        public static float[][] ToFloatArrayA(this Point2D[] pts)
+        {
+            float[][] ptArray = new float[3][];
+
+            ptArray[0] = new float[pts.Length];
+            ptArray[1] = new float[pts.Length];
+            ptArray[2] = new float[pts.Length];
+
+            for (int i = 0; i < pts.Length; i++)
+            {
+                ptArray[0][i] = (float)pts[i].X;
+                ptArray[1][i] = (float)pts[i].Y;
+                ptArray[2][i] = (float)pts[i].B;
+            }
+            return ptArray;
+        }
+
 
     }
 }
