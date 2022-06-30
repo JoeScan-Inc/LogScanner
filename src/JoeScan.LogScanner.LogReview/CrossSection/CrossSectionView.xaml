@@ -21,10 +21,44 @@
                     </Border>
                 </DockPanel>
             </GroupBox.Header>
-            <oxy:PlotView
-                Margin="0"
-                Padding="0"
-                Model="{Binding CrossSectionPlotModel}" />
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <oxy:PlotView
+                    Grid.Row="1"
+                    Margin="0"
+                    Padding="0"
+                    Model="{Binding CrossSectionPlotModel}" />
+                <DockPanel Grid.Row="2" LastChildFill="False">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Vertical">
+                        <TextBlock Margin="5">View Mode:</TextBlock>
+                        <ComboBox
+                            DisplayMemberPath="Value"
+                            Focusable="False"
+                            ItemsSource="{Binding ModeStringPairs}"
+                            SelectedValue="{Binding ViewMode}"
+                            SelectedValuePath="Key" />
+                    </StackPanel>
+                    <StackPanel
+                        Margin="5"
+                        DockPanel.Dock="Left"
+                        Orientation="Vertical">
+                        <CheckBox x:Name="ShowAcceptedPoints">Accepted Points</CheckBox>
+                        <CheckBox x:Name="ShowRejectedPoints">Rejected Points</CheckBox>
+                    </StackPanel>
+                    <StackPanel
+                        Margin="5"
+                        DockPanel.Dock="Left"
+                        Orientation="Vertical">
+                        <CheckBox x:Name="ShowModel">Model</CheckBox>
+                        <CheckBox x:Name="ShowModelPoints">Model Points</CheckBox>
+                    </StackPanel>
+                </DockPanel>
+
+            </Grid>
         </GroupBox>
 
     </Grid>

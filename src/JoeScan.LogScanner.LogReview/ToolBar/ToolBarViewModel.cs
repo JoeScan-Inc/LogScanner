@@ -81,10 +81,10 @@ public class ToolBarViewModel : Screen
     #region UI Bound Properties
 
     public string CurrentFileName => Reviewer.CurrentFile;
-    public string RawLogId => Reviewer.CurrentLog != null ? Reviewer.CurrentLog.LogNumber.ToString() : "n/a";
+    public string RawLogId => Reviewer.CurrentRawLog != null ? Reviewer.CurrentRawLog.LogNumber.ToString() : "n/a";
 
-    public string LogScannedDate => Reviewer.CurrentLog != null
-        ? Reviewer.CurrentLog.TimeScanned.ToString(CultureInfo.CurrentUICulture)
+    public string LogScannedDate => Reviewer.CurrentRawLog != null
+        ? Reviewer.CurrentRawLog.TimeScanned.ToString(CultureInfo.CurrentUICulture)
         : "";
 
     #endregion
