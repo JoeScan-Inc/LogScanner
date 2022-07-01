@@ -72,6 +72,7 @@ public interface ISectionBuilderConfig
     [DefaultValue(0.0)]
     double BarkAllowance { get; set; }
     [DefaultValue(100)]
+
     int ModelPointCount { get; set; }
     [DefaultValue(3.0)]
     double MaxOvality { get; set; }

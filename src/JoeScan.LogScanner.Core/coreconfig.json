@@ -18,5 +18,6 @@
   "LogSectionBuilder": {
     "FilterOutliers": "true",
     "OutlierFilterMaxDistance" :  30 
+
   } 
 }
