@@ -1,7 +1,6 @@
 ﻿using Caliburn.Micro;
 using HelixToolkit.Wpf;
 using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.Helpers;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using JoeScan.LogScanner.Shared.Helpers;
 
 namespace JoeScan.LogScanner.Log3D;
 
@@ -66,7 +66,7 @@ public class Log3DViewModel : Screen
         {
             TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext()
         });
-        engine.RawLogs.LinkTo(displayActionBlock);
+        engine.RawLogsBroadcastBlock.LinkTo(displayActionBlock);
 
     }
 
@@ -104,6 +104,7 @@ public class Log3DViewModel : Screen
                         break;
                    
                 }
+
                 pointsVisuals[id] =
                     new PointsVisual3D() { Color = col, Size = 1 };
                 pointsDict[id] = new Point3DCollection(10000);
@@ -120,8 +121,8 @@ public class Log3DViewModel : Screen
                     maxX = p2D.X;
                 if (p2D.Y > maxY)
                     maxY = p2D.Y;
-
-                pointsDict[id].Add(new Point3D(p2D.X, p2D.Y, (profile.EncoderValues[0] - firstEncoderVal)));
+                //TODO: get profile Z position from RawLog, this is a bad hack just to show some point data
+                pointsDict[id].Add(new Point3D(p2D.X, p2D.Y, (profile.EncoderValues[0] - firstEncoderVal) * 0.045));
             }
         }
         //TODO: I don't think we need extents

@@ -70,8 +70,8 @@ public class Js25Adapter : IScannerAdapter
     public UnitSystem Units { get; }
     public BufferBlock<Profile> AvailableProfiles { get; private set; }
     public bool IsRunning { get; private set; }
-    
 
+    public bool IsReplay => false;
     public bool IsConfigured { get; private set; }
 
     public void Start()
@@ -110,7 +110,7 @@ public class Js25Adapter : IScannerAdapter
         return Task.Run(Stop);
     }
 
-    public string Name => "JS-20/JS-25 Adapter";
+    public string Name => "JS-20/JS-25 Single Zone";
 
     public void Configure()
     {
@@ -119,7 +119,7 @@ public class Js25Adapter : IScannerAdapter
             // InternalProfileQueueLength
             var internalProfileQueueLength = Config.InternalProfileQueueLength;
             Logger.Info($"InternalProfileQueueLength: {internalProfileQueueLength}");
-            AvailableProfiles = new BufferBlock<Profile>();
+            AvailableProfiles = new BufferBlock<Profile>(new DataflowBlockOptions(){BoundedCapacity = -1, EnsureOrdered = true});
             //EncoderUpdateIncrement
             encoderUpdateIncrement = Config.EncoderUpdateIncrement;
             Logger.Info($"EncoderUpdateIncrement: {encoderUpdateIncrement}");
@@ -396,6 +396,7 @@ public class Js25Adapter : IScannerAdapter
 
     private Profile Convert(JCamNet5.Profile p, short cableId)
     {
+        //TODO: set the Unit based on param.dat
         var np = new Profile();
         {
             np.Data = p.Select(q => new Point2D(q.X, q.Y, q.Brightness)).ToArray();
@@ -433,7 +434,8 @@ public class Js25Adapter : IScannerAdapter
             if (p.EncoderValues[0] > lastEncoderUpdatePos + encoderUpdateIncrement)
             {
                 lastEncoderUpdatePos = p.EncoderValues[0];
-                OnEncoderUpdated(new EncoderUpdateArgs(lastEncoderUpdatePos, p.TimeStampNs));
+                // TODO: fix with new EncoderUpdateArgs
+              //  OnEncoderUpdated(new EncoderUpdateArgs(lastEncoderUpdatePos, p.TimeStampNs));
             }
         }
     }

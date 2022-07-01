@@ -1,5 +1,6 @@
 ﻿using Autofac.Features.AttributeFilters;
 using JoeScan.LogScanner.Core.Events;
+using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.Js50.Config;
@@ -19,16 +20,23 @@ public class Js50Adapter : IScannerAdapter
     private Thread? scanThread;
     private bool isRunning;
     static AutoResetEvent autoResetEvent = new AutoResetEvent(false);
+    private readonly ScanSyncReceiverThread encoderUpdater;
     private const int maxStartupTimeS = 10;
 
     #region Lifecycle
 
-    public Js50Adapter(ILogger? logger = null)
+    public Js50Adapter(ILogger logger, ScanSyncReceiverThread encoderUpdater)
     {
-        this.logger = logger ?? LogManager.GetCurrentClassLogger();
-        logger!.Debug($"Created Js50Adapter using JoeScan Pinchot API version {Pinchot.VersionInformation.Version}");
+        this.logger = logger;
+        this.encoderUpdater = encoderUpdater;
+        logger.Debug($"Created Js50Adapter using JoeScan Pinchot API version {Pinchot.VersionInformation.Version}");
         Units = UnitSystem.Inches;
+        encoderUpdater.EventUpdateFrequency = 100;
+        encoderUpdater.ScanSyncUpdate += EncoderUpdaterOnScanSyncUpdate;
     }
+
+    
+
     #endregion
 
     #region IScannerAdapter Implementation
@@ -36,8 +44,11 @@ public class Js50Adapter : IScannerAdapter
     public UnitSystem Units { get; }
     public bool IsConfigured => config != null;
 
+    // If we give a finite BoundedCapacity, the BufferBlock will discard Profiles 
+    // i.e Post() will return false. -1 means unlimited buffering - hopefully the 
+    // subsequent steps are fast enough not to make this a memory hog
     public BufferBlock<Profile> AvailableProfiles { get; } =
-        new BufferBlock<Profile>(new DataflowBlockOptions() { BoundedCapacity = 1 });
+        new BufferBlock<Profile>(new DataflowBlockOptions() { BoundedCapacity = -1 });
 
     public void Configure()
     {
@@ -50,6 +61,17 @@ public class Js50Adapter : IScannerAdapter
             logger!.Error($"Error  reading Js50AdapterConfig from file \"config.json\": {e.Message}");
             throw;
         }
+
+        try
+        {
+
+            encoderUpdater.Start();
+            logger!.Debug("Started ScanSyncReceiverThread.");
+        }
+        catch (Exception e)
+        {
+            logger!.Error($"Could not start ScanSyncReceiverThread: {e.Message}");
+        } 
     }
 
     public void Start()
@@ -92,8 +114,6 @@ public class Js50Adapter : IScannerAdapter
             throw new ApplicationException(msg);
         }
     }
-
-
 
     private void ScanLoop(CancellationToken ct)
     {
@@ -222,6 +242,7 @@ public class Js50Adapter : IScannerAdapter
     public event EventHandler? ScanningStopped;
     public event EventHandler? ScanErrorEncountered;
     public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
+    public bool IsReplay => false;
 
     #endregion
 
@@ -290,8 +311,11 @@ public class Js50Adapter : IScannerAdapter
         ScanErrorEncountered?.Invoke(this, EventArgs.Empty);
     }
 
-    protected virtual void OnEncoderUpdated(EncoderUpdateArgs e)
+   
+
+    private void EncoderUpdaterOnScanSyncUpdate(object? sender, EncoderUpdateArgs e)
     {
-        EncoderUpdated?.Invoke(this, e);
+        // we just pass on the event
+        EncoderUpdated.Raise(this, e);
     }
 }

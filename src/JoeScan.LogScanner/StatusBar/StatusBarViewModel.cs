@@ -5,14 +5,21 @@ namespace JoeScan.LogScanner.StatusBar;
 
 public class StatusBarViewModel : Screen
 {
-    private readonly LogScannerEngine engine;
+    public LogScannerEngine Engine { get; }
+    public EncoderStatusViewModel EncStatus { get; }
     public string BuildInfo => $"v{GitVersionInformation.FullSemVer} ";
-    public string Adapter => engine.ScannerAdapter.Name;
-    public string EngineUnits => engine.Units.ToString();
+    public string Adapter  => Engine.ActiveAdapter != null ? Engine.ActiveAdapter.Name : "n/a";
+    public string EngineUnits => Engine.Units.ToString();
 
-    public StatusBarViewModel(LogScannerEngine engine)
+    public StatusBarViewModel(LogScannerEngine engine,
+        EncoderStatusViewModel encStatus)
     {
-        this.engine = engine;
+        Engine = engine;
+        EncStatus = encStatus;
+        Engine.AdapterChanged += (_, _) =>
+        {
+            Refresh();
+        };
     }
 
    

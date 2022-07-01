@@ -2,7 +2,6 @@
 using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.Helpers;
 using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
@@ -16,6 +15,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks.Dataflow;
 using System.Windows;
 using System.Windows.Threading;
+using JoeScan.LogScanner.Shared.Helpers;
 
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -42,7 +42,7 @@ public sealed class LiveProfileViewModel : Screen
 
     #region Pipeline Endpoint
 
-    private readonly ActionBlock<Profile> displayActionBlock;
+    private ActionBlock<Profile> displayActionBlock;
 
     #endregion
 
@@ -62,11 +62,8 @@ public sealed class LiveProfileViewModel : Screen
         dispatcherTimer.Tick += (_, _) => DrawPreview();
         Engine.ScanningStarted += (_, _) => dispatcherTimer.Start();
         Engine.ScanningStopped += (_, _) => dispatcherTimer.Stop();
-
-
         displayActionBlock = new ActionBlock<Profile>(StoreProfiles);
-        engine.RawProfiles.LinkTo(displayActionBlock);
-
+        Engine.RawProfilesBroadcastBlock.LinkTo(displayActionBlock);
     }
 
     #endregion
@@ -93,7 +90,7 @@ public sealed class LiveProfileViewModel : Screen
             }
             paused = value;
             PausedIndicatorVisibility = paused ? Visibility.Visible : Visibility.Hidden;
-           
+
             NotifyOfPropertyChange(() => Paused);
             NotifyOfPropertyChange(() => PausedIndicatorVisibility);
         }
@@ -119,7 +116,7 @@ public sealed class LiveProfileViewModel : Screen
                     LiveView!.Annotations.Clear();
                 }
                 LiveView.InvalidatePlot(false);
-                NotifyOfPropertyChange(()=>ShowFilters);
+                NotifyOfPropertyChange(() => ShowFilters);
             }
         }
     }
@@ -140,7 +137,7 @@ public sealed class LiveProfileViewModel : Screen
         // we used scan head id and camera as the index
         var t = new Tuple<uint, uint>(profile.ScanHeadId, profile.Camera);
         headCamDict[t] = profile;
-        
+
     }
 
     private void DrawPreview()
@@ -168,7 +165,7 @@ public sealed class LiveProfileViewModel : Screen
             idToSeries[idCameraPair] = new ScatterSeries
             {
                 Title = $"Head: {idCameraPair.Item1} Camera {idCameraPair.Item2}",
-                MarkerStroke = ColorDefinitions.OxyColorForCableId(idCameraPair.Item1,(int)idCameraPair.Item2),
+                MarkerStroke = ColorDefinitions.OxyColorForCableId(idCameraPair.Item1, (int)idCameraPair.Item2),
                 MarkerType = MarkerType.Plus,
                 MarkerSize = 1.0,
                 MarkerFill = OxyColors.Transparent
@@ -260,7 +257,7 @@ public sealed class LiveProfileViewModel : Screen
                 LiveView.Annotations.Add(filterOutline);
             }
         }
-        
+
     }
 
     #endregion

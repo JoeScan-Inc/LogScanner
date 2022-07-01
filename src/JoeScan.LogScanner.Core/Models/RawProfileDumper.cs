@@ -1,6 +1,8 @@
 ﻿using NLog;
 using System.Collections.Concurrent;
+using System.IO.Compression;
 using System.Threading.Tasks.Dataflow;
+using Castle.Core;
 
 namespace JoeScan.LogScanner.Core.Models;
 
@@ -13,23 +15,27 @@ public class RawProfileDumper
 
     private BlockingCollection<Profile>? dumpQueue  = null;
 
+    public bool IsEnabled { get; set; } = true;
     public RawProfileDumper(ILogger logger)
     {
         this.logger = logger;
-        DumpBlock = new TransformBlock<Profile, Profile>(ProcessProfile);
+        DumpBlock = new TransformBlock<Profile, Profile>(ProcessProfile,
+            new ExecutionDataflowBlockOptions() { BoundedCapacity = -1, EnsureOrdered = true, MaxDegreeOfParallelism = 1 });
     }
 
     public void StartDumping()
     {
-        if (dumpQueue != null)
+
+        if (dumpQueue != null || !IsEnabled )
         {
             return;
         }
         // check for file being open and such here
         if (OutputDir == String.Empty)
         {
-            var msg = "Output directory must not be empty.";
-            throw new ApplicationException();
+            var msg = "Output directory must not be empty. Dumping disabled.";
+            logger.Warn(msg);
+            return;
         }
 
         if (!Directory.Exists(OutputDir))
@@ -40,8 +46,8 @@ public class RawProfileDumper
             }
             catch (Exception ex)
             {
-                logger.Error($"Failed to create directory: {OutputDir}: {ex.Message}");
-                throw;
+                logger.Error($"Failed to create directory: {OutputDir}: {ex.Message}. Dumping disabled.");
+                return;
             }
         }
 
@@ -49,8 +55,12 @@ public class RawProfileDumper
         Task.Run(() =>
         {
             dumpQueue = new BlockingCollection<Profile>();
+            
+          
             using var fs = new FileStream(fileName, FileMode.Create);
-            using var writer = new BinaryWriter(fs);
+            using var gzip = new GZipStream(fs, CompressionMode.Compress);
+            using var writer = new BinaryWriter(gzip);
+            var count = 0L;
             while (!dumpQueue.IsCompleted)
             {
                 Profile? p = null;
@@ -68,17 +78,32 @@ public class RawProfileDumper
                 if (p != null)
                 {
                     p.Write(writer);
+                    count++;
                 }
             }
 
             logger.Debug("Dumper queue empty, exiting task.");
+            gzip.Close();
             dumpQueue = null;
+            if (count == 0)
+            {
+                // didn't record anything, delete file
+                try
+                {
+                    File.Delete(fileName);
+                }
+                catch (Exception )
+                {
+                    //unused
+                }
+            }
         });
     }
 
     private string CreateOutputFileName()
     {
         var t = DateTime.Now;
+        // TODO: do a File.Exists to catch cases where the seconds are not enough to distinct
         return Path.Combine(OutputDir, $"{BaseName}{t.Year}_{t.Month}_{t.Day}_{t.Hour}_{t.Minute}_{t.Second}.raw");
     }
 
@@ -91,9 +116,9 @@ public class RawProfileDumper
     }
     private Profile ProcessProfile(Profile p)
     {
-        if (dumpQueue!=null && !dumpQueue.IsAddingCompleted)
+        if (dumpQueue!=null && !dumpQueue.IsAddingCompleted && IsEnabled)
         {
-            dumpQueue.Add(p);
+            dumpQueue.Add((Profile)p.Clone());
         }
         return p;
     }

@@ -2,7 +2,7 @@
 
 namespace JoeScan.LogScanner.Core.Models;
 
-public enum UnitSystem
+public enum UnitSystem : byte
 {
     Inches = 0,
     Millimeters = 1,
@@ -20,10 +20,12 @@ public static class UnitConverter
         if (from == UnitSystem.Inches)
         {
             p.Data = p.Data.Select(q => new Point2D(q.X * 25.4, q.Y * 25.4, q.B)).ToArray();
+            p.Units = UnitSystem.Millimeters;
         }
         else
         {
             p.Data = p.Data.Select(q => new Point2D(q.X / 25.4, q.Y / 25.4, q.B)).ToArray();
+            p.Units = UnitSystem.Inches;
 
         }
 

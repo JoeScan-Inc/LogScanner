@@ -12,11 +12,15 @@ using JoeScan.LogScanner.Toolbar;
 using JoeScan.LogScanner.TopAndSide;
 using System.Windows;
 using JoeScan.LogScanner.Config;
+using NLog;
+using System;
+using System.Linq;
 
 namespace JoeScan.LogScanner.Shell;
 
 public class ShellViewModel : Screen
 {
+    public ILogger Logger { get; }
     public ILogScannerConfig Config { get; }
     public StatusBarViewModel StatusBar { get; }
     public ToolbarViewModel Toolbar { get; }
@@ -28,8 +32,11 @@ public class ShellViewModel : Screen
     public LogScannerEngine Engine { get; }
     public IUserNotifier Notifier { get; }
 
+    public string Title => "JoeScan LogScanner";
+
     public ShellViewModel(
-         ILogScannerConfig config,
+        ILogger logger,
+        ILogScannerConfig config,
         StatusBarViewModel statusBar,
         ToolbarViewModel toolbar,
         TopAndSideViewModel topAndSide,
@@ -40,6 +47,7 @@ public class ShellViewModel : Screen
         LogScannerEngine engine,
         IUserNotifier notifier)
     {
+        Logger = logger;
         Config = config;
         StatusBar = statusBar;
         Toolbar = toolbar;
@@ -54,6 +62,28 @@ public class ShellViewModel : Screen
         {
             Refresh();
         };
+        if (!string.IsNullOrEmpty(config.ActiveAdapter))
+        {
+            var n = Engine.AvailableAdapters.FirstOrDefault(q => q.Name == config.ActiveAdapter);
+            {
+                if (n != null)
+                {
+                    try
+                    {
+                        Engine.SetActiveAdapter(n);
+                        Notifier.Success($"Active Adapter: {n}");
+                    }
+                    catch (Exception e)
+                    {
+                        var msg = $"Error setting active adapter: {e.Message}";
+                        Logger.Error(msg);
+                        Notifier.Error(msg);
+                        Engine.SetActiveAdapter(Engine.AvailableAdapters.First());
+                        Notifier.Warn($"Fallback adapter: {Engine.ActiveAdapter!.Name}");
+                    }
+                }
+            }
+        }
     }
 
     public Visibility IsBusy => Notifier.IsBusy ? Visibility.Visible : Visibility.Hidden;
