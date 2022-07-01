@@ -1,6 +1,7 @@
 ﻿using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Geometry;
 using System.Diagnostics;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace JoeScan.LogScanner.Core.Models;
 [DebuggerDisplay("Center = {SectionCenter}, Accepted = {AcceptedPoints.Count}, Rejected = {RejectedPoints.Count}")]
@@ -24,15 +25,15 @@ public class LogSection
 
     #region Lazily Evaluated Backing
 
-    private Lazy<double> rawDiameterX;
+    private readonly Lazy<double> rawDiameterX;
 
-    private Lazy<double> totalArea;
+    private readonly Lazy<double> totalArea;
 
-    public Lazy<double> rawDiameterY;
+    private readonly Lazy<double> rawDiameterY;
 
-    private Lazy<double> woodArea;
+    private readonly Lazy<double> woodArea;
 
-    private Lazy<double> fitError;
+    private readonly Lazy<double> fitError;
     #endregion
 
     #region Public Properties
@@ -61,7 +62,9 @@ public class LogSection
     #endregion
 
     #region Lifecycle
-
+    //TODO: the properties Sections, RejectedSections, EllipseModel and ModeledProfile are set as init only 
+    // properties. Because we use a LogModelBuilder as a Builder pattern and hide the constructor, it is fine
+    // but ugly nonetheless. Should find a better way to initialize. 
     internal LogSection(IReadOnlyList<Profile> profiles, double sectionCenter)
     {
         IsValid = false;

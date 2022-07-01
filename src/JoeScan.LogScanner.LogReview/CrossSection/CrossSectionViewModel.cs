@@ -1,5 +1,9 @@
 ﻿using Caliburn.Micro;
+using JoeScan.LogScanner.Core.Geometry;
+using JoeScan.LogScanner.Core.Models;
+using JoeScan.LogScanner.LogReview.Extensions;
 using JoeScan.LogScanner.LogReview.Models;
+using JoeScan.LogScanner.LogReview.Navigator;
 using JoeScan.LogScanner.Shared.Helpers;
 using NLog;
 using NLog.Filters;
@@ -7,26 +11,243 @@ using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using OxyPlot.Legends;
+using OxyPlot.Series;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Documents;
+
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace JoeScan.LogScanner.LogReview.CrossSection;
 
 public class CrossSectionViewModel : Screen
 {
-    public LogReviewer Reviewer { get; }
-    public ILogger Logger { get; }
-    public PlotModel CrossSectionPlotModel { get; set; }
+    #region Backing Properties
 
-    public CrossSectionViewModel(LogReviewer reviewer, ILogger logger)
+    private LogSection? currentSection;
+    private Mode viewMode;
+
+    #endregion
+
+    #region Injected Properties
+
+    public ILogger Logger { get; }
+
+    #endregion
+
+    public enum Mode
     {
-        Reviewer = reviewer;
-        Logger = logger;
-        CrossSectionPlotModel = SetupPlot();
+        ModeSection,
+        ModeRawProfiles
     }
 
-    private PlotModel SetupPlot()
+    public List<KeyValuePair<Mode, string>> ModeStringPairs => new List<KeyValuePair<Mode, string>>()
     {
-        var model = new PlotModel
+        new KeyValuePair<Mode, string>(Mode.ModeSection, "Sections"),
+        new KeyValuePair<Mode, string>(Mode.ModeRawProfiles, "Raw Profiles")
+    };
+
+    public Mode ViewMode
+    {
+        get => viewMode;
+        set
+        {
+            if (value == viewMode)
+            {
+                return;
+            }
+            viewMode = value;
+            NotifyOfPropertyChange(() => ViewMode);
+            RefreshDisplay();
+        }
+    }
+
+    public bool ShowAcceptedPoints
+    {
+        get => showAcceptedPoints;
+        set
+        {
+            if (value == showAcceptedPoints) return;
+            showAcceptedPoints = value;
+            NotifyOfPropertyChange(() => ShowAcceptedPoints);
+            RefreshDisplay();
+        }
+    }
+
+    public bool ShowRejectedPoints
+    {
+        get => showRejectedPoints;
+        set
+        {
+            if (value == showRejectedPoints) return;
+            showRejectedPoints = value;
+            NotifyOfPropertyChange(() => ShowRejectedPoints);
+            RefreshDisplay();
+        }
+    }
+
+    public bool ShowModelPoints
+    {
+        get => showModelPoints;
+        set
+        {
+            if (value == showModelPoints) return;
+            showModelPoints = value;
+            NotifyOfPropertyChange(() => ShowModelPoints);
+            RefreshDisplay();
+        }
+    }
+
+    public bool ShowModel
+    {
+        get => showModel;
+        set
+        {
+            if (value == showModel) return;
+            showModel = value;
+            NotifyOfPropertyChange(() => ShowModel);
+            RefreshDisplay();
+        }
+    }
+
+    private readonly OxyColor acceptedPointsColor = OxyColors.Red;
+    private readonly OxyColor rejectedPointsColor = OxyColors.Blue;
+    private readonly OxyColor modelPointsColor = OxyColors.Yellow;
+    private bool showAcceptedPoints = true;
+    private bool showRejectedPoints = true;
+    private bool showModelPoints = true;
+    private bool showModel = false;
+
+    #region UI Bound
+
+    public PlotModel CrossSectionPlotModel { get; private set; }
+
+    public LogSection? CurrentSection
+    {
+        get => currentSection;
+        set
+        {
+            if (value == currentSection)
+            {
+                return;
+            }
+            currentSection = value;
+            RefreshDisplay();
+        }
+    }
+
+    #endregion
+
+    #region Lifecycle
+
+    public CrossSectionViewModel(ILogger logger)
+    {
+        Logger = logger;
+        SetupPlot();
+        viewMode = Mode.ModeSection;
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void RefreshDisplay()
+    {
+        if (CurrentSection == null)
+        {
+            CrossSectionPlotModel.Series.Clear();
+            CrossSectionPlotModel.Annotations.Clear();
+            CrossSectionPlotModel.InvalidatePlot(true);
+            return;
+        }
+
+        RefreshSeries();
+        RefreshAnnotations();
+        CrossSectionPlotModel.InvalidatePlot(true);
+    }
+
+    private void RefreshAnnotations()
+    {
+        if (CurrentSection == null)
+        {
+            return;
+        }
+
+    }
+
+    private void RefreshSeries()
+    {
+        CrossSectionPlotModel.Series.Clear();
+        if (CurrentSection == null)
+        {
+            return;
+        }
+
+        if (ShowAcceptedPoints && ViewMode == Mode.ModeSection)
+        {
+            var s = new ScatterSeries()
+            {
+                Title = $"Accepted Pts:",
+                MarkerStroke = acceptedPointsColor,
+                MarkerType = MarkerType.Cross,
+                MarkerSize = 0.5,
+                MarkerFill = acceptedPointsColor,
+
+            };
+            s.Points.AddRange(CurrentSection.AcceptedPoints.ToScatterPoints());
+            CrossSectionPlotModel.Series.Add(s);
+        }
+        if (ShowRejectedPoints && ViewMode == Mode.ModeSection)
+        {
+            var s = new ScatterSeries()
+            {
+                Title = $"Rejected Pts:",
+                MarkerStroke = rejectedPointsColor,
+                MarkerType = MarkerType.Circle,
+                MarkerSize = 1.0,
+                MarkerFill = rejectedPointsColor,
+
+            };
+            s.Points.AddRange(CurrentSection.RejectedPoints.ToScatterPoints());
+            CrossSectionPlotModel.Series.Add(s);
+        }
+        if (ShowModelPoints && ViewMode == Mode.ModeSection)
+        {
+            var s = new ScatterSeries()
+            {
+                Title = $"Model Pts:",
+                MarkerStroke = modelPointsColor,
+                MarkerType = MarkerType.Circle,
+                MarkerSize = 2.0,
+                MarkerFill = modelPointsColor,
+
+            };
+            s.Points.AddRange(CurrentSection.ModeledProfile.ToScatterPoints());
+            CrossSectionPlotModel.Series.Add(s);
+        }
+
+        if (ShowModel && ViewMode == Mode.ModeSection)
+        {
+            var s = new LineSeries
+            {
+                Color = OxyColors.Orange,
+                MarkerType = MarkerType.None,
+                StrokeThickness = 0.5,
+                DataFieldX = "X",
+                DataFieldY = "Y"
+            };
+            PointF[] ellipsePoints = EllipseFit.MakeEllipseSection(CurrentSection.DiameterMax / 2,
+                CurrentSection.DiameterMin / 2, CurrentSection.DiameterMaxAngle,
+                CurrentSection.CentroidX , CurrentSection.CentroidY , 100);
+            s.ItemsSource = ellipsePoints;
+            CrossSectionPlotModel.Series.Add(s);
+        }
+
+    }
+
+    private void SetupPlot()
+    {
+        CrossSectionPlotModel  = new PlotModel
         {
             PlotType = PlotType.Cartesian,
             Background = OxyColorsForStyle.PlotBackgroundColor,
@@ -34,7 +255,7 @@ public class CrossSectionViewModel : Screen
             PlotAreaBorderThickness = new OxyThickness(0),
             PlotMargins = new OxyThickness(-10)
         };
-        model.Legends.Add(new Legend
+        CrossSectionPlotModel.Legends.Add(new Legend
         {
             LegendPosition = LegendPosition.TopRight,
             LegendTextColor = OxyColorsForStyle.LegendTextColor
@@ -58,7 +279,7 @@ public class CrossSectionViewModel : Screen
             TextColor = OxyColorsForStyle.AxisTextColor,
             // LabelFormatter = x => null
         };
-        model.Axes.Add(columnAxis);
+        CrossSectionPlotModel.Axes.Add(columnAxis);
 
         var rowAxis = new LinearAxis
         {
@@ -79,9 +300,8 @@ public class CrossSectionViewModel : Screen
             TextColor = OxyColorsForStyle.AxisTextColor,
             // LabelFormatter = x => null
         };
-        model.Axes.Add(rowAxis);
-
-        return model;
-
+        CrossSectionPlotModel.Axes.Add(rowAxis);
     }
+
+    #endregion
 }
