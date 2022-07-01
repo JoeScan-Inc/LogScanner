@@ -13,7 +13,7 @@ namespace JoeScan.LogScanner.Core.Geometry
             Control.UseManaged();    
         }
 
-        internal static PointF[] MakeEllipseSection(double a, double b, double angle, double x0, double y0, double top, double bottom, int pointCount)
+        public static PointF[] MakeEllipseSection(double a, double b, double angle, double x0, double y0, double top, double bottom, int pointCount)
         {
             PointF[] points = new PointF[pointCount];
             
@@ -40,7 +40,7 @@ namespace JoeScan.LogScanner.Core.Geometry
         }
 
 
-        internal static PointF[] MakeEllipseSection(double a, double b, double angle, double x0, double y0, int pointCount)
+        public static PointF[] MakeEllipseSection(double a, double b, double angle, double x0, double y0, int pointCount)
         {
             PointF[] points = new PointF[pointCount];
 

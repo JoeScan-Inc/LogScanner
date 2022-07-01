@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.LogReview.Extensions;
 using JoeScan.LogScanner.LogReview.Models;
@@ -12,6 +13,7 @@ using OxyPlot.Axes;
 using OxyPlot.Legends;
 using OxyPlot.Series;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Documents;
 
 // ReSharper disable MemberCanBePrivate.Global
@@ -221,6 +223,23 @@ public class CrossSectionViewModel : Screen
 
             };
             s.Points.AddRange(CurrentSection.ModeledProfile.ToScatterPoints());
+            CrossSectionPlotModel.Series.Add(s);
+        }
+
+        if (ShowModel && ViewMode == Mode.ModeSection)
+        {
+            var s = new LineSeries
+            {
+                Color = OxyColors.Orange,
+                MarkerType = MarkerType.None,
+                StrokeThickness = 0.5,
+                DataFieldX = "X",
+                DataFieldY = "Y"
+            };
+            PointF[] ellipsePoints = EllipseFit.MakeEllipseSection(CurrentSection.DiameterMax / 2,
+                CurrentSection.DiameterMin / 2, CurrentSection.DiameterMaxAngle,
+                CurrentSection.CentroidX , CurrentSection.CentroidY , 100);
+            s.ItemsSource = ellipsePoints;
             CrossSectionPlotModel.Series.Add(s);
         }
 
