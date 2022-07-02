@@ -35,10 +35,6 @@
     <Folder Include="Settings\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="OxyPlot.Wpf">
-      <HintPath>..\..\..\..\..\..\.nuget\packages\oxyplot.wpf\2.1.0\lib\netcoreapp3.1\OxyPlot.Wpf.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+ 
 
 </Project>

@@ -35,6 +35,8 @@ public class LogModel
     /// </summary>
     public  List<LogSection> RejectedSections { get; init; } = new List<LogSection>();
 
+    public double EncoderPulseInterval => encoderPulseInterval;
+
     #endregion
 
     private Lazy<double> length;

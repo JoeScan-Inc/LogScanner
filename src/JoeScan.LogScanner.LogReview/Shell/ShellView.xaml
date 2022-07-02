@@ -33,7 +33,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="3*" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -46,5 +46,7 @@
             </Grid.ColumnDefinitions>
             <ContentControl x:Name="CrossSection" Grid.Column="1" />
         </Grid>
+        <ContentControl x:Name="Log3D" Grid.Row="3" />
+
     </Grid>
 </controls:AdonisWindow>

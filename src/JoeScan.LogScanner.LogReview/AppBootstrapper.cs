@@ -8,6 +8,7 @@ using System.Windows;
 using Config.Net;
 using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.LogReview.CrossSection;
+using JoeScan.LogScanner.LogReview.Log3D;
 using JoeScan.LogScanner.LogReview.Models;
 using JoeScan.LogScanner.LogReview.Settings;
 using MvvmDialogs;
@@ -33,6 +34,7 @@ public class AppBootstrapper : AutofacBootstrapper
         builder.RegisterModule<NLogModule>();
         builder.RegisterType<LogReviewer>().AsSelf().SingleInstance();
         builder.RegisterType<CrossSectionViewModel>().AsSelf().SingleInstance();
+        builder.RegisterType<Log3DViewModel>().AsSelf().SingleInstance();
         builder.RegisterType<DialogService>().As<IDialogService>();
 
 

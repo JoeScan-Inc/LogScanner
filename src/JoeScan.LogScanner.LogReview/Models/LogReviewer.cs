@@ -3,6 +3,7 @@ using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.LogReview.CrossSection;
+using JoeScan.LogScanner.LogReview.Log3D;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ public class LogReviewer : PropertyChangedBase
     public ILogger Logger { get; }
     public LogModelBuilder ModelBuilder { get; }
     public CrossSectionViewModel CrossSectionViewModel { get; }
+    public Log3DViewModel Log3D { get; }
 
     #region Bound Properties
 
@@ -59,6 +61,8 @@ public class LogReviewer : PropertyChangedBase
                 CurrentSection = null;
                 Sections = null;
             }
+
+            Log3D.CurrentLogModel = value;
         }
     }
 
@@ -85,11 +89,13 @@ public class LogReviewer : PropertyChangedBase
 
     public LogReviewer(ILogger logger,
         LogModelBuilder modelBuilder,
-        CrossSectionViewModel crossSectionViewModel)
+        CrossSectionViewModel crossSectionViewModel,
+        Log3DViewModel log3D)
     {
         Logger = logger;
         ModelBuilder = modelBuilder;
         CrossSectionViewModel = crossSectionViewModel;
+        Log3D = log3D;
     }
 
     #endregion
