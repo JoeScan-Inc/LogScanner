@@ -31,11 +31,11 @@
                 CameraMode="Inspect"
                 CameraRotationMode="Trackball"
                 ModelUpDirection="0,1,0"
-                ShowCameraInfo="True"
+                ShowCameraInfo="False"
                 ShowCoordinateSystem="True"
                 ZoomAroundMouseDownPoint="True"
                 ZoomExtentsWhenLoaded="True">
-                <h:DefaultLights/>
+                <h:DefaultLights />
 
                 <h:HelixViewport3D.DefaultCamera>
 
@@ -65,6 +65,13 @@
                     DockPanel.Dock="Left"
                     Orientation="Vertical">
                     <CheckBox x:Name="ShowModel">Model</CheckBox>
+
+                </StackPanel>
+                <StackPanel
+                    Margin="10,3"
+                    DockPanel.Dock="Left"
+                    Orientation="Vertical">
+                    <CheckBox x:Name="ShowSectionCenters">Section Centers</CheckBox>
 
                 </StackPanel>
             </DockPanel>

@@ -110,13 +110,28 @@ public class CrossSectionViewModel : Screen
         }
     }
 
+    public bool ShowSectionCenters
+    {
+        get => showSectionCenters;
+        set
+        {
+            if (value == showSectionCenters)
+            {
+                return;
+            }
+            showSectionCenters = value;
+            NotifyOfPropertyChange(() => ShowSectionCenters);
+        }
+    }
+
     private readonly OxyColor acceptedPointsColor = OxyColors.Red;
     private readonly OxyColor rejectedPointsColor = OxyColors.Blue;
     private readonly OxyColor modelPointsColor = OxyColors.Yellow;
     private bool showAcceptedPoints = true;
     private bool showRejectedPoints = true;
     private bool showModelPoints = true;
-    private bool showModel = false;
+    private bool showModel = true;
+    private bool showSectionCenters = true;
 
     #region UI Bound
 
@@ -168,11 +183,37 @@ public class CrossSectionViewModel : Screen
 
     private void RefreshAnnotations()
     {
+        CrossSectionPlotModel.Annotations.Clear();
         if (CurrentSection == null)
         {
             return;
         }
 
+        if (showSectionCenters)
+        {
+            CrossSectionPlotModel.Annotations.Add(new PolylineAnnotation()
+            {
+                Points =
+                {
+                    new DataPoint(CurrentSection.CentroidX-5, CurrentSection.CentroidY),
+                    new DataPoint(CurrentSection.CentroidX+5, CurrentSection.CentroidY)
+                },
+                LineStyle = LineStyle.Solid,
+                StrokeThickness = 1.0,
+                Color = OxyColors.Orange
+            });
+            CrossSectionPlotModel.Annotations.Add(new PolylineAnnotation()
+            {
+                Points =
+                {
+                    new DataPoint(CurrentSection.CentroidX, CurrentSection.CentroidY-5),
+                    new DataPoint(CurrentSection.CentroidX, CurrentSection.CentroidY+5)
+                },
+                LineStyle = LineStyle.Solid,
+                StrokeThickness = 1.0,
+                Color = OxyColors.Orange
+            });
+        }
     }
 
     private void RefreshSeries()
