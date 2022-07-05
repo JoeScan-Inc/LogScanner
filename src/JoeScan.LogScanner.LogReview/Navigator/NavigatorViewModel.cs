@@ -1,5 +1,7 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.LogReview.Models;
+using System;
+using System.Windows.Input;
 
 namespace JoeScan.LogScanner.LogReview.Navigator;
 
@@ -60,8 +62,19 @@ public class NavigatorViewModel : Screen
             }
             var index = Reviewer.Sections!.IndexOf(Reviewer.CurrentSection!);
             var count = Reviewer.Sections.Count;
-            var pos = Reviewer.CurrentSection!.SectionCenter;
-            return $"Section {index+1} of {count}, Center at {pos:F2} mm";
+            return $"Section {index+1} of {count}";
         }
     }
+
+    public string Position => 
+        Reviewer.CurrentSection != null ? $"{Reviewer.CurrentSection!.SectionCenter:F} mm": "n/a";
+
+    public string FitError =>
+        Reviewer.CurrentSection != null ? $"{Reviewer.CurrentSection.FitError:F1} mm" : "n/a";
+
+    public string SectionWidth => 
+        Reviewer.CurrentLogModel != null ? $"{Reviewer.CurrentLogModel.Interval:F1} mm" : "";
+
+    
+
 }

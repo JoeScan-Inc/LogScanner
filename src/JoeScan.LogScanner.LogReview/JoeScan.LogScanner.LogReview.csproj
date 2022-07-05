@@ -24,6 +24,7 @@
     <PackageReference Include="MvvmDialogs" Version="8.0.0" />
     <PackageReference Include="OxyPlot.Core" Version="2.1.0" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.1.0" />
+    <PackageReference Include="SpicyTaco.AutoGrid" Version="1.2.29" />
   </ItemGroup>
 
   <ItemGroup>

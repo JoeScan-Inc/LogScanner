@@ -6,76 +6,126 @@
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:local="clr-namespace:JoeScan.LogScanner.LogReview.Navigator"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="45"
-    d:DesignWidth="800"
+    xmlns:st="http://schemas.spicytaco.io/"
+    MinWidth="300"
+    d:DesignHeight="600"
+    d:DesignWidth="300"
     mc:Ignorable="d">
-    <DockPanel LastChildFill="True">
-        <Button
-            x:Name="FirstSection"
-            Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
-            Height="{Binding ActualHeight, ElementName=CurrentFileName}"
-            Margin="5,5,5,5"
-            Padding="0"
-            DockPanel.Dock="Left"
-            Focusable="False">
-            <Border VerticalAlignment="Center">
-                <iconPacks:Material
-                    Width="16"
-                    Height="16"
-                    Kind="Rewind" />
-            </Border>
-        </Button>
 
-        <Button
-            x:Name="PreviousSection"
-            Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
-            Height="{Binding ActualHeight, ElementName=CurrentFileName}"
-            Margin="5,5,5,5"
-            Padding="0"
-            DockPanel.Dock="Left"
-            Focusable="False">
-            <Border VerticalAlignment="Center">
-                <iconPacks:Material
-                    Width="16"
-                    Height="16"
-                    Kind="ArrowLeftBold" />
-            </Border>
-        </Button>
-        <Button
-            x:Name="LastSection"
-            Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
-            Height="{Binding ActualHeight, ElementName=CurrentFileName}"
-            Margin="5,5,5,5"
-            Padding="0"
-            DockPanel.Dock="Right"
-            Focusable="False">
-            <Border VerticalAlignment="Center">
-                <iconPacks:Material
-                    Width="16"
-                    Height="16"
-                    Kind="FastForward" />
-            </Border>
-        </Button>
+    <GroupBox Padding="0">
+        <GroupBox.Header>
+            <DockPanel MinHeight="30" LastChildFill="False">
+                <Border
+                    VerticalAlignment="Center"
+                    BorderBrush="{x:Null}"
+                    DockPanel.Dock="Left">
+                    <TextBlock Margin="10,0,0,0">Navigation</TextBlock>
+                </Border>
+            </DockPanel>
+        </GroupBox.Header>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <DockPanel Grid.Row="0" LastChildFill="False">
+                <Button
+                    x:Name="FirstSection"
+                    Width="32"
+                    Height="32"
+                    Margin="5,5,5,5"
+                    Padding="0"
+                    DockPanel.Dock="Left"
+                    Focusable="False">
+                    <Border VerticalAlignment="Center">
+                        <iconPacks:Material
+                            Width="16"
+                            Height="16"
+                            Kind="Rewind" />
+                    </Border>
+                </Button>
 
-        <Button
-            x:Name="NextSection"
-            Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
-            Height="{Binding ActualHeight, ElementName=CurrentFileName}"
-            Margin="5,5,5,5"
-            Padding="0"
-            DockPanel.Dock="Right"
-            Focusable="False">
-            <Border VerticalAlignment="Center">
-                <iconPacks:Material
-                    Width="16"
-                    Height="16"
-                    Kind="ArrowRightBold" />
-            </Border>
-        </Button>
+                <Button
+                    x:Name="PreviousSection"
+                    Width="32"
+                    Height="32"
+                    Margin="5,5,5,5"
+                    Padding="0"
+                    DockPanel.Dock="Left"
+                    Focusable="False">
+                    <Border VerticalAlignment="Center">
+                        <iconPacks:Material
+                            Width="16"
+                            Height="16"
+                            Kind="ArrowLeftBold" />
+                    </Border>
+                </Button>
+                <Button
+                    x:Name="LastSection"
+                    Width="32"
+                    Height="32"
+                    Margin="5,5,5,5"
+                    Padding="0"
+                    DockPanel.Dock="Right"
+                    Focusable="False">
+                    <Border VerticalAlignment="Center">
+                        <iconPacks:Material
+                            Width="16"
+                            Height="16"
+                            Kind="FastForward" />
+                    </Border>
+                </Button>
 
-        <Label
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Content="{Binding SectionInfoLabel}" />
-    </DockPanel>
+                <Button
+                    x:Name="NextSection"
+                    Width="32"
+                    Height="32"
+                    Margin="5,5,5,5"
+                    Padding="0"
+                    DockPanel.Dock="Right"
+                    Focusable="False">
+                    <Border VerticalAlignment="Center">
+                        <iconPacks:Material
+                            Width="16"
+                            Height="16"
+                            Kind="ArrowRightBold" />
+                    </Border>
+                </Button>
+
+
+            </DockPanel>
+
+            <GroupBox
+                Grid.Row="2"
+                Margin="3"
+                Header="{Binding SectionInfoLabel}">
+                <st:AutoGrid
+                    ChildMargin="3"
+                    Columns="Auto,*"
+                    Rows="Auto,Auto,Auto,*">
+                    <st:AutoGrid.Resources>
+                        <Style BasedOn="{StaticResource {x:Type Label}}" TargetType="Label">
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                        </Style>
+                        <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="TextBox">
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="IsReadOnly" Value="True" />
+                            <Setter Property="Focusable" Value="False" />
+                        </Style>
+                    </st:AutoGrid.Resources>
+
+                    <Label Content="Position:" />
+                    <TextBox Text="{Binding Position, Mode=OneWay}" />
+
+                    <Label Content="Section Width:" />
+                    <TextBox Text="{Binding SectionWidth, Mode=OneWay}" />
+
+                    <Label Content="Fit Error:" />
+                    <TextBox Text="{Binding FitError, Mode=OneWay}" />
+
+                </st:AutoGrid>
+            </GroupBox>
+        </Grid>
+    </GroupBox>
 </UserControl>

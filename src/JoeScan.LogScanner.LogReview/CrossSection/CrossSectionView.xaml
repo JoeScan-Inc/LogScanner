@@ -17,25 +17,25 @@
                         VerticalAlignment="Center"
                         BorderBrush="{x:Null}"
                         DockPanel.Dock="Left">
-                        <TextBlock>Cross Section</TextBlock>
+                        <TextBlock Margin="10,0,0,0">Cross Section</TextBlock>
                     </Border>
                 </DockPanel>
             </GroupBox.Header>
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+                
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
                 <oxy:PlotView
-                    Grid.Row="1"
+                    Grid.Column="0"
                     Margin="0"
                     Padding="0"
                     Model="{Binding CrossSectionPlotModel}" />
-                <DockPanel Grid.Row="2" LastChildFill="False">
-                    <StackPanel DockPanel.Dock="Left" Orientation="Vertical">
+                <DockPanel Grid.Column="1" LastChildFill="False">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
                         <TextBlock Margin="5">View Mode:</TextBlock>
-                        <ComboBox
+                        <ComboBox Margin="5"
                             DisplayMemberPath="Value"
                             Focusable="False"
                             ItemsSource="{Binding ModeStringPairs}"
@@ -44,15 +44,10 @@
                     </StackPanel>
                     <StackPanel
                         Margin="5"
-                        DockPanel.Dock="Left"
+                        DockPanel.Dock="Top"
                         Orientation="Vertical">
                         <CheckBox x:Name="ShowAcceptedPoints">Accepted Points</CheckBox>
                         <CheckBox x:Name="ShowRejectedPoints">Rejected Points</CheckBox>
-                    </StackPanel>
-                    <StackPanel
-                        Margin="5"
-                        DockPanel.Dock="Left"
-                        Orientation="Vertical">
                         <CheckBox x:Name="ShowModel">Model</CheckBox>
                         <CheckBox x:Name="ShowModelPoints">Model Points</CheckBox>
                     </StackPanel>
