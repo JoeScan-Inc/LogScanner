@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JoeScan.LogScanner.Core\JoeScan.LogScanner.Core.csproj" />
+  </ItemGroup>
+	<Target Name="CopyDLLs" AfterTargets="Build">
+		<Message Text="Executing CopyDLLs task" Importance="High" />
+
+		<Copy
+			SourceFiles="$(TargetDir)$(ProjectName).dll;$(TargetDir)$(ProjectName).pdb"
+			DestinationFolder="$(SolutionDir)JoeScan.LogScanner\bin\$(Configuration)\net6.0-windows\vendor" />
+
+		<Message Text="Copied build files" Importance="High" />
+	</Target>
+</Project>

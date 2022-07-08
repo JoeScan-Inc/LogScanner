@@ -39,13 +39,11 @@ In order to build LogScanner for your specific hardware,
  instructed to use a specific module for resolving the ```IScannerAdapter``` service. This is done in the ```ConfigureContainer```
  method for the application:
 
-	// -- Adapter Modules --
-    // only one adapter should be registered. The adapter module 
-    // must provide at least one registration for an IScannerAdapter
 
-    // builder.RegisterModule<ReplayModule>();
-       builder.RegisterModule<Js25Module>();
-    // builder.RegisterModule<Js50Module>();
+
+     builder.RegisterModule<ReplayModule>();
+     builder.RegisterModule<Js25Module>();
+     builder.RegisterModule<Js50Module>();
 
 Several adapter modules are provided:
 
@@ -128,6 +126,20 @@ the order of profiles is preserved, as we have the following steps:
  - a broadcast block that allows other components to 'see' the raw profile stream. The GUI uses this 'tee' in the pipeline 
   to display a live view of the data. 
 
+## Vendor specific modules
+
+LogScanner implements a plug-in system that vendors can utilize to execute their own (proprietary) code
+in the context of the LogScannerEngine. 
+Currently, only one extension point exists. In order to register, a vendor plug-in must 
+implement the `ILogModelConsumer` interface in an assembly. This assembly must be 
+located in a directory named `vendor` next to the executables for JoeScan.LogScanner.
+
+We provided a sample project, `LogScanner.VendorSample` that implements a basic version. 
+Note that the project contains an MSBuild task that copies the created DLL to the `vendor` subdirectory 
+mentioned above. 
+
+For completed LogModels, the engine will call the `Consume` method of this implementation on 
+a taskpool task. 
 
   ## Requirements
 

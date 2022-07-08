@@ -19,6 +19,7 @@ using JoeScan.LogScanner.Js50;
 using JoeScan.LogScanner.Replay;
 using JoeScan.LogScanner.SyntheticDataAdapter;
 using System.IO;
+using System.Reflection;
 using ToastNotifications;
 using ToastNotifications.Lifetime;
 using ToastNotifications.Position;
@@ -78,5 +79,20 @@ public class AppBootstrapper : AutofacBootstrapper
             // this will override the registration of MuteNotifier in the engine
         }))).As<IUserNotifier>().SingleInstance();
 
+        // add vendor specific assemblies from a folder 
+        Assembly executingAssembly = Assembly.GetExecutingAssembly();
+        string applicationDirectory = Path.GetDirectoryName(executingAssembly.Location);
+        foreach (var file in Directory.GetFiles(Path.Combine(applicationDirectory!, "vendor"), "*.dll"))
+        {
+            try
+            {
+                var vendorAssembly = Assembly.LoadFile(file);
+                builder.RegisterAssemblyTypes(new Assembly[] { vendorAssembly }).AsImplementedInterfaces();
+            }
+            catch
+            {
+
+            }
+        }
     }
 }

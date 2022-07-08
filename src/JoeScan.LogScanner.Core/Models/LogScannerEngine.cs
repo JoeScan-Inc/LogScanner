@@ -4,6 +4,7 @@ using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Interfaces;
 using NLog;
+using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
 
 namespace JoeScan.LogScanner.Core.Models
@@ -21,10 +22,16 @@ namespace JoeScan.LogScanner.Core.Models
         public IScannerAdapter? ActiveAdapter { get; private set; }
         private ILogger Logger { get; }
         public ILogAssembler LogAssembler { get; }
+        public LogModelBuilder ModelBuilder { get; }
+        public IEnumerable<ILogModelConsumer> Consumers { get; }
+
         public BroadcastBlock<Profile> RawProfilesBroadcastBlock { get; private set; } 
             = new BroadcastBlock<Profile>(profile => profile);
         public BroadcastBlock<RawLog> RawLogsBroadcastBlock { get; } 
             = new BroadcastBlock<RawLog>(r => r);
+        public BroadcastBlock<LogModel> LogModelBroadcastBlock { get; }
+            = new BroadcastBlock<LogModel>(r => r);
+
         public UnitSystem Units { get; }
         public bool IsRunning => ActiveAdapter is { IsRunning: true };
         public bool CanStart => ActiveAdapter != null && !IsRunning;
@@ -76,7 +83,9 @@ namespace JoeScan.LogScanner.Core.Models
             ILogger logger,
             ILogAssembler logAssembler,
             IUserNotifier notifier,
-            ILogArchiver archiver)
+            ILogArchiver archiver,
+            LogModelBuilder modelBuilder,
+            IEnumerable<ILogModelConsumer> consumers)
         {
             this.notifier = notifier;
             this.archiver = archiver;
@@ -86,6 +95,8 @@ namespace JoeScan.LogScanner.Core.Models
             ActiveAdapter = null;
             Logger = logger;
             LogAssembler = logAssembler;
+            ModelBuilder = modelBuilder;
+            Consumers = consumers;
             Units = Config.Units;
             foreach (var a in AvailableAdapters)
             {
@@ -135,6 +146,21 @@ namespace JoeScan.LogScanner.Core.Models
             LogAssembler.RawLogs.LinkTo(RawLogsBroadcastBlock);
             // the archiver gets to see all raw logs
             RawLogsBroadcastBlock.LinkTo(new ActionBlock<RawLog>((l) => archiver.ArchiveLog(l)));
+            // the raw logs get sent to ModelBuilder. 
+            RawLogsBroadcastBlock.LinkTo( ModelBuilder.BuilderBlock);
+
+            ModelBuilder.BuilderBlock.LinkTo(LogModelBroadcastBlock);
+           // ModelBuilder.BuilderBlock.LinkTo(new ActionBlock<LogModel>((l) => { Debugger.Break(); }));
+            // the LogModelBroadcastBlock receives finished LogModels and now the end user can subscribe to 
+            // it and do any processing needed, like a sorter or sending to an optimizer
+           // LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModel>((l) => { Debugger.Break(); }));
+            foreach (var logModelConsumer in Consumers)
+            {
+                var userBlock = new ActionBlock<LogModel>(logModelConsumer.Consume);
+                LogModelBroadcastBlock.LinkTo(userBlock);
+            }
+           
+
         }
 
         #endregion
