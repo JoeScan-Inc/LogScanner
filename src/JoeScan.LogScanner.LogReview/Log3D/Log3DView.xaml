@@ -22,20 +22,23 @@
             </DockPanel>
         </GroupBox.Header>
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
             <h:HelixViewport3D
                 x:Name="Viewport"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
                 CameraMode="Inspect"
                 CameraRotationMode="Trackball"
-                ModelUpDirection="0,1,0"
+                ModelUpDirection="0,0,1"
+                Orthographic="{Binding IsChecked, ElementName=UseOrthographicCamera}"
                 ShowCameraInfo="False"
                 ShowCoordinateSystem="True"
                 ZoomAroundMouseDownPoint="True"
                 ZoomExtentsWhenLoaded="True">
-                <h:DefaultLights />
+                <h:SunLight />
 
                 <h:HelixViewport3D.DefaultCamera>
 
@@ -45,35 +48,20 @@
                         UpDirection="0,1,0" />
                 </h:HelixViewport3D.DefaultCamera>
             </h:HelixViewport3D>
-            <DockPanel Grid.Row="1" LastChildFill="False">
-                <StackPanel
-                    Margin="10,3"
-                    DockPanel.Dock="Left"
-                    Orientation="Vertical">
-                    <CheckBox x:Name="ShowRawPoints">Raw Points</CheckBox>
+            <DockPanel
+                Grid.Column="0"
+                Margin="3"
+                LastChildFill="False">
 
-                </StackPanel>
-                <StackPanel
-                    Margin="10,3"
-                    DockPanel.Dock="Left"
-                    Orientation="Vertical">
-                    <CheckBox x:Name="ShowModelPoints">Model Points</CheckBox>
+                <CheckBox x:Name="ShowRawPoints" DockPanel.Dock="Top">Raw Points</CheckBox>
 
-                </StackPanel>
-                <StackPanel
-                    Margin="10,3"
-                    DockPanel.Dock="Left"
-                    Orientation="Vertical">
-                    <CheckBox x:Name="ShowModel">Model</CheckBox>
+                <CheckBox x:Name="ShowModelPoints" DockPanel.Dock="Top">Model Points</CheckBox>
 
-                </StackPanel>
-                <StackPanel
-                    Margin="10,3"
-                    DockPanel.Dock="Left"
-                    Orientation="Vertical">
-                    <CheckBox x:Name="ShowSectionCenters">Section Centers</CheckBox>
+                <CheckBox x:Name="ShowModel" DockPanel.Dock="Top">Model</CheckBox>
 
-                </StackPanel>
+                <CheckBox x:Name="ShowSectionCenters" DockPanel.Dock="Top">Section Centers</CheckBox>
+                <CheckBox x:Name="UseOrthographicCamera" DockPanel.Dock="Bottom">Orthographic</CheckBox>
+
             </DockPanel>
         </Grid>
     </GroupBox>
