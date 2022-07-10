@@ -33,7 +33,7 @@ public class LogSectionBuilder
 
         if (config.SectionBuilderConfig.FilterOutliers)
         {
-            filteredPoints = FilterOutliers(profiles, filteredPoints,rejectedPoints, config.SectionBuilderConfig.OutlierFilterMaxNumIterations, 
+            filteredPoints = FilterOutliers1( filteredPoints, rejectedPoints, config.SectionBuilderConfig.OutlierFilterMaxNumIterations, 
                 config.SectionBuilderConfig.OutlierFilterMaxDistance);
         }
 
@@ -56,7 +56,7 @@ public class LogSectionBuilder
 
     }
 
-    private List<Point2D> FilterOutliers(IReadOnlyList<Profile> profiles, List<Point2D> filteredPoints, List<Point2D> rejectedPoints, int numIterations, double maxDistance)
+    private List<Point2D> FilterOutliers( List<Point2D> filteredPoints, List<Point2D> rejectedPoints, int numIterations, double maxDistance)
     {
         var results = new List<Circle>(numIterations);
         var r1 = new Random(42);
@@ -88,6 +88,41 @@ public class LogSectionBuilder
         {
             double dist = CircleFit.DistanceSquare(bestModel.x, bestModel.y, p.X, p.Y);
             if ((bestModel.r + maxDistance) * (bestModel.r + maxDistance) > dist)
+            {
+                consensusSet.Add(p);
+            }
+            else
+            {
+                rejectedPoints.Add(p);
+            }
+        }
+        return consensusSet;
+    }
+
+    private List<Point2D> FilterOutliers1( List<Point2D> filteredPoints,
+        List<Point2D> rejectedPoints, int numIterations, double maxDistance)
+    {
+        int sampleCount = 100;
+        var c = filteredPoints.Count;
+        float[][] ellFitInput = new float[3][];
+        ellFitInput[0] = new float[sampleCount];
+        ellFitInput[1] = new float[sampleCount];
+        ellFitInput[2] = new float[sampleCount];
+        var r1 = new Random(42);
+        for (int i = 0; i < sampleCount; i++)
+        {
+            var index = r1.Next(c);
+            ellFitInput[0][i] = (float) filteredPoints[index].X;
+            ellFitInput[1][i] = (float) filteredPoints[index].Y;
+            ellFitInput[2][i] = (float) filteredPoints[index].B;
+        }
+
+        var bestFittingEllipse = EllipseFit.EllipseFitDirect(ellFitInput);
+        var consensusSet = new List<Point2D>(c);
+        foreach (var p in filteredPoints)
+        {
+            double dist = bestFittingEllipse.PointToEllipseError((float)p.X, (float)p.Y);
+            if (Math.Abs(dist) < maxDistance)
             {
                 consensusSet.Add(p);
             }
@@ -222,7 +257,7 @@ public class LogSectionBuilder
 
             double fractionalIndex = pointCount * angle / (Math.PI * 2);
             //TODO: unit dependent?
-            const double smoothingRegion = 2.1;
+            const double smoothingRegion = 2.1; 
 
             for (var index = (int)Math.Ceiling(fractionalIndex); index - fractionalIndex < smoothingRegion; ++index)
             {
