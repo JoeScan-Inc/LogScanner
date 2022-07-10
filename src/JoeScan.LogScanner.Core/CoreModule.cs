@@ -31,10 +31,16 @@ public class CoreModule : Module
         // whenever an instance of ICoreConfig is needed, we first resolve the IConfigLocator, which gives 
         // us the path to where our config files are stored. Then, we combine that path with the name for our main
         // core config file, let the Config.NET ConfigurationBuilder read it, and return it as an instance of ICoreConfig.
-        // the upside is that we can easily change the location of where our config files live, in a centralized location 
+        // the upside is that we can easily change the location of where our config files live, in a centralized location.
+        // 
+        // Giving the Registration two files creates a merge. The idea here is that coreconfig contains 
+        // factory defaults, and will be updated from the contents of the git repo.
+        // The version with the _user suffix can be used to selectively override values specific for that site
+        // see here for details: https://github.com/aloneguid/config#using-multiple-sources
 
         builder.Register(c => new ConfigurationBuilder<ICoreConfig>()
-            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetConfigLocation(),"coreconfig.json"))
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetUserConfigLocation(), "coreconfig_user.json"))
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(),"coreconfig.json"))
             .Build()).As<ICoreConfig>().SingleInstance();
 
     }

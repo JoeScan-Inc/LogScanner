@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="..\..\config\adapters\replay\ReplayAdapter.json" Link="ReplayAdapter.json" />
+    <Content Include="..\..\config\adapters\replay\ReplayAdapter_user.json" Link="ReplayAdapter_user.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Autofac" Version="6.3.0" />
   </ItemGroup>
 

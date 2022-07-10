@@ -19,7 +19,7 @@ public class FlightsAndWindowFilter : IFlightsAndWindowFilter
         ConfigLocator = configLocator;
         try
         {
-            var filters = JsonConvert.DeserializeObject<List<FilterBase>>(File.ReadAllText(Path.Combine(ConfigLocator.GetConfigLocation(),"rawfilters.json")));
+            var filters = JsonConvert.DeserializeObject<List<FilterBase>>(File.ReadAllText(Path.Combine(ConfigLocator.GetDefaultConfigLocation(),"rawfilters.json")));
          
             if (filters != null)
             {

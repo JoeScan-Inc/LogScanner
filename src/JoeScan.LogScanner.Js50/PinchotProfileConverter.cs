@@ -24,6 +24,6 @@ public static class PinchotProfileConverter
             ScanHeadId = pProfile.ScanHeadID,
             Camera = (uint)pProfile.Camera,
             Inputs = InputFlags.None
-        };
+        }; 
     }
 }

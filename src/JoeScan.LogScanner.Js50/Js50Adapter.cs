@@ -3,7 +3,6 @@ using JoeScan.LogScanner.Core.Events;
 using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.Js50.Config;
 using JoeScan.Pinchot;
 using NLog;
 using System.Threading.Tasks.Dataflow;
@@ -13,7 +12,7 @@ namespace JoeScan.LogScanner.Js50;
 
 public class Js50Adapter : IScannerAdapter
 {
-    private Js50AdapterConfig? config;
+    public IJs50AdapterConfig Config { get; }
     private readonly ILogger? logger;
     private ScanSystem? scanSystem;
     private CancellationTokenSource? cancellationTokenSource;
@@ -25,8 +24,9 @@ public class Js50Adapter : IScannerAdapter
 
     #region Lifecycle
 
-    public Js50Adapter(ILogger logger, ScanSyncReceiverThread encoderUpdater)
+    public Js50Adapter(ILogger logger, IJs50AdapterConfig config, ScanSyncReceiverThread encoderUpdater)
     {
+        Config = config;
         this.logger = logger;
         this.encoderUpdater = encoderUpdater;
         logger.Debug($"Created Js50Adapter using JoeScan Pinchot API version {Pinchot.VersionInformation.Version}");
@@ -35,14 +35,12 @@ public class Js50Adapter : IScannerAdapter
         encoderUpdater.ScanSyncUpdate += EncoderUpdaterOnScanSyncUpdate;
     }
 
-    
-
     #endregion
 
     #region IScannerAdapter Implementation
     public string Name => $"JS-50 (Pinchot v{Pinchot.VersionInformation.Version})";
     public UnitSystem Units { get; }
-    public bool IsConfigured => config != null;
+    public bool IsConfigured => true;
 
     // If we give a finite BoundedCapacity, the BufferBlock will discard Profiles 
     // i.e Post() will return false. -1 means unlimited buffering - hopefully the 
@@ -54,24 +52,13 @@ public class Js50Adapter : IScannerAdapter
     {
         try
         {
-            config = Js50AdapterConfig.ReadFromFile("config.json");
-        }
-        catch (Exception e)
-        {
-            logger!.Error($"Error  reading Js50AdapterConfig from file \"config.json\": {e.Message}");
-            throw;
-        }
-
-        try
-        {
-
             encoderUpdater.Start();
             logger!.Debug("Started ScanSyncReceiverThread.");
         }
         catch (Exception e)
         {
             logger!.Error($"Could not start ScanSyncReceiverThread: {e.Message}");
-        } 
+        }
     }
 
     public void Start()
@@ -140,16 +127,16 @@ public class Js50Adapter : IScannerAdapter
                 logger.Debug($"Active scan head: {scanHead.SerialNumber} ({scanHead.ID}) FW: {scanHead.Status.FirmwareVersion.Version}");
             }
 
-            logger.Debug($"Using DataFormat {config.DataFormat}.");
+            logger.Debug($"Using DataFormat {Config.DataFormat}.");
             var systemMaxScanRate = scanSystem!.GetMaxScanRate();
             logger!.Debug(
                 $"ScanSystem reported a Max Scan Rate of {systemMaxScanRate} Hz (min Scan Period: {1000.0 / systemMaxScanRate:F2} ms)");
-            logger.Debug($"Configuration requested ScanRate is {config.ScanRate} Hz (min Scan Period: {1000.0 / config.ScanRate:F2} ms)");
-            if (config.ScanRate > systemMaxScanRate)
+            logger.Debug($"Configuration requested ScanRate is {Config.ScanRate} Hz (min Scan Period: {1000.0 / Config.ScanRate:F2} ms)");
+            if (Config.ScanRate > systemMaxScanRate)
             {
-                logger.Warn($"Configuration requested rate ({config.ScanRate} Hz) is higher than the system max rate ({systemMaxScanRate} Hz) - using system max rate.");
+                logger.Warn($"Configuration requested rate ({Config.ScanRate} Hz) is higher than the system max rate ({systemMaxScanRate} Hz) - using system max rate.");
             }
-            scanSystem.StartScanning(config.ScanRate > systemMaxScanRate ? systemMaxScanRate : config.ScanRate, config.DataFormat);
+            scanSystem.StartScanning(Config.ScanRate > systemMaxScanRate ? systemMaxScanRate : Config.ScanRate, Config.DataFormat);
             // we seem to have connected and are scanning
             autoResetEvent.Set();
             while (!ct.IsCancellationRequested)
@@ -250,11 +237,11 @@ public class Js50Adapter : IScannerAdapter
     {
         logger!.Debug("Setting up ScanSystem");
         var system = new ScanSystem();
-        logger.Debug($"Configuration contains {config.ScanHeads.Count} heads.");
+        logger.Debug($"Configuration contains {Config.ScanHeads.Count()} heads.");
 
         try
         {
-            foreach (var headConfig in config.ScanHeads)
+            foreach (var headConfig in Config.ScanHeads)
             {
                 logger.Debug($"Creating ScanHead for serial number {headConfig.Serial} with ID {headConfig.Id}.");
                 var scanHead = system.CreateScanHead(headConfig.Serial, headConfig.Id);
@@ -268,23 +255,23 @@ public class Js50Adapter : IScannerAdapter
                 conf.ScanPhaseOffset = headConfig.ScanPhaseOffset;
                 logger.Debug($"Applying configuration to {scanHead.ID}");
                 scanHead.Configure(conf);
-                logger.Debug($"Setting Window for {scanHead.ID} to {headConfig.Window.Top}/"
-                             + $"{headConfig.Window.Bottom}/"
-                             + $"{headConfig.Window.Left}/"
-                             + $"{headConfig.Window.Right}"
+                logger.Debug($"Setting Window for {scanHead.ID} to {headConfig.WindowTop}/"
+                             + $"{headConfig.WindowBottom}/"
+                             + $"{headConfig.WindowLeft}/"
+                             + $"{headConfig.WindowRight}"
                              + "(Top/Bottom/Left/Right");
-                scanHead.SetWindow(ScanWindow.CreateScanWindowRectangular(headConfig.Window.Top,
-                    headConfig.Window.Bottom,
-                    headConfig.Window.Left,
-                    headConfig.Window.Right));
-                logger.Debug($"Setting Alignment for head {scanHead.ID} to ShiftX: {headConfig.Alignment.ShiftX}" 
-                + $" ShiftY: {headConfig.Alignment.ShiftY} "
-                + $" RollDeg: {headConfig.Alignment.RollDegrees}"
-                + $" Orientation: {headConfig.Alignment.Orientation}");
-                scanHead.SetAlignment(headConfig.Alignment.RollDegrees,
-                    headConfig.Alignment.ShiftX,
-                    headConfig.Alignment.ShiftY,
-                    headConfig.Alignment.Orientation);
+                scanHead.SetWindow(ScanWindow.CreateScanWindowRectangular(headConfig.WindowTop,
+                    headConfig.WindowBottom,
+                    headConfig.WindowLeft,
+                    headConfig.WindowRight));
+                logger.Debug($"Setting Alignment for head {scanHead.ID} to ShiftX: {headConfig.AlignmentShiftX}" 
+                + $" ShiftY: {headConfig.AlignmentShiftY} "
+                + $" RollDeg: {headConfig.AlignmentRollDegrees}"
+                + $" Orientation: {headConfig.AlignmentOrientation}");
+                scanHead.SetAlignment(headConfig.AlignmentRollDegrees,
+                    headConfig.AlignmentShiftX,
+                    headConfig.AlignmentShiftY,
+                    headConfig.AlignmentOrientation);
             }
             logger.Debug("Done setting up ScanSystem");
             return system;

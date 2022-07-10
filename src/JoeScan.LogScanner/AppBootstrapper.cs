@@ -41,7 +41,7 @@ public class AppBootstrapper : AutofacBootstrapper
     protected override void ConfigureContainer(ContainerBuilder builder)
     {
         builder.Register(c => new ConfigurationBuilder<ILogScannerConfig>()
-            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetConfigLocation(),"LogScannerConfig.json"))
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(),"LogScannerConfig.json"))
             .Build()).SingleInstance();
 
         // -- Adapter Modules --

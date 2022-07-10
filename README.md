@@ -141,6 +141,49 @@ mentioned above.
 For completed LogModels, the engine will call the `Consume` method of this implementation on 
 a taskpool task. 
 
+## Configuration files and runtime search path
+We use Config.Net (https://github.com/aloneguid/config) to store and read config files. Although Config.Net can use 
+many different storage formats, JSON is  preferred. There are some challenges with storing and retrieving configs
+for such a complex application, especially when we need good defaults, but any of these can be different for a specific install 
+at a customer site. 
+
+At runtime, we need to find the config files reliably. During development, the path of the application is 
+different from the path at a client site. In a default Visual Studio environment, the executables are written to 
+
+    bin\Debug\net6.0-windows 
+
+or similar, whereas on a deployed system, they typically would end up in 
+
+    C:\Program Files\LogScanner 
+
+or wherever the installer puts them. 
+As a solution, we use a component that resolves that path for us, depending on what runtime environment we're in.
+The class `DefaultConfigLocator`  implements the `IConfigLocator` interface. It has two members, `GetDefaultConfigLocation()` 
+and `GetUserConfigLocation()`. 
+
+When running under Visual Studio or Rider, it returns the path to where the config files from the repository are located,
+the directory `config` at the top level of the git repository. 
+On a deployed instance, it returns the path next to the executables, e.g. `C:\Program Files\LogScanner\config`.
+
+Resolving at runtime using the IoC container looks like this: 
+
+    builder.Register(c => new ConfigurationBuilder<ICoreConfig>()
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetUserConfigLocation(), "coreconfig_user.json"))
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(),"coreconfig.json"))
+            .Build()).As<ICoreConfig>().SingleInstance();
+
+We register a lambda that uses `Config.NET` to build an `ICoreConfig` implementation. The `ConfigurationBuilder` takes 
+two JSON files (more on that below). The location of those two files come from the `IConfigLocator`. 
+
+`Config.NET` can automatically merge the values from two data stores, and takes the value from the first store where that 
+value is defined. By having two files, one with the "_user" suffix, we can let the developer override site specific values, 
+while keeping the default values in the Git repository. 
+
+So for customizations specific to one site/customer, edit the `coreconfig_user.json` file, it will never be overwritten.
+The `.gitignore` file has been modified to ignore all files with the `_user` suffix.
+
+
+
   ## Requirements
 
 ## Building and Running

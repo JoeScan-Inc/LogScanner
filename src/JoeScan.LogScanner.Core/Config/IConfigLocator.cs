@@ -2,5 +2,6 @@
 
 public interface IConfigLocator
 {
-    string GetConfigLocation ();
+    string GetDefaultConfigLocation ();
+    string GetUserConfigLocation ();
 }

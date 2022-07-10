@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# specific to LogScanner
+
+**/*_user.*
 # User-specific files
 *.suo
 *.user
@@ -323,32 +326,5 @@ __pycache__/
 client/net/lib/UdpReceiver/logs/NLog_internal_.txt
 
 # CMake artifacts
-client_cpp/*.vcxproj
-client_cpp/*.vcxproj.filters
-client_cpp/JScanApi.sln
 
-# Distribution folders
-client/net/lib/dist
-joescanapi-*
-opensource-*
 
-# -- EXTRAS -- #
-
-# Build stuff
-client-cpp/build/
-client-net/build/
-embedded/build/
-
-# AssemblyInfo is generated with GitVersion
-AssemblyInfo.cs
-
-# Garbage from init.sh
-hdf/
-!hdf/pmufw.bin
-HDL/Xilinx/XU3.*
-HDL/Xilinx/JS_IP/
-*.jou
-
-# Flatbuffer objects
-client-net/Api/src/JoeScan.Pinchot.Schema/joescan/
-!schema/bin/
