@@ -8,9 +8,9 @@ using System.Windows;
 using Config.Net;
 using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.LogReview.CrossSection;
-using JoeScan.LogScanner.LogReview.Log3D;
 using JoeScan.LogScanner.LogReview.Models;
 using JoeScan.LogScanner.LogReview.Settings;
+using JoeScan.LogScanner.Shared.Log3D;
 using MvvmDialogs;
 
 namespace JoeScan.LogScanner.LogReview;

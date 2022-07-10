@@ -1,10 +1,10 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.LogReview.CrossSection;
-using JoeScan.LogScanner.LogReview.Log3D;
 using JoeScan.LogScanner.LogReview.Models;
 using JoeScan.LogScanner.LogReview.Navigator;
 using JoeScan.LogScanner.LogReview.SectionTable;
 using JoeScan.LogScanner.LogReview.ToolBar;
+using JoeScan.LogScanner.Shared.Log3D;
 using NLog;
 
 namespace JoeScan.LogScanner.LogReview.Shell;

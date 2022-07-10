@@ -34,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Log3D\" />
     <Folder Include="Settings\" />
   </ItemGroup>
 

@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace JoeScan.LogScanner.LogReview.Log3D
+namespace JoeScan.LogScanner.Shared.Log3D
 {
     /// <summary>
     /// Interaction logic for Log3DView.xaml

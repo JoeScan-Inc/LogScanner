@@ -3,7 +3,7 @@ using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.LogReview.CrossSection;
-using JoeScan.LogScanner.LogReview.Log3D;
+using JoeScan.LogScanner.Shared.Log3D;
 using NLog;
 using System;
 using System.Collections.Generic;

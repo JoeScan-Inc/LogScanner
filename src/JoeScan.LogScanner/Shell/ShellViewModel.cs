@@ -2,7 +2,6 @@
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.LiveProfiles;
-using JoeScan.LogScanner.Log3D;
 using JoeScan.LogScanner.LogHistory;
 using JoeScan.LogScanner.LogProperties;
 using JoeScan.LogScanner.StatusBar;
@@ -10,9 +9,13 @@ using JoeScan.LogScanner.Toolbar;
 using JoeScan.LogScanner.TopAndSide;
 using System.Windows;
 using JoeScan.LogScanner.Config;
+using JoeScan.LogScanner.Shared.Log3D;
 using NLog;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks.Dataflow;
+
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable ClassNeverInstantiated.Global
@@ -85,6 +88,12 @@ public class ShellViewModel : Screen
                 }
             }
         }
+
+        engine.LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModel>(model =>
+        {
+            // needs to run on UI thread
+            Application.Current.Dispatcher.BeginInvoke(() => log3D.CurrentLogModel = model);
+        }));
     }
 
     public Visibility IsBusy => Notifier.IsBusy ? Visibility.Visible : Visibility.Hidden;

@@ -2,17 +2,12 @@
 using HelixToolkit.Wpf;
 using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.Shared.Helpers;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
-using Color = System.Drawing.Color;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace JoeScan.LogScanner.LogReview.Log3D;
+namespace JoeScan.LogScanner.Shared.Log3D;
 
 public class Log3DViewModel : Screen
 {
