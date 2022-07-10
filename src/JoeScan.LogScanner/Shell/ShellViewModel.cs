@@ -1,12 +1,10 @@
-﻿using Autofac.Features.AttributeFilters;
-using Caliburn.Micro;
+﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.LiveProfiles;
 using JoeScan.LogScanner.Log3D;
 using JoeScan.LogScanner.LogHistory;
 using JoeScan.LogScanner.LogProperties;
-using JoeScan.LogScanner.Notifications;
 using JoeScan.LogScanner.StatusBar;
 using JoeScan.LogScanner.Toolbar;
 using JoeScan.LogScanner.TopAndSide;
@@ -15,6 +13,9 @@ using JoeScan.LogScanner.Config;
 using NLog;
 using System;
 using System.Linq;
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace JoeScan.LogScanner.Shell;
 

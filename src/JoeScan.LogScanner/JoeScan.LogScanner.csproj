@@ -20,6 +20,8 @@
     <None Remove="Fonts\Inter-Regular.ttf" />
     <None Remove="Fonts\Inter-SemiBold.ttf" />
     <None Remove="Fonts\Inter-Thin.ttf" />
+    <None Remove="Interfaces\**" />
+    <None Remove="Themes\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +38,7 @@
     <PackageReference Include="HelixToolkit.Core.Wpf" Version="2.20.2" />
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="NLog.Schema" Version="5.0.1" />
     <PackageReference Include="OxyPlot.Core" Version="2.1.0" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.1.0" />
     <PackageReference Include="ToastNotifications.Messages.Net5" Version="3.0.1" />
@@ -54,8 +57,6 @@
 
   <ItemGroup>
     <Folder Include="Config\" />
-    <Folder Include="Interfaces\" />
-    <Folder Include="Themes\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -76,6 +77,21 @@
     <None Update="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Interfaces\**" />
+    <Compile Remove="Themes\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Interfaces\**" />
+    <EmbeddedResource Remove="Themes\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="Interfaces\**" />
+    <Page Remove="Themes\**" />
   </ItemGroup>
 
 </Project>
