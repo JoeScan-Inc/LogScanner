@@ -17,10 +17,12 @@ public class Log3DViewModel : Screen
     private bool showModel = true;
     private bool needsFit = true;
     private bool showSectionCenters = true;
+    private bool showDebugStuff = true;
     private ModelVisual3D? rawPointCloud;
     private ModelVisual3D? modelPoints;
     private ModelVisual3D? model;
     private ModelVisual3D? sectionCenters;
+    private ModelVisual3D? debugStuff;
     private HelixViewport3D Viewport { get; set; }
 
     #region IViewAware Implementation
@@ -113,13 +115,46 @@ public class Log3DViewModel : Screen
         }
     }
 
+    public bool ShowDebugStuff
+    {
+        get => showDebugStuff;
+        set
+        {
+            if (value == showDebugStuff)
+            {
+                return;
+            }
+
+            showDebugStuff = value;
+            NotifyOfPropertyChange(()=>ShowDebugStuff);
+            RefreshDisplay();
+        }
+    }
+
     private void CreateVisuals()
     {
         rawPointCloud = CreateRawCloudByColor();
         modelPoints = CreateModelPoints();
         model = CreateModel();
         sectionCenters = CreateSectionCenters();
+        debugStuff = CreateDebugVisuals();
 
+    }
+
+    private ModelVisual3D CreateDebugVisuals()
+    {
+        var group = new ModelVisual3D();
+        // for debugging, show the best fitting center line
+        var centerLine = new LinesVisual3D() { Color = Colors.MediumPurple };
+        group.Children.Add(centerLine);
+        centerLine.Points = new Point3DCollection()
+        {
+            new Point3D(CurrentLogModel!.CenterLineStart.X,CurrentLogModel.CenterLineStart.Y, CurrentLogModel.CenterLineStart.Z),
+            new Point3D(CurrentLogModel.CenterLineEnd.X,CurrentLogModel.CenterLineEnd.Y, CurrentLogModel.CenterLineEnd.Z),
+
+        };
+
+        return group;
     }
 
     private ModelVisual3D CreateRawCloudByHeadId()
@@ -238,8 +273,8 @@ public class Log3DViewModel : Screen
                 new Point3D(section.CentroidX, section.CentroidY-5, section.SectionCenter),
                 new Point3D(section.CentroidX, section.CentroidY+5, section.SectionCenter)
             };
-
         }
+        
         return group;
     }
     private static byte BinByBrightness(double b)
@@ -304,6 +339,17 @@ public class Log3DViewModel : Screen
             }
         }
 
+        if (debugStuff != null)
+        {
+            if (ShowDebugStuff)
+            {
+                Viewport.Children.Add(debugStuff);
+            }
+            else
+            {
+                Viewport.Children.Remove(debugStuff);
+            }
+        }
         if (needsFit)
         {
             Viewport.CameraController.CameraPosition = new(2000, 300, CurrentLogModel.Length / 2);

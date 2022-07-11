@@ -47,10 +47,14 @@ public class LogSection
     public double RawDiameterX => rawDiameterX.Value;
     public double RawDiameterY => rawDiameterY.Value;
 
+
     public double TotalArea => totalArea.Value;
 
     public double DiameterMax => RawDiameterMax - 2.0 * BarkAllowance;
     public double DiameterMin => RawDiameterMin - 2.0 * BarkAllowance;
+
+    public double DiameterX => RawDiameterX - 2.0 * BarkAllowance;
+    public double DiameterY => RawDiameterY - 2.0 * BarkAllowance;
 
     public double Ovality => DiameterMax / DiameterMin;
     
@@ -58,6 +62,8 @@ public class LogSection
 
     public double BarkArea => TotalArea - WoodArea;
     public double FitError => fitError.Value;
+    public double CenterLineX { get; internal set; }
+    public double CenterLineY { get; internal set; }
 
     #endregion
 

@@ -1,4 +1,5 @@
 ﻿using JoeScan.LogScanner.Core.Extensions;
+using JoeScan.LogScanner.Core.Geometry;
 using System.Runtime.ExceptionServices;
 
 namespace JoeScan.LogScanner.Core.Models;
@@ -39,11 +40,22 @@ public class LogModel
 
     #endregion
 
+    #region Lazy Backing Values
+
     private Lazy<double> length;
     private Lazy<double> beginZ;
     private Lazy<double> endZ;
     private Lazy<Profile> lastGoodProfile;
     private Lazy<Profile> firstGoodProfile;
+    private Lazy<Point3D> centerLineStart;
+    private Lazy<Point3D> centerLineEnd;
+    private Lazy<double> taper;
+    private Lazy<double> taperX;
+    private Lazy<double> taperY;
+
+    #endregion
+
+    #region Lifecycle
 
     internal LogModel(int logNumber, double interval, DateTime timeScanned, double maxFitError, double encoderPulseInterval)
     {
@@ -78,12 +90,49 @@ public class LogModel
             }
             return section.Profiles.First();
         }, true);
+        centerLineStart = new Lazy<Point3D>(() => new Point3D(
+            Sections.First().SectionCenter * CenterLineSlopeX + CenterLineInterceptXZ,
+            Sections.First().SectionCenter * CenterLineSlopeY + CenterLineInterceptYZ,
+            Sections.First().SectionCenter,
+            0.0), true);
+        centerLineEnd = new Lazy<Point3D>(() => new Point3D(
+            Sections.Last().SectionCenter * CenterLineSlopeX + CenterLineInterceptXZ,
+            Sections.Last().SectionCenter * CenterLineSlopeY + CenterLineInterceptYZ,
+            Sections.Last().SectionCenter,
+            0.0), true);
+        taper = new Lazy<double>(() => (LargeEndDiameter - SmallEndDiameter) / Length,true);
+        taperX = new Lazy<double>(() => (LargeEndDiameterX - SmallEndDiameterX) / Length,true);
+        taperY = new Lazy<double>(() => (LargeEndDiameterY - SmallEndDiameterY) / Length,true);
     }
 
+    #endregion
+
     /// <summary>
-    /// Log length in millimeters.
+    /// Log length 
     /// </summary>
     public double Length => length.Value;
     public Profile LastGoodProfile => lastGoodProfile.Value;
     public Profile FirstGoodProfile => firstGoodProfile.Value;
+    public double CenterLineSlopeX { get; internal set; }
+    public double CenterLineInterceptXZ { get; internal set; }
+    public double CenterLineSlopeY { get; internal set; }
+    public double CenterLineInterceptYZ { get; internal set; }
+    public Point3D CenterLineStart => centerLineStart.Value;
+    public Point3D CenterLineEnd => centerLineEnd.Value;
+    public double SmallEndDiameter { get; internal set; }
+    public double SmallEndDiameterX { get; internal set; }
+    public double SmallEndDiameterY { get; internal set; }
+    public double LargeEndDiameter { get; internal set; }
+    public double LargeEndDiameterX { get; internal set; }
+    public double LargeEndDiameterY { get; internal set; }
+    public double Sweep { get; internal set; }
+    public double SweepAngle { get; internal set; }
+    public double CompoundSweep { get; internal set; }
+    public double CompoundSweep90 { get; internal set; }
+    public double Taper => taper.Value;
+    public double TaperX => taperX.Value;
+    public double TaperY => taperY.Value;
+    public double Volume { get; internal set; }
+    public double BarkVolume { get; internal set; }
+
 }

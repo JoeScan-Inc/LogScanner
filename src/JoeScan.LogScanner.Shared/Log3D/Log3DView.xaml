@@ -59,6 +59,7 @@
                 <CheckBox x:Name="ShowModel" DockPanel.Dock="Top">Model</CheckBox>
 
                 <CheckBox x:Name="ShowSectionCenters" DockPanel.Dock="Top">Section Centers</CheckBox>
+                <CheckBox x:Name="ShowDebugStuff" DockPanel.Dock="Top">Debug Stuff</CheckBox>
                 <CheckBox x:Name="UseOrthographicCamera" DockPanel.Dock="Bottom">Orthographic</CheckBox>
 
             </DockPanel>
