@@ -24,32 +24,34 @@ public interface ISingleZoneLogAssemblerConfig
     // https://github.com/aloneguid/config#default-values
 
     [DefaultValue(false)]
-    bool UseLogPresenceSignal { get; set; }
+    bool UseLogPresenceSignal { get;  }
     [DefaultValue(false)]
-    bool StartScanInverted { get; set; }
+    bool StartScanInverted { get;  }
     [DefaultValue(3.0)]
-    double MinProfileSpacing { get; set; }
+    double MinProfileSpacing { get;  }
     [DefaultValue(6000.0)]
-    double MaxLogLength { get; set; }
+    double MaxLogLength { get;  }
     [DefaultValue(1000.0)]
-    double MinLogLength { get; set; }
+    double MinLogLength { get;  }
     [DefaultValue(5)]
-    int StopLogCount { get; set; }
+    int StopLogCount { get;  }
     [DefaultValue(20)]
-    int StartLogCount { get; set; }
+    int StartLogCount { get;  }
     [DefaultValue(1.0)]
-    double EncoderPulseInterval { get; set; }
+    double EncoderPulseInterval { get;  }
 }
 
 public interface ILogModelBuilderConfig
 {
     [Option(Alias = "SectionInterval", DefaultValue = "100.0")]
-    double SectionInterval { get; set; }
+    double SectionInterval { get; }
+    [Option(DefaultValue = 0.0)]
+    double DiameterEndOffset { get;  }
 }
 
 public interface IRawLogArchiverConfig
 {
-    string Location { get; set; }
+    string Location { get;  }
   
     //TODO: delete oldest, set max number of archived logs
 
@@ -57,38 +59,38 @@ public interface IRawLogArchiverConfig
 
 public interface IRawDumperConfig
 {
-    string RawDumpLocation { get; set; }
+    string RawDumpLocation { get;  }
 }
 
 public interface ISectionBuilderConfig
 {
     [DefaultValue(true)]
-    bool FilterOutliers { get; set; }
+    bool FilterOutliers { get;  }
     [DefaultValue(100)]
-    int OutlierFilterMaxNumIterations { get; set; }
+    int OutlierFilterMaxNumIterations { get;  }
     //TODO: Units?
     [DefaultValue(10.0)]
-    double OutlierFilterMaxDistance { get; set; }
+    double OutlierFilterMaxDistance { get;  }
     [DefaultValue(0.0)]
-    double BarkAllowance { get; set; }
+    double BarkAllowance { get;  }
     [DefaultValue(100)]
 
-    int ModelPointCount { get; set; }
+    int ModelPointCount { get;  }
     [DefaultValue(3.0)]
-    double MaxOvality { get; set; }
+    double MaxOvality { get;  }
     [DefaultValue(60.0)]
-    double MinimumLogDiameter { get; set; }
+    double MinimumLogDiameter { get;  }
     [DefaultValue(600.0)]
-    double MaximumLogDiameter { get; set; }
+    double MaximumLogDiameter { get;  }
     [DefaultValue(300.0)]
-    double LogMaximumPositionX { get; set; }
+    double LogMaximumPositionX { get;  }
     [DefaultValue(0.0)]
-    double LogMinimumPositionX { get; set; }
+    double LogMinimumPositionX { get;  }
     [DefaultValue(300.0)]
-    double LogMaximumPositionY { get; set; }
+    double LogMaximumPositionY { get;  }
     [DefaultValue(-300.0)]
-    double LogMinimumPositionY { get; set; }
+    double LogMinimumPositionY { get;  }
     [DefaultValue(5.0)]
-    double MaxFitError { get; set; }
+    double MaxFitError { get;  }
 
 }
