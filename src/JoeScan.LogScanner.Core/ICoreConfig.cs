@@ -84,11 +84,11 @@ public interface ISectionBuilderConfig
     double MaximumLogDiameter { get;  }
     [DefaultValue(300.0)]
     double LogMaximumPositionX { get;  }
-    [DefaultValue(0.0)]
+    [DefaultValue(-100.0)]
     double LogMinimumPositionX { get;  }
     [DefaultValue(300.0)]
     double LogMaximumPositionY { get;  }
-    [DefaultValue(-300.0)]
+    [DefaultValue(0.0)]
     double LogMinimumPositionY { get;  }
     [DefaultValue(5.0)]
     double MaxFitError { get;  }
