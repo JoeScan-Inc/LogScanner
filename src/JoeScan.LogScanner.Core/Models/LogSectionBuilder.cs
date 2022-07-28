@@ -33,7 +33,7 @@ public class LogSectionBuilder
 
         if (config.SectionBuilderConfig.FilterOutliers)
         {
-            filteredPoints = FilterOutliers1( filteredPoints, rejectedPoints, config.SectionBuilderConfig.OutlierFilterMaxNumIterations, 
+            filteredPoints = FilterOutliers( filteredPoints, rejectedPoints, config.SectionBuilderConfig.OutlierFilterMaxNumIterations, 
                 config.SectionBuilderConfig.OutlierFilterMaxDistance);
         }
 
