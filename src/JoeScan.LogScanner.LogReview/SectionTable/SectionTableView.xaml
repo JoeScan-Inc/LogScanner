@@ -19,14 +19,18 @@
                 </Border>
             </DockPanel>
         </GroupBox.Header>
-        <ListView Name="lvUsers">
+        <ListView x:Name="Sections">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn DisplayMemberBinding="{Binding something}" Header="Position" />
-                    <GridViewColumn DisplayMemberBinding="{Binding Age}" Header="Fit" />
-                    <GridViewColumn DisplayMemberBinding="{Binding Mail}" Header="# Pts" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=SectionCenter, StringFormat={}{0:F0} mm}" Header="Pos" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=AcceptedPoints.Count}" Header="#Pts" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=RawDiameterX, StringFormat={}{0:F1} mm}" Header="Dia. X" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=RawDiameterY, StringFormat={}{0:F1} mm}" Header="Dia. Y" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=FitError, StringFormat={}{0:F3} mm}" Header="Fit Error" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Ovality, StringFormat={}{0:F3}}" Header="Ovality" />
                 </GridView>
             </ListView.View>
         </ListView>
+        <!-- <DataGrid AutoGenerateColumns="True" ItemsSource="{Binding Sections}" /> -->
     </GroupBox>
 </UserControl>
