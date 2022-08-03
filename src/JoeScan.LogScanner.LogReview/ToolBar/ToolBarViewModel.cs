@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Accessibility;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Models;
+using JoeScan.LogScanner.LogReview.Interfaces;
 using JoeScan.LogScanner.LogReview.Models;
 using JoeScan.LogScanner.LogReview.Settings;
 using MvvmDialogs;
@@ -15,7 +17,7 @@ public class ToolBarViewModel : Screen
 {
     #region Injected
 
-    public LogReviewer Reviewer { get; }
+    public ILogModelObservable Model { get; }
 
     #region Private fields
 
@@ -28,14 +30,14 @@ public class ToolBarViewModel : Screen
 
     #region Lifecycle
 
-    public ToolBarViewModel(LogReviewer reviewer,
+    public ToolBarViewModel(ILogModelObservable model,
         ILogReviewSettings settings,
         IDialogService dialogService)
     {
         this.settings = settings;
-        Reviewer = reviewer;
         this.dialogService = dialogService;
-        Reviewer.LogChanged += (_, _) => Refresh();
+        Model = model;
+        Model.PropertyChanged += (_, _) => Refresh();
     }
 
     #endregion
@@ -44,7 +46,7 @@ public class ToolBarViewModel : Screen
 
     public void Load()
     {
-       
+
         var initialDirectory = String.IsNullOrEmpty(this.settings.FileBrowserLastFolder)
             ? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
             : this.settings.FileBrowserLastFolder;
@@ -60,43 +62,43 @@ public class ToolBarViewModel : Screen
         bool? success = dialogService.ShowOpenFileDialog(this, openFileDialogSettings);
         if (success == true)
         {
-            Reviewer.Load(openFileDialogSettings.FileName);
+            Model.Load(openFileDialogSettings.FileName);
             settings.FileBrowserLastFolder = Path.GetDirectoryName(openFileDialogSettings.FileName);
         }
     }
 
     public bool CanLoadNext =>
-        !String.IsNullOrEmpty(Reviewer.CurrentFile) &&
-        !String.IsNullOrEmpty(GetNextFile(Reviewer.CurrentFile));
+        !String.IsNullOrEmpty(Model.CurrentFile) &&
+        !String.IsNullOrEmpty(GetNextFile(Model.CurrentFile));
 
-    
+
 
     public bool CanLoadPrevious =>
-        !String.IsNullOrEmpty(Reviewer.CurrentFile) &&
-        !String.IsNullOrEmpty(GetNextFile(Reviewer.CurrentFile,-1));
+        !String.IsNullOrEmpty(Model.CurrentFile) &&
+        !String.IsNullOrEmpty(GetNextFile(Model.CurrentFile, -1));
 
 
     #endregion
 
     #region UI Bound Properties
 
-    public string CurrentFileName => Reviewer.CurrentFile;
-    public string RawLogId => Reviewer.CurrentRawLog != null ? Reviewer.CurrentRawLog.LogNumber.ToString() : "n/a";
+    public string CurrentFileName => Model.CurrentFile;
+    public string RawLogId => Model.CurrentRawLog != null ? Model.CurrentRawLog.LogNumber.ToString() : "n/a";
 
-    public string LogScannedDate => Reviewer.CurrentRawLog != null
-        ? Reviewer.CurrentRawLog.TimeScanned.ToString(CultureInfo.CurrentUICulture)
+    public string LogScannedDate => Model.CurrentRawLog != null
+        ? Model.CurrentRawLog.TimeScanned.ToString(CultureInfo.CurrentUICulture)
         : "";
 
     #endregion
 
     public void LoadNext()
     {
-        Reviewer.Load(GetNextFile(Reviewer.CurrentFile,1));
+        Model.Load(GetNextFile(Model.CurrentFile, 1));
     }
 
     public void LoadPrevious()
     {
-        Reviewer.Load(GetNextFile(Reviewer.CurrentFile, -1));
+        Model.Load(GetNextFile(Model.CurrentFile, -1));
 
     }
 

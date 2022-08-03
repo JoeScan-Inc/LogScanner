@@ -8,6 +8,7 @@ using System.Windows;
 using Config.Net;
 using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.LogReview.CrossSection;
+using JoeScan.LogScanner.LogReview.Interfaces;
 using JoeScan.LogScanner.LogReview.Models;
 using JoeScan.LogScanner.LogReview.SectionTable;
 using JoeScan.LogScanner.LogReview.Settings;
@@ -33,38 +34,9 @@ public class AppBootstrapper : AutofacBootstrapper
         builder.RegisterModule<CoreModule>();
         // logging
         builder.RegisterModule<NLogModule>();
-        builder.RegisterType<LogReviewer>().AsSelf().SingleInstance();
-        builder.RegisterType<CrossSectionViewModel>().AsSelf().SingleInstance();
-        builder.RegisterType<Log3DViewModel>().AsSelf().SingleInstance();
-        builder.RegisterType<SectionTableViewModel>().AsSelf().SingleInstance();
+        // use the reviewer object as an observable that holds the loaded log data
+        builder.RegisterType<LogReviewer>().As<ILogModelObservable>().SingleInstance();
         builder.RegisterType<DialogService>().As<IDialogService>();
-
-
-        // UI controls. We use the AutofacBootstrapper which registers all ViewModels and Views automatically,
-        // these are just special to warrant re-registration because we want to force them to be singletons
-        // builder.RegisterType<StatusBarViewModel>().AsSelf().SingleInstance();
-        // builder.RegisterType<ToolbarViewModel>().AsSelf().SingleInstance();
-        // builder.RegisterType<TopAndSideViewModel>().AsSelf().SingleInstance();
-        //
-        // // wrap the Notifier in a service 
-        // builder.Register(c => new NotifierService(new Notifier(cfg => {
-        //     cfg.PositionProvider = new WindowPositionProvider(
-        //         parentWindow: Application.Current.MainWindow,
-        //         corner: Corner.BottomLeft,
-        //         offsetX: 10,
-        //         offsetY: 10);
-        //
-        //     cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
-        //         notificationLifetime: TimeSpan.FromSeconds(5),
-        //         maximumNotificationCount: MaximumNotificationCount.FromCount(5));
-        //
-        //     cfg.Dispatcher = Application.Current.Dispatcher;
-        //
-        //     cfg.DisplayOptions.TopMost = true;
-        //     cfg.DisplayOptions.Width = 250;
-        //     // this will override the registration of MuteNotifier in the engine
-        // }))).As<IUserNotifier>().SingleInstance();
-
     }
 }
 

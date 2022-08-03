@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Models;
+using JoeScan.LogScanner.LogReview.Interfaces;
 using JoeScan.LogScanner.LogReview.Models;
 using JoeScan.LogScanner.LogReview.Navigator;
 using System;
@@ -10,55 +11,15 @@ namespace JoeScan.LogScanner.LogReview.SectionTable;
 
 public class SectionTableViewModel : Screen
 {
-    private LogModel? currentLogModel;
-    private LogSection currentSection;
-    public event EventHandler? SectionChanged;
-    public SectionTableViewModel()
+    public ILogModelObservable Model { get; }
+
+    public SectionTableViewModel(ILogModelObservable model)
     {
-
-    }
-
-    public IObservableCollection<LogSection> Sections { get; set; } = new BindableCollection<LogSection>();
-
-    public LogModel? CurrentLogModel
-    {
-        get => currentLogModel;
-        set
-        {
-            if (Equals(value, currentLogModel))
-            {
-                return;
-            }
-            currentLogModel = value;
-            NotifyOfPropertyChange(() => CurrentLogModel);
-            Sections.Clear();
-            if (currentLogModel != null)
-            {
-                Sections.AddRange(currentLogModel.Sections);
-            }
-
-            Refresh();
-        }
-    }
-
-    public LogSection? CurrentSection
-    {
-        get => currentSection;
-        set
-        {
-            if (value == currentSection)
-            {
-                return;
-            }
-            currentSection = value;
-            OnSectionChanged();
-            Refresh();
-        }
+        Model = model;
     }
 
 
-    protected virtual void OnSectionChanged()
-    {
-        SectionChanged?.Invoke(this, EventArgs.Empty);
-    }
+   
+
+   
 }
