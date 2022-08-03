@@ -87,7 +87,7 @@ public class AppBootstrapper : AutofacBootstrapper
             try
             {
                 var vendorAssembly = Assembly.LoadFile(file);
-                builder.RegisterAssemblyTypes(new Assembly[] { vendorAssembly }).AsImplementedInterfaces();
+                builder.RegisterAssemblyModules(new Assembly[]{vendorAssembly});
             }
             catch
             {
