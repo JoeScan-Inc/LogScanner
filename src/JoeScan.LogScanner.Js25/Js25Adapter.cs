@@ -86,10 +86,7 @@ public class Js25Adapter : IScannerAdapter
         StartScanThread();
     }
 
-    public Task StartAsync()
-    {
-        return Task.Run(Start);
-    }
+    
 
     public void Stop()
     {
@@ -103,11 +100,6 @@ public class Js25Adapter : IScannerAdapter
                 throw (new ApplicationException("Scanning Thread failed to stop"));
             }
         }
-    }
-
-    public Task StopAsync()
-    {
-        return Task.Run(Stop);
     }
 
     public string Name => "JS-20/JS-25 Single Zone";

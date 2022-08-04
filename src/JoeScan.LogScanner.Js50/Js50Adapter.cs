@@ -12,15 +12,24 @@ namespace JoeScan.LogScanner.Js50;
 
 public class Js50Adapter : IScannerAdapter
 {
-    public IJs50AdapterConfig Config { get; }
-    private readonly ILogger? logger;
+    #region Private Fields
+
     private ScanSystem? scanSystem;
     private CancellationTokenSource? cancellationTokenSource;
     private Thread? scanThread;
     private bool isRunning;
-    static AutoResetEvent autoResetEvent = new AutoResetEvent(false);
-    private readonly ScanSyncReceiverThread encoderUpdater;
+    static readonly AutoResetEvent autoResetEvent = new AutoResetEvent(false);
     private const int maxStartupTimeS = 10;
+
+    #endregion
+
+    #region Injected
+
+    private readonly ILogger? logger;
+    private IJs50AdapterConfig Config { get; }
+    private readonly ScanSyncReceiverThread encoderUpdater;
+
+    #endregion
 
     #region Lifecycle
 
@@ -31,7 +40,7 @@ public class Js50Adapter : IScannerAdapter
         this.encoderUpdater = encoderUpdater;
         logger.Debug($"Created Js50Adapter using JoeScan Pinchot API version {Pinchot.VersionInformation.Version}");
         Units = UnitSystem.Inches;
-        encoderUpdater.EventUpdateFrequency = 100;
+        encoderUpdater.EventUpdateFrequencyMs = 100;
         encoderUpdater.ScanSyncUpdate += EncoderUpdaterOnScanSyncUpdate;
     }
 
@@ -40,7 +49,8 @@ public class Js50Adapter : IScannerAdapter
     #region IScannerAdapter Implementation
     public string Name => $"JS-50 (Pinchot v{Pinchot.VersionInformation.Version})";
     public UnitSystem Units { get; }
-    public bool IsConfigured => true;
+    public bool IsConfigured { get; private set; }
+
 
     // If we give a finite BoundedCapacity, the BufferBlock will discard Profiles 
     // i.e Post() will return false. -1 means unlimited buffering - hopefully the 
@@ -53,6 +63,7 @@ public class Js50Adapter : IScannerAdapter
         try
         {
             encoderUpdater.Start();
+            IsConfigured = true;
             logger!.Debug("Started ScanSyncReceiverThread.");
         }
         catch (Exception e)
@@ -101,6 +112,57 @@ public class Js50Adapter : IScannerAdapter
             throw new ApplicationException(msg);
         }
     }
+
+
+
+    public void Stop()
+    {
+        logger!.Debug($"Trying to stop {this.GetType().Name}.");
+        if (!IsRunning)
+        {
+            return;
+        }
+        cancellationTokenSource!.Cancel();
+        if (!scanThread!.Join(TimeSpan.FromSeconds(1)))
+        {
+            logger.Warn("ScanThread did not exit. Abandoning it.");
+        }
+        else
+        {
+            logger.Debug("Clean shutdown of scan thread successful.");
+        }
+
+        scanThread = null;
+        cancellationTokenSource = null;
+    }
+
+    public bool IsRunning
+    {
+        get => isRunning;
+        set
+        {
+            if (value != isRunning)
+            {
+                isRunning = value;
+                if (isRunning)
+                {
+                    OnScanningStarted();
+                }
+                else
+                {
+                    OnScanningStopped();
+                }
+            }
+        }
+    }
+
+    public event EventHandler? ScanningStarted;
+    public event EventHandler? ScanningStopped;
+    public event EventHandler? ScanErrorEncountered;
+    public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
+    public bool IsReplay => false;
+
+    #endregion
 
     private void ScanLoop(CancellationToken ct)
     {
@@ -174,65 +236,6 @@ public class Js50Adapter : IScannerAdapter
         }
     }
 
-    public Task StartAsync()
-    {
-        return Task.Run(Start);
-    }
-
-    public void Stop()
-    {
-        logger!.Debug($"Trying to stop {this.GetType().Name}.");
-        if (!IsRunning)
-        {
-            return;
-        }
-        cancellationTokenSource!.Cancel();
-        if (!scanThread!.Join(TimeSpan.FromSeconds(1)))
-        {
-           logger.Warn("ScanThread did not exit. Abandoning it.");
-        }
-        else
-        {
-            logger.Debug("Clean shutdown of scan thread successful.");
-        }
-
-        scanThread = null;
-        cancellationTokenSource = null;
-    }
-
-    public Task StopAsync()
-    {
-        return Task.Run(Stop);
-    }
-
-    public bool IsRunning
-    {
-        get => isRunning;
-        set
-        {
-            if (value != isRunning)
-            {
-                isRunning = value;
-                if (isRunning)
-                {
-                    OnScanningStarted();
-                }
-                else
-                {
-                    OnScanningStopped();
-                }
-            }
-        }
-    }
-
-    public event EventHandler? ScanningStarted;
-    public event EventHandler? ScanningStopped;
-    public event EventHandler? ScanErrorEncountered;
-    public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
-    public bool IsReplay => false;
-
-    #endregion
-
     private ScanSystem SetupScanSystem()
     {
         logger!.Debug("Setting up ScanSystem");
@@ -264,7 +267,7 @@ public class Js50Adapter : IScannerAdapter
                     headConfig.WindowBottom,
                     headConfig.WindowLeft,
                     headConfig.WindowRight));
-                logger.Debug($"Setting Alignment for head {scanHead.ID} to ShiftX: {headConfig.AlignmentShiftX}" 
+                logger.Debug($"Setting Alignment for head {scanHead.ID} to ShiftX: {headConfig.AlignmentShiftX}"
                 + $" ShiftY: {headConfig.AlignmentShiftY} "
                 + $" RollDeg: {headConfig.AlignmentRollDegrees}"
                 + $" Orientation: {headConfig.AlignmentOrientation}");
@@ -298,7 +301,7 @@ public class Js50Adapter : IScannerAdapter
         ScanErrorEncountered?.Invoke(this, EventArgs.Empty);
     }
 
-   
+
 
     private void EncoderUpdaterOnScanSyncUpdate(object? sender, EncoderUpdateArgs e)
     {

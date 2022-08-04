@@ -121,8 +121,6 @@ namespace JoeScan.LogScanner.Core.Models
             dumper = new RawProfileDumper(Logger);
             dumper.OutputDir = Config.RawDumperConfig.RawDumpLocation;
             
-            
-
             var unitConverterBlock = new TransformBlock<Profile, Profile>((p) => UnitConverter.Convert(ActiveAdapter.Units, Units, p));
             // dumper.DumpBlock is a pass-through from the source block where the profiles originate, scannerAdapter.AvailableProfiles
             dumper.DumpBlock.LinkTo(unitConverterBlock, linkOptions);
@@ -231,7 +229,7 @@ namespace JoeScan.LogScanner.Core.Models
             OnAdapterChanged();
         }
 
-        public async void Start()
+        public void Start()
         {
             CheckForActiveAdapter();
             notifier.IsBusy = true;
@@ -239,7 +237,7 @@ namespace JoeScan.LogScanner.Core.Models
             try
             {
                 ActiveAdapter!.Configure();
-                await ActiveAdapter.StartAsync();
+                ActiveAdapter.Start();
             }
             catch (Exception e)
             {
@@ -259,14 +257,14 @@ namespace JoeScan.LogScanner.Core.Models
             }
         }
 
-        public async void Stop()
+        public void Stop()
         {
             CheckForActiveAdapter();
             notifier.IsBusy = true;
             
             try
             {
-                await ActiveAdapter!.StopAsync();
+                ActiveAdapter!.Stop();
                 notifier.IsBusy = false;
                 notifier.Success("Stopped Scanning.");
             }

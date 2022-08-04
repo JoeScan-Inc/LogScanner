@@ -104,11 +104,7 @@ public class ReplayAdapter : IScannerAdapter
         }
     }
 
-    public Task StartAsync()
-    {
-        return Task.Run(Start);
-    }
-
+    
     public void Stop()
     {
         if (cts != null)
@@ -117,11 +113,6 @@ public class ReplayAdapter : IScannerAdapter
             thread!.Join();
             OnScanningStopped();
         }
-    }
-
-    public Task StopAsync()
-    {
-        return Task.Run(Stop);
     }
 
     public string Name => "Replay";

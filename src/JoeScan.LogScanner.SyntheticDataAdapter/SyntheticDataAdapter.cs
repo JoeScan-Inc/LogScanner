@@ -47,12 +47,7 @@ public class SyntheticDataAdapter : IScannerAdapter
         }
     }
 
-    public Task StartAsync()
-    {
-        return Task.Run(Start);
-    }
-
-    public void Stop()
+   public void Stop()
     {
         if (cts != null)
         {
@@ -61,12 +56,7 @@ public class SyntheticDataAdapter : IScannerAdapter
             OnScanningStopped();
         }
     }
-
-    public Task StopAsync()
-    {
-        return Task.Run(Stop);
-    }
-
+    
     public string Name => "Synthetic Data";
     public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
     public event EventHandler? ScanningStarted;

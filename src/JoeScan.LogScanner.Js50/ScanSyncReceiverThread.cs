@@ -31,7 +31,7 @@ public  class ScanSyncReceiverThread : IDisposable
 
     #region Internal Properties
 
-    internal int EventUpdateFrequency { get; set; } = 1000;
+    internal int EventUpdateFrequencyMs { get; set; } = 1000;
 
     #endregion
 
@@ -143,7 +143,7 @@ public  class ScanSyncReceiverThread : IDisposable
                 byte[] rsp = receiverClient.Receive(ref groupEndPoint);
                 goodPackets++;
                 bytesReceived += rsp.Length;
-                if (counter++ == EventUpdateFrequency)
+                if (counter++ == EventUpdateFrequencyMs)
                 {
                     var packet = new ScanSyncPacket(rsp);
                     ScanSyncUpdate.Raise(this, new EncoderUpdateArgs(

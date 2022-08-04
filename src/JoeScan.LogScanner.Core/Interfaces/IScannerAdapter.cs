@@ -8,7 +8,9 @@ public interface IScannerAdapter
 {
     /// <summary>
     /// the Units in which the adapter delivers profiles. For Pinchot API v13 this is
-    /// always Inches, but for later versions of the API we can choose to use Millimeters.
+    /// always Inches, for v14+ it can be Inches or Millimeters,
+    /// depending on how the adapter was configured. For JS-20/25 models it can be Inches or Millimeters, depending
+    /// on the settings in param.dat.
     /// </summary>
     UnitSystem Units { get; }
     BufferBlock<Profile> AvailableProfiles { get; }
@@ -21,9 +23,7 @@ public interface IScannerAdapter
     void Configure();
     bool IsConfigured { get; }
     void Start();
-    Task StartAsync();
     void Stop();
-    Task StopAsync();
 
     string Name { get; }
 
