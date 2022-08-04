@@ -1,25 +1,16 @@
 ﻿
 using Caliburn.Micro;
-using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.LogReview.CrossSection;
-using JoeScan.LogScanner.LogReview.SectionTable;
-using JoeScan.LogScanner.Shared.Log3D;
+using JoeScan.LogScanner.LogReview.Interfaces;
 using NLog;
 using System;
-using System.Collections.Generic;
-using System.Windows.Documents;
 
 namespace JoeScan.LogScanner.LogReview.Models;
 
-public class LogReviewer : PropertyChangedBase
+public class LogReviewer : PropertyChangedBase, ILogModelObservable
 {
     public ILogger Logger { get; }
     public LogModelBuilder ModelBuilder { get; }
-    public CrossSectionViewModel CrossSectionViewModel { get; }
-    public Log3DViewModel Log3D { get; }
-
-    public SectionTableViewModel SectionTable { get; }
 
     #region Bound Properties
 
@@ -33,13 +24,11 @@ public class LogReviewer : PropertyChangedBase
                 return;
             }
             currentRawLog = value;
+            NotifyOfPropertyChange(() => CurrentRawLog);
             if (currentRawLog != null)
             {
-
                 CurrentLogModel = ModelBuilder.Build(currentRawLog);
             }
-            NotifyOfPropertyChange(() => CurrentRawLog);
-            OnLogChanged();
         }
     }
 
@@ -54,19 +43,13 @@ public class LogReviewer : PropertyChangedBase
             }
             currentLogModel = value;
             NotifyOfPropertyChange(() => CurrentLogModel);
+            Sections.Clear();
             if (currentLogModel != null)
             {
-                CurrentSection = currentLogModel.Sections[0];
-                Sections = currentLogModel.Sections;
+                Sections.AddRange(currentLogModel.Sections);
+                CurrentSection = Sections[0];
             }
-            else
-            {
-                CurrentSection = null;
-                Sections = null;
-            }
-
-            Log3D.CurrentLogModel = value;
-            SectionTable.CurrentLogModel = value;
+            
         }
     }
 
@@ -81,36 +64,21 @@ public class LogReviewer : PropertyChangedBase
             }
             currentSection = value;
             NotifyOfPropertyChange(() => CurrentSection);
-            CrossSectionViewModel.CurrentSection = currentSection;
-            SectionTable.CurrentSection = currentSection;
         }
     }
 
+    public IObservableCollection<LogSection> Sections { get; } = new BindableCollection<LogSection>();
     public string CurrentFile { get; set; } = String.Empty;
-    public List<LogSection>? Sections { get; private set; }
     #endregion
 
     #region Lifecycle
 
     public LogReviewer(ILogger logger,
-        LogModelBuilder modelBuilder,
-        CrossSectionViewModel crossSectionViewModel,
-        Log3DViewModel log3D,
-        SectionTableViewModel sectionTable)
+        LogModelBuilder modelBuilder)
     {
         Logger = logger;
         ModelBuilder = modelBuilder;
-        CrossSectionViewModel = crossSectionViewModel;
-        Log3D = log3D;
-        SectionTable = sectionTable;
-        SectionTable.SectionChanged += (_, _) => CurrentSection = SectionTable.CurrentSection;
     }
-
-    #endregion
-
-    #region Event Handlers
-
-    public event EventHandler? LogChanged;
 
     #endregion
 
@@ -122,16 +90,6 @@ public class LogReviewer : PropertyChangedBase
 
     #endregion
 
-    #region Event Invocation
-
-    private void OnLogChanged()
-    {
-        LogChanged?.Raise(this, EventArgs.Empty);
-        
-    }
-
-    #endregion
-
     public void Load(string fileName)
     {
         // do the actual load
@@ -139,14 +97,12 @@ public class LogReviewer : PropertyChangedBase
         {
             CurrentRawLog = RawLogReaderWriter.Read(fileName);
             CurrentFile = fileName;
-            NotifyOfPropertyChange(()=>CurrentFile);
-            OnLogChanged();
+            NotifyOfPropertyChange(() => CurrentFile);
         }
         catch (Exception e)
         {
             var msg = $"Failed to read raw log from file \"{fileName}\". Error was: {e.Message}";
             Logger.Error(msg);
-            
         }
     }
 }

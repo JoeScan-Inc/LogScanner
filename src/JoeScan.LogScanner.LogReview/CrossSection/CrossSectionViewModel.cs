@@ -1,7 +1,9 @@
-﻿using Caliburn.Micro;
+﻿using Accessibility;
+using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.LogReview.Extensions;
+using JoeScan.LogScanner.LogReview.Interfaces;
 using JoeScan.LogScanner.LogReview.Models;
 using JoeScan.LogScanner.LogReview.Navigator;
 using JoeScan.LogScanner.Shared.Helpers;
@@ -24,13 +26,13 @@ public class CrossSectionViewModel : Screen
 {
     #region Backing Properties
 
-    private LogSection? currentSection;
     private Mode viewMode;
 
     #endregion
 
     #region Injected Properties
 
+    public ILogModelObservable Model { get; }
     public ILogger Logger { get; }
 
     #endregion
@@ -137,26 +139,16 @@ public class CrossSectionViewModel : Screen
 
     public PlotModel CrossSectionPlotModel { get; private set; }
 
-    public LogSection? CurrentSection
-    {
-        get => currentSection;
-        set
-        {
-            if (value == currentSection)
-            {
-                return;
-            }
-            currentSection = value;
-            RefreshDisplay();
-        }
-    }
+    public LogSection? CurrentSection => Model.CurrentSection;
 
     #endregion
 
     #region Lifecycle
 
-    public CrossSectionViewModel(ILogger logger)
+    public CrossSectionViewModel(ILogModelObservable model, ILogger logger)
     {
+        Model = model;
+        Model.PropertyChanged += (_, _) => RefreshDisplay();
         Logger = logger;
         SetupPlot();
         viewMode = Mode.ModeSection;

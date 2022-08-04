@@ -19,7 +19,7 @@
                 </Border>
             </DockPanel>
         </GroupBox.Header>
-        <ListView x:Name="Sections">
+        <ListView ItemsSource="{Binding Model.Sections}" SelectedItem="{Binding Model.CurrentSection}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding Path=SectionCenter, StringFormat={}{0:F0} mm}" Header="Pos" />
