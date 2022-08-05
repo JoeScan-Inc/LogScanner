@@ -132,6 +132,11 @@ public class Js50Adapter : IScannerAdapter
             logger.Debug("Clean shutdown of scan thread successful.");
         }
 
+        if (scanSystem != null)
+        {
+            scanSystem.Dispose();
+            scanSystem = null;
+        }
         scanThread = null;
         cancellationTokenSource = null;
     }
@@ -168,8 +173,8 @@ public class Js50Adapter : IScannerAdapter
     {
         try
         {
-            var timeOut = TimeSpan.FromSeconds(1);
-            logger!.Debug($"Attempting to connect to scan heads with timeout of {timeOut}.");
+            var timeOut = TimeSpan.FromSeconds(10);
+            logger!.Debug($"Attempting to connect to scan heads with timeout of {timeOut} seconds.");
             var disconnectedHeads = scanSystem!.Connect(timeOut);
             if (disconnectedHeads == null)
             {
@@ -199,6 +204,7 @@ public class Js50Adapter : IScannerAdapter
                 logger.Warn($"Configuration requested rate ({Config.ScanRate} Hz) is higher than the system max rate ({systemMaxScanRate} Hz) - using system max rate.");
             }
             scanSystem.StartScanning(Config.ScanRate > systemMaxScanRate ? systemMaxScanRate : Config.ScanRate, Config.DataFormat);
+            int failedToPost = 0;
             // we seem to have connected and are scanning
             autoResetEvent.Set();
             while (!ct.IsCancellationRequested)
@@ -210,7 +216,18 @@ public class Js50Adapter : IScannerAdapter
                     var prof = scanHead.TakeNextProfile(ct);
                     if (prof != null)
                     {
-                        AvailableProfiles.Post(prof.ToLogScannerProfile());
+                        //TODO: check the result of Post to see if we lose profiles
+                        // due to the downstream processing being too slow
+                        if (!AvailableProfiles.Post(prof.ToLogScannerProfile()))
+                        {
+                            failedToPost++;
+                            if (failedToPost >= 100)
+                            {
+                                string msg = "BufferBlock failed to post new profiles 100 times.";
+                                logger.Error(msg);
+                                throw new InternalBufferOverflowException(msg);
+                            }
+                        }
                     }
                 }
             }
@@ -218,7 +235,6 @@ public class Js50Adapter : IScannerAdapter
         catch (OperationCanceledException)
         {
             // perfectly normal exception we get when using the token to cancel
-            AvailableProfiles.Complete();
         }
         catch (Exception e)
         {
@@ -232,6 +248,10 @@ public class Js50Adapter : IScannerAdapter
             {
                 scanSystem.StopScanning();
             }
+
+            scanSystem.Dispose();
+            scanSystem = null;
+
             IsRunning = false;
         }
     }
