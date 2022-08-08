@@ -16,6 +16,7 @@ using JoeScan.LogScanner.Config;
 using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.Js25;
 using JoeScan.LogScanner.Js50;
+using JoeScan.LogScanner.Models;
 using JoeScan.LogScanner.Replay;
 using JoeScan.LogScanner.SyntheticDataAdapter;
 using System.IO;
@@ -49,7 +50,9 @@ public class AppBootstrapper : AutofacBootstrapper
         builder.RegisterModule<Js25Module>();
         builder.RegisterModule<Js50Module>();
         builder.RegisterModule<SyntheticDataModule>();
-        
+
+        builder.RegisterType<LogScannerEngineModel>().AsSelf().SingleInstance();
+
         // the actual log scanner engine is in CoreModule
         builder.RegisterModule<CoreModule>();
         // logging

@@ -1,25 +1,23 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Models;
+using JoeScan.LogScanner.Models;
 
 namespace JoeScan.LogScanner.StatusBar;
 
 public class StatusBarViewModel : Screen
 {
-    public LogScannerEngine Engine { get; }
+    public LogScannerEngineModel Model { get; }
     public EncoderStatusViewModel EncStatus { get; }
     public string BuildInfo => $"v{GitVersionInformation.FullSemVer} ";
-    public string Adapter  => Engine.ActiveAdapter != null ? Engine.ActiveAdapter.Name : "n/a";
-    public string EngineUnits => Engine.Units.ToString();
+    public string Adapter  => Model.ActiveAdapter != null ? Model.ActiveAdapter.Name : "n/a";
+   
 
-    public StatusBarViewModel(LogScannerEngine engine,
+    public StatusBarViewModel(LogScannerEngineModel model,
         EncoderStatusViewModel encStatus)
     {
-        Engine = engine;
+        Model = model;
         EncStatus = encStatus;
-        Engine.AdapterChanged += (_, _) =>
-        {
-            Refresh();
-        };
+        
     }
 
    

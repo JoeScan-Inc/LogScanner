@@ -34,7 +34,7 @@ namespace JoeScan.LogScanner.Core.Models
 
         public UnitSystem Units { get; }
         public bool IsRunning => ActiveAdapter is { IsRunning: true };
-        public bool CanStart => ActiveAdapter != null && !IsRunning;
+        
 
         #region Event Handlers
 

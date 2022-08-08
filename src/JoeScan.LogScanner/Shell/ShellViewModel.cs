@@ -1,6 +1,5 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Interfaces;
-using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.LiveProfiles;
 using JoeScan.LogScanner.LogHistory;
 using JoeScan.LogScanner.LogProperties;
@@ -11,10 +10,6 @@ using System.Windows;
 using JoeScan.LogScanner.Config;
 using JoeScan.LogScanner.Shared.Log3D;
 using NLog;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks.Dataflow;
 
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -33,7 +28,6 @@ public class ShellViewModel : Screen
     public LogHistoryViewModel LogHistory { get; }
     public Log3DViewModel Log3D { get; }
     public LogPropertiesViewModel LogProperties { get; }
-    public LogScannerEngine Engine { get; }
     public IUserNotifier Notifier { get; }
 
     public string Title => "JoeScan LogScanner";
@@ -48,7 +42,6 @@ public class ShellViewModel : Screen
         LogHistoryViewModel logHistory,
         Log3DViewModel log3D,
         LogPropertiesViewModel logProperties,
-        LogScannerEngine engine,
         IUserNotifier notifier)
     {
         Logger = logger;
@@ -60,40 +53,12 @@ public class ShellViewModel : Screen
         LogHistory = logHistory;
         Log3D = log3D;
         LogProperties = logProperties;
-        Engine = engine;
         Notifier = notifier;
         Notifier.BusyChanged+= (_, _) =>
         {
             Refresh();
         };
-        if (!string.IsNullOrEmpty(config.ActiveAdapter))
-        {
-            var n = Engine.AvailableAdapters.FirstOrDefault(q => q.Name == config.ActiveAdapter);
-            {
-                if (n != null)
-                {
-                    try
-                    {
-                        Engine.SetActiveAdapter(n);
-                        Notifier.Success($"Active Adapter: {n}");
-                    }
-                    catch (Exception e)
-                    {
-                        var msg = $"Error setting active adapter: {e.Message}";
-                        Logger.Error(msg);
-                        Notifier.Error(msg);
-                        Engine.SetActiveAdapter(Engine.AvailableAdapters.First());
-                        Notifier.Warn($"Fallback adapter: {Engine.ActiveAdapter!.Name}");
-                    }
-                }
-            }
-        }
-
-        engine.LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModel>(model =>
-        {
-            // needs to run on UI thread
-            Application.Current.Dispatcher.BeginInvoke(() => log3D.CurrentLogModel = model);
-        }));
+        
     }
 
     public Visibility IsBusy => Notifier.IsBusy ? Visibility.Visible : Visibility.Hidden;

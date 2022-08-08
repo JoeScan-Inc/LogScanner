@@ -23,12 +23,12 @@
             IsReadOnly="True" />
         <Label VerticalContentAlignment="Center" DockPanel.Dock="Right">Adapter:</Label>
         <TextBox
-            x:Name="EngineUnits"
             MinWidth="160"
             Margin="3"
             DockPanel.Dock="Right"
-            IsReadOnly="True" />
+            IsReadOnly="True"
+            Text="{Binding Model.Units}" />
         <Label VerticalContentAlignment="Center" DockPanel.Dock="Right">Units:</Label>
-        <ContentControl DockPanel.Dock="Right" x:Name="EncStatus"></ContentControl>
+        <ContentControl x:Name="EncStatus" DockPanel.Dock="Right" />
     </DockPanel>
 </UserControl>

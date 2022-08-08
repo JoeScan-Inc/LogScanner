@@ -2,6 +2,7 @@
 using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
+using JoeScan.LogScanner.Models;
 using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
@@ -46,13 +47,20 @@ public sealed class LiveProfileViewModel : Screen
 
     #endregion
 
+    #region Injected Properties
+
+    public LogScannerEngineModel Model { get; }
+    public IFlightsAndWindowFilter Filter { get; }
+
+    #endregion
+
     #region Lifecycle
 
-    public LiveProfileViewModel(LogScannerEngine engine,
+    public LiveProfileViewModel(LogScannerEngineModel model,
         IFlightsAndWindowFilter filter)
     {
         paused = false;
-        Engine = engine;
+        Model = model;
         Filter = filter;
         SetupPlotModel();
         dispatcherTimer = new DispatcherTimer
@@ -60,18 +68,12 @@ public sealed class LiveProfileViewModel : Screen
             Interval = new TimeSpan(0, 0, 0, 0, refreshIntervalMs)
         };
         dispatcherTimer.Tick += (_, _) => DrawPreview();
-        Engine.ScanningStarted += (_, _) => dispatcherTimer.Start();
-        Engine.ScanningStopped += (_, _) => dispatcherTimer.Stop();
+        Model.PropertyChanged += (_, _) => Refresh();
+        // Model.ScanningStarted += (_, _) => dispatcherTimer.Start();
+        // Model.ScanningStopped += (_, _) => dispatcherTimer.Stop();
         displayActionBlock = new ActionBlock<Profile>(StoreProfiles);
-        Engine.RawProfilesBroadcastBlock.LinkTo(displayActionBlock);
+        Model.RawProfilesBroadcast.LinkTo(displayActionBlock);
     }
-
-    #endregion
-
-    #region Injected Properties
-
-    public LogScannerEngine Engine { get; }
-    public IFlightsAndWindowFilter Filter { get; }
 
     #endregion
 

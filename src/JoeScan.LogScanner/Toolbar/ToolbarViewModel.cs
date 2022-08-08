@@ -1,6 +1,7 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
+using JoeScan.LogScanner.Models;
 using System;
 using System.Linq;
 
@@ -12,42 +13,31 @@ public class ToolbarViewModel : Screen
 {
     private bool record;
     private string selectedAdapter;
-    private LogScannerEngine Engine { get; }
+    private LogScannerEngineModel Model { get; }
 
-    public IObservableCollection<IScannerAdapter> Adapters =>
-        new BindableCollection<IScannerAdapter>(Engine.AvailableAdapters);
+    
 
-    public IScannerAdapter? SelectedAdapter
+    public IScannerAdapter? SelectedAdapter => Model.ActiveAdapter;
+
+    public IObservableCollection<IScannerAdapter> Adapters => Model.Adapters;
+
+    public ToolbarViewModel(LogScannerEngineModel model)
     {
-        get => Engine!.ActiveAdapter;
-        set => Engine!.SetActiveAdapter(value);
+        Model = model;
+        Model.PropertyChanged += (_, _) => Refresh();
+
     }
 
-    public ToolbarViewModel(LogScannerEngine engine)
-    {
-        Engine = engine;
-        Engine.ScanningStopped += EngineStateChanged!;
-        Engine.ScanningStarted += EngineStateChanged!;
-        //TODO: save and restore in settings
-        SelectedAdapter = Engine.AvailableAdapters.First();
-    }
-
-    private void EngineStateChanged(object sender, EventArgs args)
-    {
-        NotifyOfPropertyChange(()=>CanStart);
-        NotifyOfPropertyChange(()=>CanStop);
-    }
-
-    public bool CanStart => Engine.CanStart;
-    public bool CanStop => Engine.IsRunning;
+    public bool CanStart => Model.CanStart;
+    public bool CanStop => Model.CanStop;
 
     public void Start()
     {
-        Engine.Start(); 
+        Model.Start(); 
     }
     public void Stop()
     {
-        Engine.Stop();
+        Model.Stop();
     }
 
     public bool Record
@@ -62,11 +52,11 @@ public class ToolbarViewModel : Screen
 
             if (value)
             {
-                Engine.StartDumping();
+                Model.StartDumping();
             }
             else
             {
-                Engine.StopDumping();
+                Model.StopDumping();
             }
             record = value;
 
