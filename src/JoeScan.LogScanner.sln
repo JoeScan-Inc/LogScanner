@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner.Shared", "JoeScan.LogScanner.Shared\JoeScan.LogScanner.Shared.csproj", "{247D23F7-981E-4875-9623-AE2BFD691241}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner", "JoeScan.LogScanner\JoeScan.LogScanner.csproj", "{C3B41738-4D85-4C3B-8496-FB358F64C06A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner.Desktop", "JoeScan.LogScanner\JoeScan.LogScanner.Desktop.csproj", "{C3B41738-4D85-4C3B-8496-FB358F64C06A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner.Core", "JoeScan.LogScanner.Core\JoeScan.LogScanner.Core.csproj", "{680E7FBB-3D78-48E7-8E12-F7C1EF729ADC}"
 EndProject
@@ -30,7 +30,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner.Syntheti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner.LogReview", "JoeScan.LogScanner.LogReview\JoeScan.LogScanner.LogReview.csproj", "{2F4DB1CA-166F-4C55-90ED-65190E94FCD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogScanner.VendorSample", "LogScanner.VendorSample\LogScanner.VendorSample.csproj", "{025C2484-2304-4C47-AAC5-7F5E90E750CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogScanner.VendorSample", "LogScanner.VendorSample\LogScanner.VendorSample.csproj", "{025C2484-2304-4C47-AAC5-7F5E90E750CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

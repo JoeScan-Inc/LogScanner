@@ -1,31 +1,30 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Interfaces;
-using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.Models;
-using System;
-using System.Linq;
+using JoeScan.LogScanner.Desktop.Engine;
+using JoeScan.LogScanner.Desktop.Main;
+using NLog;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace JoeScan.LogScanner.Toolbar;
+namespace JoeScan.LogScanner.Desktop.Toolbar;
 
 public class ToolbarViewModel : Screen
 {
+    public ILogger Logger { get; }
     private bool record;
     private string selectedAdapter;
-    private LogScannerEngineModel Model { get; }
-
-    
+    private EngineViewModel Model { get; }
 
     public IScannerAdapter? SelectedAdapter => Model.ActiveAdapter;
 
     public IObservableCollection<IScannerAdapter> Adapters => Model.Adapters;
 
-    public ToolbarViewModel(LogScannerEngineModel model)
+    public ToolbarViewModel(EngineViewModel model,
+        ILogger logger)
     {
         Model = model;
-        Model.PropertyChanged += (_, _) => Refresh();
-
+        Logger = logger;
+        Model!.PropertyChanged += (_, _) => Refresh();
     }
 
     public bool CanStart => Model.CanStart;

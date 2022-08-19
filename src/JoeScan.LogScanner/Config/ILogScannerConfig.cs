@@ -1,4 +1,4 @@
-﻿namespace JoeScan.LogScanner.Config;
+﻿namespace JoeScan.LogScanner.Desktop.Config;
 
 public interface ILogScannerConfig
 {

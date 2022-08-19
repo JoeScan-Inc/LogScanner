@@ -10,7 +10,7 @@
                 <ResourceDictionary>
                     <local:AppBootstrapper x:Key="Bootstrapper" />
                 </ResourceDictionary>
-               
+
                 <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/dark.xaml" />
                 <!-- <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/light.xaml" /> -->
                 <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml" />

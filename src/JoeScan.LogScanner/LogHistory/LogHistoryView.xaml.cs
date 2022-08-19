@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace JoeScan.LogScanner.LogHistory
+namespace JoeScan.LogScanner.Desktop.LogHistory
 {
     /// <summary>
     /// Interaction logic for LogHistoryView.xaml

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace JoeScan.LogScanner.StatusBar
+namespace JoeScan.LogScanner.Desktop.StatusBar
 {
     /// <summary>
     /// Interaction logic for StatusBarView.xaml

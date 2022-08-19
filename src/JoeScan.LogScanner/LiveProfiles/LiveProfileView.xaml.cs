@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace JoeScan.LogScanner.LiveProfiles
+namespace JoeScan.LogScanner.Desktop.LiveProfiles
 {
     /// <summary>
     /// Interaction logic for LiveProfileView.xaml

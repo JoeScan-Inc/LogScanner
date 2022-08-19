@@ -1,7 +1,7 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Models;
 
-namespace JoeScan.LogScanner.LogProperties;
+namespace JoeScan.LogScanner.Desktop.LogProperties;
 
 public class LogPropertiesViewModel : Screen
 {

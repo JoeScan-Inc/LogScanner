@@ -1,5 +1,5 @@
 ﻿<UserControl
-    x:Class="JoeScan.LogScanner.Toolbar.ToolbarView"
+    x:Class="JoeScan.LogScanner.Desktop.Toolbar.ToolbarView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
@@ -21,7 +21,7 @@
             Focusable="False"
             IsEnabled="{Binding CanStart}"
             ItemsSource="{Binding Adapters}"
-            SelectedValue="{Binding SelectedAdapter}" />
+            SelectedValue="{Binding SelectedAdapter, Mode=OneWay}" />
         <Button
             x:Name="Start"
             MinWidth="120"

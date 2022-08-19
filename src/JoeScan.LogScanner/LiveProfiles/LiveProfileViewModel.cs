@@ -1,8 +1,9 @@
-﻿using Accessibility;
-using Caliburn.Micro;
+﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.Models;
+using JoeScan.LogScanner.Desktop.Engine;
+using JoeScan.LogScanner.Desktop.Main;
+using JoeScan.LogScanner.Shared.Helpers;
 using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
@@ -12,16 +13,14 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks.Dataflow;
 using System.Windows;
 using System.Windows.Threading;
-using JoeScan.LogScanner.Shared.Helpers;
 
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace JoeScan.LogScanner.LiveProfiles;
+namespace JoeScan.LogScanner.Desktop.LiveProfiles;
 
 public sealed class LiveProfileViewModel : Screen
 {
@@ -49,14 +48,14 @@ public sealed class LiveProfileViewModel : Screen
 
     #region Injected Properties
 
-    public LogScannerEngineModel Model { get; }
+    public EngineViewModel Model { get; }
     public IFlightsAndWindowFilter Filter { get; }
 
     #endregion
 
     #region Lifecycle
 
-    public LiveProfileViewModel(LogScannerEngineModel model,
+    public LiveProfileViewModel(EngineViewModel model,
         IFlightsAndWindowFilter filter)
     {
         paused = false;
@@ -68,9 +67,7 @@ public sealed class LiveProfileViewModel : Screen
             Interval = new TimeSpan(0, 0, 0, 0, refreshIntervalMs)
         };
         dispatcherTimer.Tick += (_, _) => DrawPreview();
-        Model.PropertyChanged += (_, _) => Refresh();
-        // Model.ScanningStarted += (_, _) => dispatcherTimer.Start();
-        // Model.ScanningStopped += (_, _) => dispatcherTimer.Stop();
+        dispatcherTimer.Start();
         displayActionBlock = new ActionBlock<Profile>(StoreProfiles);
         Model.RawProfilesBroadcast.LinkTo(displayActionBlock);
     }
@@ -146,7 +143,7 @@ public sealed class LiveProfileViewModel : Screen
     {
         // we want to draw profiles from both cameras on a single WX head
         // on separate series, but with similar colors
-        if (Paused)
+        if (Paused || headCamDict.Count == 0)
         {
             return;
         }

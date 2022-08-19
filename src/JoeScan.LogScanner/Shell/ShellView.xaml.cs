@@ -1,6 +1,6 @@
 ﻿using AdonisUI.Controls;
 
-namespace JoeScan.LogScanner.Shell
+namespace JoeScan.LogScanner.Desktop.Shell
 {
     /// <summary>
     /// Interaction logic for ShellView.xaml

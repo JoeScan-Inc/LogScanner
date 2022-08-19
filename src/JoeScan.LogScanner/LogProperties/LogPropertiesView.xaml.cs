@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace JoeScan.LogScanner.LogProperties
+namespace JoeScan.LogScanner.Desktop.LogProperties
 {
     /// <summary>
     /// Interaction logic for LogDataView.xaml

@@ -1,14 +1,15 @@
 ﻿<Application
-    x:Class="JoeScan.LogScanner.App"
+    x:Class="JoeScan.LogScanner.Desktop.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+    xmlns:desktop="clr-namespace:JoeScan.LogScanner.Desktop"
     xmlns:logScanner="clr-namespace:JoeScan.LogScanner">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary>
-                    <logScanner:AppBootstrapper x:Key="Bootstrapper" />
+                    <desktop:AppBootstrapper x:Key="Bootstrapper" />
                 </ResourceDictionary>
                 <ResourceDictionary>
                     <FontFamily x:Key="InterUI">pack://application:,,,/Fonts/#Inter Medium</FontFamily>

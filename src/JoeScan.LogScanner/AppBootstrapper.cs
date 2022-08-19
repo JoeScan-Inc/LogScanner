@@ -1,31 +1,31 @@
 ﻿using Autofac;
 using Autofac.Extras.NLog;
-using JoeScan.LogScanner.Core;
-using JoeScan.LogScanner.Core.Interfaces;
-using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.Notifications;
-using JoeScan.LogScanner.Shared;
-using JoeScan.LogScanner.Shell;
-using JoeScan.LogScanner.StatusBar;
-using JoeScan.LogScanner.Toolbar;
-using JoeScan.LogScanner.TopAndSide;
-using System;
-using System.Windows;
 using Config.Net;
-using JoeScan.LogScanner.Config;
+using JoeScan.LogScanner.Core;
 using JoeScan.LogScanner.Core.Config;
+using JoeScan.LogScanner.Core.Interfaces;
+using JoeScan.LogScanner.Desktop.Config;
+using JoeScan.LogScanner.Desktop.Engine;
+using JoeScan.LogScanner.Desktop.Main;
+using JoeScan.LogScanner.Desktop.Notifications;
+using JoeScan.LogScanner.Desktop.Shell;
+using JoeScan.LogScanner.Desktop.StatusBar;
+using JoeScan.LogScanner.Desktop.Toolbar;
+using JoeScan.LogScanner.Desktop.TopAndSide;
 using JoeScan.LogScanner.Js25;
 using JoeScan.LogScanner.Js50;
-using JoeScan.LogScanner.Models;
 using JoeScan.LogScanner.Replay;
+using JoeScan.LogScanner.Shared;
 using JoeScan.LogScanner.SyntheticDataAdapter;
+using System;
 using System.IO;
 using System.Reflection;
+using System.Windows;
 using ToastNotifications;
 using ToastNotifications.Lifetime;
 using ToastNotifications.Position;
 
-namespace JoeScan.LogScanner;
+namespace JoeScan.LogScanner.Desktop;
 
 public class AppBootstrapper : AutofacBootstrapper
 {
@@ -51,7 +51,7 @@ public class AppBootstrapper : AutofacBootstrapper
         builder.RegisterModule<Js50Module>();
         builder.RegisterModule<SyntheticDataModule>();
 
-        builder.RegisterType<LogScannerEngineModel>().AsSelf().SingleInstance();
+        builder.RegisterType<EngineViewModel>().AsSelf().SingleInstance();
 
         // the actual log scanner engine is in CoreModule
         builder.RegisterModule<CoreModule>();
