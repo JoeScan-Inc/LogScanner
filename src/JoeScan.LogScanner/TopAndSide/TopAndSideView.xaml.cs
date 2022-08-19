@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace JoeScan.LogScanner.TopAndSide
+namespace JoeScan.LogScanner.Desktop.TopAndSide
 {
     /// <summary>
     /// Interaction logic for TopAndSideView.xaml

@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace JoeScan.LogScanner
+namespace JoeScan.LogScanner.Desktop
 {
     /// <summary>
     /// Interaction logic for App.xaml

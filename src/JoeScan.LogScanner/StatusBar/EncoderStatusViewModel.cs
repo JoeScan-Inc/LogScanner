@@ -1,16 +1,24 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Events;
 using JoeScan.LogScanner.Core.Models;
+using JoeScan.LogScanner.Desktop.Engine;
+using NLog;
+// ReSharper disable ClassNeverInstantiated.Global
 
-namespace JoeScan.LogScanner.StatusBar;
+namespace JoeScan.LogScanner.Desktop.StatusBar;
 
 public class EncoderStatusViewModel : Screen
 {
+    public EngineViewModel Model { get; }
+    public ILogger Logger { get; }
     public string EncoderValue { get; private set; }
 
-    public EncoderStatusViewModel(LogScannerEngine engine)
+    public EncoderStatusViewModel(EngineViewModel model,
+        ILogger logger)
     {
-        engine.EncoderUpdated += Engine_EncoderUpdated;
+        Model = model;
+        Logger = logger;
+        Model.EncoderUpdated += Engine_EncoderUpdated;
         EncoderValue = "n/a";
     }
 

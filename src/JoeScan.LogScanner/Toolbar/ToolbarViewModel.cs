@@ -1,53 +1,42 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Interfaces;
-using JoeScan.LogScanner.Core.Models;
-using System;
-using System.Linq;
+using JoeScan.LogScanner.Desktop.Engine;
+using JoeScan.LogScanner.Desktop.Main;
+using NLog;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace JoeScan.LogScanner.Toolbar;
+namespace JoeScan.LogScanner.Desktop.Toolbar;
 
 public class ToolbarViewModel : Screen
 {
+    public ILogger Logger { get; }
     private bool record;
     private string selectedAdapter;
-    private LogScannerEngine Engine { get; }
+    private EngineViewModel Model { get; }
 
-    public IObservableCollection<IScannerAdapter> Adapters =>
-        new BindableCollection<IScannerAdapter>(Engine.AvailableAdapters);
+    public IScannerAdapter? SelectedAdapter => Model.ActiveAdapter;
 
-    public IScannerAdapter? SelectedAdapter
+    public IObservableCollection<IScannerAdapter> Adapters => Model.Adapters;
+
+    public ToolbarViewModel(EngineViewModel model,
+        ILogger logger)
     {
-        get => Engine!.ActiveAdapter;
-        set => Engine!.SetActiveAdapter(value);
+        Model = model;
+        Logger = logger;
+        Model!.PropertyChanged += (_, _) => Refresh();
     }
 
-    public ToolbarViewModel(LogScannerEngine engine)
-    {
-        Engine = engine;
-        Engine.ScanningStopped += EngineStateChanged!;
-        Engine.ScanningStarted += EngineStateChanged!;
-        //TODO: save and restore in settings
-        SelectedAdapter = Engine.AvailableAdapters.First();
-    }
-
-    private void EngineStateChanged(object sender, EventArgs args)
-    {
-        NotifyOfPropertyChange(()=>CanStart);
-        NotifyOfPropertyChange(()=>CanStop);
-    }
-
-    public bool CanStart => Engine.CanStart;
-    public bool CanStop => Engine.IsRunning;
+    public bool CanStart => Model.CanStart;
+    public bool CanStop => Model.CanStop;
 
     public void Start()
     {
-        Engine.Start(); 
+        Model.Start(); 
     }
     public void Stop()
     {
-        Engine.Stop();
+        Model.Stop();
     }
 
     public bool Record
@@ -62,11 +51,11 @@ public class ToolbarViewModel : Screen
 
             if (value)
             {
-                Engine.StartDumping();
+                Model.StartDumping();
             }
             else
             {
-                Engine.StopDumping();
+                Model.StopDumping();
             }
             record = value;
 

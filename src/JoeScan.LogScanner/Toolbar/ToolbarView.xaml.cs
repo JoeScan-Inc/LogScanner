@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace JoeScan.LogScanner.Toolbar
+namespace JoeScan.LogScanner.Desktop.Toolbar
 {
     /// <summary>
     /// Interaction logic for ToolbarView.xaml

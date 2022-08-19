@@ -6,7 +6,7 @@ using UnitsNet;
 
 #pragma warning disable CS0618
 
-namespace JoeScan.LogScanner.LogProperties;
+namespace JoeScan.LogScanner.Desktop.LogProperties;
 
 public class LogPropertyItemViewModel : PropertyChangedBase 
 {
