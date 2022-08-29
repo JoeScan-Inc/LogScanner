@@ -9,7 +9,7 @@ using System.Threading.Tasks.Dataflow;
 
 namespace JoeScan.LogScanner.Core.Models
 {
-    public class LogScannerEngine
+    public class LogScannerEngine : IDisposable
     {
         private readonly ILogArchiver archiver;
         private RawProfileDumper dumper;
@@ -290,6 +290,16 @@ namespace JoeScan.LogScanner.Core.Models
                 Logger.Error(msg);
                 throw new ApplicationException(msg);
             }
+        }
+
+        #endregion
+
+        #region IDisposable Implementation
+
+        public void Dispose()
+        {
+            unlinker?.Dispose();
+           
         }
 
         #endregion

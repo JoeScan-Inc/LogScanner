@@ -3,7 +3,7 @@ using System.Threading.Tasks.Dataflow;
 
 namespace JoeScan.LogScanner.Core.Interfaces;
 
-public interface ILogModelConsumer
+public interface ILogModelConsumer : IDisposable
 {
     public void Consume(LogModel logModel);
 }

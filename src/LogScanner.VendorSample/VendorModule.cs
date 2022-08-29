@@ -7,6 +7,6 @@ public class VendorModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
-        builder.RegisterType<SampleConsumer>().As<ILogModelConsumer>();
+        builder.RegisterType<SampleConsumer>().As<ILogModelConsumer>().As<IDisposable>();
     }
 }

@@ -11,4 +11,9 @@ public class SampleConsumer : ILogModelConsumer
         // within the LogScannerEngine, so the recommended approach is a producer-consumer
         // pattern that just stores the model and processes it in it's own task
     }
+
+    public void Dispose()
+    {
+
+    }
 }
