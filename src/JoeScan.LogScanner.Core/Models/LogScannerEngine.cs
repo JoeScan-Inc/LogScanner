@@ -9,9 +9,8 @@ using System.Threading.Tasks.Dataflow;
 
 namespace JoeScan.LogScanner.Core.Models
 {
-    public class LogScannerEngine
+    public class LogScannerEngine : IDisposable
     {
-        private readonly IUserNotifier notifier;
         private readonly ILogArchiver archiver;
         private RawProfileDumper dumper;
         public IFlightsAndWindowFilter Filter { get; }
@@ -34,7 +33,7 @@ namespace JoeScan.LogScanner.Core.Models
 
         public UnitSystem Units { get; }
         public bool IsRunning => ActiveAdapter is { IsRunning: true };
-        public bool CanStart => ActiveAdapter != null && !IsRunning;
+        
 
         #region Event Handlers
 
@@ -82,12 +81,10 @@ namespace JoeScan.LogScanner.Core.Models
             IFlightsAndWindowFilter filter,
             ILogger logger,
             ILogAssembler logAssembler,
-            IUserNotifier notifier,
             ILogArchiver archiver,
             LogModelBuilder modelBuilder,
             IEnumerable<ILogModelConsumer> consumers)
         {
-            this.notifier = notifier;
             this.archiver = archiver;
             Filter = filter;
             Config = config;
@@ -232,7 +229,6 @@ namespace JoeScan.LogScanner.Core.Models
         public void Start()
         {
             CheckForActiveAdapter();
-            notifier.IsBusy = true;
             var msg = string.Empty;
             try
             {
@@ -245,48 +241,37 @@ namespace JoeScan.LogScanner.Core.Models
             }
             finally
             {
-                notifier.IsBusy = false;
+                //IsBusy = false;
             }
-            if (IsRunning)
-            {
-                notifier.Success("Successfully Started Scanning.");
-            }
-            else
-            {
-                notifier.Error($"Failed to start scanning. Error was : {msg}");
-            }
+
+           
         }
 
         public void Stop()
         {
             CheckForActiveAdapter();
-            notifier.IsBusy = true;
             
             try
             {
                 ActiveAdapter!.Stop();
-                notifier.IsBusy = false;
-                notifier.Success("Stopped Scanning.");
             }
             catch (Exception e)
             {
-                notifier.IsBusy = false;
                 var msg = e.Message;
                 Logger.Debug(msg);
-                notifier.Error($"Problem stopping. Error was : {msg}");
             }
         }
 
         public void StartDumping()
         {
             dumper.StartDumping();
-            notifier.Success("Now dumping raw profiles to disk.");
+//notifier.Success("Now dumping raw profiles to disk.");
         }
 
         public void StopDumping()
         {
             dumper.StopDumping();
-            notifier.Success("Stopped dumping raw profiles.");
+  //          notifier.Success("Stopped dumping raw profiles.");
         }
 
         #endregion
@@ -305,6 +290,16 @@ namespace JoeScan.LogScanner.Core.Models
                 Logger.Error(msg);
                 throw new ApplicationException(msg);
             }
+        }
+
+        #endregion
+
+        #region IDisposable Implementation
+
+        public void Dispose()
+        {
+            unlinker?.Dispose();
+           
         }
 
         #endregion
