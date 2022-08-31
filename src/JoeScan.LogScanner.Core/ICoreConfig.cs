@@ -52,8 +52,8 @@ public interface ILogModelBuilderConfig
 public interface IRawLogArchiverConfig
 {
     string Location { get;  }
-  
-    //TODO: delete oldest, set max number of archived logs
+    bool Enabled { get; }
+    
 
 }
 
