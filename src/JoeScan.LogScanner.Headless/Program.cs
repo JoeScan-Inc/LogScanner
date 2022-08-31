@@ -2,7 +2,7 @@
 using Autofac.Extras.NLog;
 using JoeScan.LogScanner.Core;
 using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.Replay;
+using JoeScan.LogScanner.SyntheticDataAdapter;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -15,7 +15,8 @@ Console.CancelKeyPress += (_, e) =>
 };
 EnableLogging();
 var builder = new ContainerBuilder();
-builder.RegisterModule<ReplayModule>();
+// builder.RegisterModule<ReplayModule>();
+builder.RegisterModule<SyntheticDataModule>();
 builder.RegisterModule<CoreModule>();
 builder.RegisterModule<NLogModule>();
 
