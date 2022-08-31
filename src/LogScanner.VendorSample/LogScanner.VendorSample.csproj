@@ -14,7 +14,7 @@
 
 		<Copy
 			SourceFiles="$(TargetDir)$(ProjectName).dll;$(TargetDir)$(ProjectName).pdb"
-			DestinationFolder="$(SolutionDir)JoeScan.LogScanner\bin\$(Configuration)\net6.0-windows\vendor" />
+			DestinationFolder="$(SolutionDir)JoeScan.LogScanner.Desktop\bin\$(Configuration)\net6.0-windows\vendor" />
 
 		<Message Text="Copied build files" Importance="High" />
 	</Target>
