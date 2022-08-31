@@ -1,5 +1,6 @@
 ﻿using Autofac.Features.AttributeFilters;
 using JoeScan.LogScanner.Core.Events;
+using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Helpers;
 using JoeScan.LogScanner.Core.Interfaces;
@@ -64,25 +65,8 @@ public class ReplayAdapter : IScannerAdapter
     public bool IsConfigured => true;
 
     public bool IsReplay => true;
-    public bool IsRunning
-    {
-        get => isRunning;
-        private set
-        {
-            if (isRunning != value)
-            {
-                isRunning = value;
-                if (isRunning)
-                {
-                    OnScanningStarted();
-                }
-                else
-                {
-                    OnScanningStopped();
-                }
-            }
-        }
-    }
+    public bool IsRunning { get; private set; }
+    
 
     public BufferBlock<Profile> AvailableProfiles { get; } =
         new BufferBlock<Profile>(new DataflowBlockOptions
@@ -101,6 +85,7 @@ public class ReplayAdapter : IScannerAdapter
             cts = new CancellationTokenSource();
             thread = new Thread(() => ThreadMain(cts.Token)) { IsBackground = true };
             thread.Start();
+            OnScanningStarted();
         }
     }
 
@@ -204,12 +189,12 @@ public class ReplayAdapter : IScannerAdapter
 
     protected virtual void OnScanningStarted()
     {
-        ScanningStarted?.Invoke(this, EventArgs.Empty);
+        ScanningStarted?.Raise(this, EventArgs.Empty);
     }
 
     protected virtual void OnScanningStopped()
     {
-        ScanningStopped?.Invoke(this, EventArgs.Empty);
+        ScanningStopped?.Raise(this, EventArgs.Empty);
     }
 
     #endregion
