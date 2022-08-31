@@ -1,6 +1,7 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Desktop.Config;
+using JoeScan.LogScanner.Desktop.Live3D;
 using JoeScan.LogScanner.Desktop.LiveProfiles;
 using JoeScan.LogScanner.Desktop.LogHistory;
 using JoeScan.LogScanner.Desktop.LogProperties;
@@ -21,7 +22,7 @@ public class MainViewModel : Screen
     public TopAndSideViewModel TopAndSide { get; }
     public LiveProfileViewModel LiveView { get; }
     public LogHistoryViewModel LogHistory { get; }
-    public Log3DViewModel Log3D { get; }
+    public Live3DViewModel Live3D { get; }
     public LogPropertiesViewModel LogProperties { get; }
     public ILogger Logger { get; }
     public ILogScannerConfig Config { get; }
@@ -37,7 +38,7 @@ public class MainViewModel : Screen
         TopAndSideViewModel topAndSide,
         LiveProfileViewModel liveView,
         LogHistoryViewModel logHistory,
-        Log3DViewModel log3D,
+        Live3DViewModel live3D,
         LogPropertiesViewModel logProperties
       )
     {
@@ -47,17 +48,12 @@ public class MainViewModel : Screen
         TopAndSide = topAndSide;
         LiveView = liveView;
         LogHistory = logHistory;
-        Log3D = log3D;
+        Live3D = live3D;
         LogProperties = logProperties;
         Logger = logger;
         Config = config;
 
-        // Engine.EncoderUpdated += ... // don't use
-        // engine.LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModel>(model =>
-        // {
-        //     // needs to run on UI thread
-        //     Application.Current.Dispatcher.BeginInvoke(() => log3D.CurrentLogModel = model);
-        // }));
+       
     }
   
 

@@ -48,7 +48,7 @@
             MinHeight="5"
             HorizontalAlignment="Stretch" />
         <ContentControl
-            x:Name="Log3D"
+            x:Name="Live3D"
             Grid.Row="3"
             Grid.Column="1" />
         <GridSplitter
