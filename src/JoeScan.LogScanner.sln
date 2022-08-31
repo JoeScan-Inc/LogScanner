@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner.Core", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner.Core.Tests", "JoeScan.LogScanner.Core.Tests\JoeScan.LogScanner.Core.Tests.csproj", "{CC39FCDA-995E-4FC8-974B-3CC38EB35CB5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner.Headless", "JoeScan.LogScanner.Headless\JoeScan.LogScanner.Headless.csproj", "{D0A5053C-FCF7-475B-BCAB-0CEDCE3C1BB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner.Service", "JoeScan.LogScanner.Headless\JoeScan.LogScanner.Service.csproj", "{D0A5053C-FCF7-475B-BCAB-0CEDCE3C1BB3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner.Js25", "JoeScan.LogScanner.Js25\JoeScan.LogScanner.Js25.csproj", "{2CAE6E50-379D-4C4F-B81F-71812874715B}"
 EndProject
