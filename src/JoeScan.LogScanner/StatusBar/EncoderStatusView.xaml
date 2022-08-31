@@ -11,7 +11,8 @@
             MinWidth="160"
             Margin="3"
             DockPanel.Dock="Right"
-            IsReadOnly="True" />
+            IsReadOnly="True" 
+            TextAlignment="Right"/>
         <Label VerticalContentAlignment="Center" DockPanel.Dock="Right">Encoder:</Label>
 
     </DockPanel>

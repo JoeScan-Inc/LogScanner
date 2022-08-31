@@ -5,6 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\config\adapters\synthetic\SyntheticDataAdapter.json" Link="SyntheticDataAdapter.json" />
+  </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Autofac" Version="6.3.0" />
 		<PackageReference Include="JoeScan.Pinchot" Version="13.1.3" />

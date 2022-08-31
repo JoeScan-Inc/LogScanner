@@ -21,7 +21,7 @@
             Focusable="False"
             IsEnabled="{Binding CanStart}"
             ItemsSource="{Binding Adapters}"
-            SelectedValue="{Binding SelectedAdapter, Mode=OneWay}" />
+            SelectedValue="{Binding SelectedAdapter}" />
         <Button
             x:Name="Start"
             MinWidth="120"

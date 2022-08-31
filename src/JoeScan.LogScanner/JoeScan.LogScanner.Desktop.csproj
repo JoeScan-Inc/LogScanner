@@ -95,4 +95,8 @@
     <Page Remove="Themes\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\..\config\LogScanner.Desktop.Config.json" Link="LogScanner.Desktop.Config.json" />
+  </ItemGroup>
+
 </Project>
