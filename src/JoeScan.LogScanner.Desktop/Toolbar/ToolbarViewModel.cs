@@ -15,7 +15,11 @@ public class ToolbarViewModel : Screen
     private string selectedAdapter;
     private EngineViewModel Model { get; }
 
-    public IScannerAdapter? SelectedAdapter => Model.ActiveAdapter;
+    public IScannerAdapter? SelectedAdapter
+    {
+        get => Model.ActiveAdapter;
+        set => Model!.ActiveAdapter = value;
+    }
 
     public IObservableCollection<IScannerAdapter> Adapters => Model.Adapters;
 

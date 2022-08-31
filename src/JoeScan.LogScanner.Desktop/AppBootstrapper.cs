@@ -82,8 +82,14 @@ public class AppBootstrapper : AutofacBootstrapper
             // this will override the registration of MuteNotifier in the engine
         }))).As<IUserNotifier>().SingleInstance();
 
+
+        builder.Register(c => new ConfigurationBuilder<ILogScannerConfig>()
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "LogScanner.Desktop.Config.json"))
+            .Build()).SingleInstance();
         // add vendor specific assemblies from a folder 
         Assembly executingAssembly = Assembly.GetExecutingAssembly();
+
+        // TODO: move this to module so headless can use it too
         string applicationDirectory = Path.GetDirectoryName(executingAssembly.Location);
         foreach (var file in Directory.GetFiles(Path.Combine(applicationDirectory!, "vendor"), "*.dll"))
         {
