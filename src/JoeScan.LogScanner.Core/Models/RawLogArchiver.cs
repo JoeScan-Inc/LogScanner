@@ -17,6 +17,10 @@ public class RawLogArchiver : ILogArchiver
 
     public void ArchiveLog(RawLog rawLog)
     {
+        if (!config.Enabled)
+        {
+            return;
+        }
         if (string.IsNullOrEmpty(config.Location))
         {
             Logger.Debug("No location set for archiving raw logs.");
