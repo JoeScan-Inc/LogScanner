@@ -16,7 +16,7 @@
                     VerticalAlignment="Center"
                     BorderBrush="{x:Null}"
                     DockPanel.Dock="Left">
-                    <TextBlock Style="{StaticResource GroupBoxHeaderText}">Live Profiles</TextBlock>
+                    <TextBlock Margin="30,0">Live Profiles</TextBlock>
                 </Border>
                 <ToggleButton
                     x:Name="Paused"
