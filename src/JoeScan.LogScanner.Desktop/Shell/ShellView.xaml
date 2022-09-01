@@ -10,6 +10,7 @@
     Title="JoeScan LogScanner"
     Width="1920"
     Height="1080"
+    FontFamily="{StaticResource InterLight}"
     IconVisibility="Collapsed"
     PlaceTitleBarOverContent="False"
     TextElement.FontSize="13"

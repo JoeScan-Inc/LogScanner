@@ -16,7 +16,7 @@
                     VerticalAlignment="Center"
                     BorderBrush="{x:Null}"
                     DockPanel.Dock="Left">
-                    <TextBlock Style="{StaticResource GroupBoxHeaderText}">Top / Side</TextBlock>
+                    <TextBlock Margin="30,0">Top / Side</TextBlock>
                 </Border>
             </DockPanel>
         </GroupBox.Header>
