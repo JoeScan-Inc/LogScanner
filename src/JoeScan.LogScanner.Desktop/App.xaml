@@ -28,16 +28,7 @@
                     <CornerRadius x:Key="{x:Static adonisUi:Dimensions.CornerRadius}">3</CornerRadius>
                     <Thickness x:Key="{x:Static adonisUi:Dimensions.BorderThickness}">1</Thickness>
                 </ResourceDictionary>
-                <ResourceDictionary>
-                    <Style
-                        x:Key="GroupBoxHeaderText"
-                        BasedOn="{StaticResource {x:Type TextBlock}}"
-                        TargetType="TextBlock">
-                        <Setter Property="VerticalAlignment" Value="Center" />
-                        <Setter Property="FontFamily" Value="{StaticResource InterLight}" />
-                        <Setter Property="Margin" Value="10,3,3,3" />
-                    </Style>
-                </ResourceDictionary>
+                
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

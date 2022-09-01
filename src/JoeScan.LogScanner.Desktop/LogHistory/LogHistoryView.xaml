@@ -10,12 +10,13 @@
     mc:Ignorable="d">
     <GroupBox Padding="0">
         <GroupBox.Header>
-            <DockPanel LastChildFill="False" MinHeight="30">
-                <Border MinHeight="24"
+            <DockPanel MinHeight="30" LastChildFill="False">
+                <Border
+                    MinHeight="24"
                     VerticalAlignment="Center"
                     BorderBrush="{x:Null}"
                     DockPanel.Dock="Left">
-                    <TextBlock Style="{StaticResource GroupBoxHeaderText}">Log History</TextBlock>
+                    <TextBlock Margin="30,0">Log History</TextBlock>
                 </Border>
             </DockPanel>
         </GroupBox.Header>
