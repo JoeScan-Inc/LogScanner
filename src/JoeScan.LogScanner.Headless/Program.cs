@@ -6,6 +6,7 @@ using JoeScan.LogScanner.SyntheticDataAdapter;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using System.Reflection;
 
 AutoResetEvent autoResetEvent = new AutoResetEvent(false);
 Console.CancelKeyPress += (_, e) =>
@@ -20,12 +21,32 @@ builder.RegisterModule<SyntheticDataModule>();
 builder.RegisterModule<CoreModule>();
 builder.RegisterModule<NLogModule>();
 
+Assembly executingAssembly = Assembly.GetExecutingAssembly();
+
+string applicationDirectory = Path.GetDirectoryName(executingAssembly.Location);
+foreach (var file in Directory.GetFiles(Path.Combine(applicationDirectory!, "vendor"), "*.dll"))
+{
+    try
+    {
+        var vendorAssembly = Assembly.LoadFile(file);
+        builder.RegisterAssemblyModules(new Assembly[] { vendorAssembly });
+    }
+    catch
+    {
+
+    }
+}
+
+
 var container = builder.Build();
 
 using var scope = container.BeginLifetimeScope();
 var engine= scope.Resolve<LogScannerEngine>();
 engine.SetActiveAdapter(engine.AvailableAdapters.First()); // we only have the replay adapter registered
-engine.Start();
+//engine.Start();
+
+JoeScan.LogScanner.Service.ServiceListener joeScanListener = new JoeScan.LogScanner.Service.ServiceListener();
+joeScanListener.StartServer(ref engine);
 
 autoResetEvent.WaitOne();
 engine.Stop();
