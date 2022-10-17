@@ -235,7 +235,7 @@ public class SingleZoneLogAssembler : ILogAssembler
     private async void LogReady()
     {
         Stopwatch sw = Stopwatch.StartNew();
-        RawLog rawLog = new RawLog(Numerator.GetNextPieceNumber(), accumulatedProfiles);
+        RawLog rawLog = new RawLog(Numerator.GetNextPieceNumber(), Config.Units, accumulatedProfiles);
         sw.Stop();
         Logger.Trace($"Sorting raw profiles took {sw.ElapsedMilliseconds} ms");
         await RawLogs.SendAsync(rawLog).ConfigureAwait(false);

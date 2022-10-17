@@ -1,6 +1,7 @@
 ﻿using NLog;
 using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
+using UnitsNet;
 
 namespace JoeScan.LogScanner.Core.Models;
 
@@ -99,7 +100,7 @@ public class LogModelBuilder
         logger.Debug($"Log Model Generation took: {elapsed} ms");
         // var fitErrors = model.Sections.Select(s => s.FitError).ToArray();
         var model = new LogModel(log.LogNumber, config.LogModelBuilderConfig.SectionInterval, log.TimeScanned, config.SectionBuilderConfig.MaxFitError,
-            config.SingleZoneLogAssemblerConfig.EncoderPulseInterval) { Sections = sections, RejectedSections = rejectedSections };
+            config.SingleZoneLogAssemblerConfig.EncoderPulseInterval, log.Units) { Sections = sections, RejectedSections = rejectedSections };
         MeasureModel(model);
         return model;
 

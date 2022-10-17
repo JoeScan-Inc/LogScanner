@@ -31,6 +31,7 @@ public class EngineViewModel : PropertyChangedBase
     public bool CanStop => IsRunning;
     public UnitSystem Units => Engine.Units;
     public BroadcastBlock<Profile> RawProfilesBroadcast => Engine.RawProfilesBroadcastBlock;
+    public BroadcastBlock<LogModel> LogModelBroadcastBlock => Engine.LogModelBroadcastBlock;
     public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
     public EngineViewModel(LogScannerEngine engine,
         ILogScannerConfig config,

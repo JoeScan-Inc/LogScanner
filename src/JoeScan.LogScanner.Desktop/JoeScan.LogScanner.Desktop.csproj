@@ -96,6 +96,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\..\config\LogPropertyItems.json" Link="LogPropertyItems.json" />
     <Content Include="..\..\config\LogScanner.Desktop.Config.json" Link="LogScanner.Desktop.Config.json" />
   </ItemGroup>
 
