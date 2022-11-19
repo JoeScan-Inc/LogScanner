@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -14,7 +14,7 @@
 
 		<Copy
 			SourceFiles="$(TargetDir)$(ProjectName).dll;$(TargetDir)$(ProjectName).pdb"
-			DestinationFolder="$(SolutionDir)JoeScan.LogScanner.Desktop\bin\$(Configuration)\net6.0-windows\vendor" />
+			DestinationFolder="$(SolutionDir)JoeScan.LogScanner.Desktop\bin\$(Configuration)\net7.0-windows\vendor" />
 
 		<Message Text="Copied build files" Importance="High" />
 	</Target>

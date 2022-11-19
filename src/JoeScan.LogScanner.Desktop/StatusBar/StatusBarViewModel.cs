@@ -8,7 +8,7 @@ public class StatusBarViewModel : Screen
 {
     public EngineViewModel Model { get; }
     public EncoderStatusViewModel EncStatus { get; }
-    public string BuildInfo => $"v{GitVersionInformation.FullSemVer} ";
+    public string BuildInfo => $"TODO-FIXME ";
    
 
     public StatusBarViewModel(
