@@ -2,9 +2,10 @@
   "Units": "Inches",
 
   "SingleZoneLogAssemblerConfig": {
-    "EncoderPulseInterval": 0.0001183,
-    "MinProfileSpacing": 0.05,
-    "MinLogLength": 30
+    "EncoderPulseInterval": 0.000565866,
+    "MinProfileSpacing": 0.03,
+    "MinLogLength": 100,
+    "MaxLogLength": 150
   },
   "RawLogArchiverConfig": {
     "Location": "C:/tmp/test/rawlogs/",

@@ -78,9 +78,9 @@ public interface ISectionBuilderConfig
     int ModelPointCount { get;  }
     [DefaultValue(3.0)]
     double MaxOvality { get;  }
-    [DefaultValue(60.0)]
+    [DefaultValue(1.0)]
     double MinimumLogDiameter { get;  }
-    [DefaultValue(600.0)]
+    [DefaultValue(24.0)]
     double MaximumLogDiameter { get;  }
     [DefaultValue(300.0)]
     double LogMaximumPositionX { get;  }
@@ -90,7 +90,7 @@ public interface ISectionBuilderConfig
     double LogMaximumPositionY { get;  }
     [DefaultValue(0.0)]
     double LogMinimumPositionY { get;  }
-    [DefaultValue(5.0)]
+    [DefaultValue(0.1)]
     double MaxFitError { get;  }
 
 }

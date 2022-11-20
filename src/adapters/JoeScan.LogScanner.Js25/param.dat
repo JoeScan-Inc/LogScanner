@@ -7,8 +7,8 @@ ScannerConfig  Northwest 10
 	WindowRight 10
 	BackgroundSubtraction false
 	MinLaserOn 0.01
-	DefaultLaserOn 0.1
-	MaxLaserOn 0.1
+	DefaultLaserOn 0.5
+	MaxLaserOn 0.5
 	LaserUpstream false
 }
 
@@ -21,8 +21,8 @@ ScannerConfig Southeast 11
 	WindowRight 14
 	BackgroundSubtraction false
 	MinLaserOn 0.01
-	DefaultLaserOn 0.1
-	MaxLaserOn 0.1
+	DefaultLaserOn 0.5
+	MaxLaserOn 0.5
 	#LaserThreshold 120
 	#SaturatedIntensity 600
 	LaserUpstream true
@@ -40,8 +40,8 @@ TriggerPhase 1 : 11
 UntriggeredSyncScanning 
 
 Units Inches
-EncoderPulseInterval 0.0001183
-EncoderScanInterval 0.2
+EncoderPulseInterval 0.000565866
+EncoderScanInterval 0.04
 
 Zone AllScanners 10,11
 #PulseMaster 0 15.0
