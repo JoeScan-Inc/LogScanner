@@ -1,4 +1,4 @@
-ScannerConfig  Northwest 0
+ScannerConfig  Northwest 10
 {
 	CalibrationFixtureNames Block
 	WindowTop 28
@@ -12,7 +12,7 @@ ScannerConfig  Northwest 0
 	LaserUpstream false
 }
 
-ScannerConfig Southeast 1
+ScannerConfig Southeast 11
 {
 	CalibrationFixtureNames Block
 	WindowTop 28
@@ -29,24 +29,11 @@ ScannerConfig Southeast 1
 	
 }
 
-ScannerConfig Southwest 2
-{
-	CalibrationFixtureNames Block
-	WindowTop 28
-	WindowBottom -5
-	WindowLeft -6
-	WindowRight 15
-	BackgroundSubtraction false
-	MinLaserOn 0.01
-	DefaultLaserOn 0.1
-	MaxLaserOn 0.1
-	LaserUpstream false
-}
 
-NumberOfPhases 3
-TriggerPhase 0 : 0 
-TriggerPhase 1 : 2
-TriggerPhase 2 : 1
+NumberOfPhases 2
+TriggerPhase 0 : 10 
+TriggerPhase 1 : 11
+
 
 
 
@@ -56,10 +43,7 @@ Units Inches
 EncoderPulseInterval 0.0001183
 EncoderScanInterval 0.2
 
-Zone AllScanners 0,1,2
-Zone SE 0
-Zone NW 1
-Zone SW 2
+Zone AllScanners 10,11
 #PulseMaster 0 15.0
 
 CalibFixture Block
