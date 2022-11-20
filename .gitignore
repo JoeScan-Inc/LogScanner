@@ -183,7 +183,7 @@ publish/
 *.azurePubxml
 # Note: Comment the next line if you want to checkin your web deploy settings,
 # but database connection strings (with potential passwords) will be unencrypted
-*.pubxml
+
 *.publishproj
 
 # Microsoft Azure Web App publish settings. Comment the next line if you want to
@@ -325,6 +325,7 @@ __pycache__/
 *.xsd.cs
 client/net/lib/UdpReceiver/logs/NLog_internal_.txt
 
-# CMake artifacts
+# Published Plugins
+runtime/
 
 
