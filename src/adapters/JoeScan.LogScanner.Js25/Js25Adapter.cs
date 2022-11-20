@@ -62,7 +62,8 @@ public class Js25Adapter : IScannerAdapter
 
     public Js25Adapter(ILogger logger = null)
     {
-        AvailableProfiles = new BufferBlock<Profile>();
+        AvailableProfiles =
+            new BufferBlock<Profile>(new DataflowBlockOptions() { BoundedCapacity = -1, EnsureOrdered = true });
         // since the plugin is loaded into the main application, we need to
         // find the plugin location first
         pluginBaseDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
@@ -73,7 +74,6 @@ public class Js25Adapter : IScannerAdapter
         Logger = logger ?? LogManager.GetCurrentClassLogger();
         IsRunning = false;
     }
-
     #endregion
 
     #region IScannerAdapter implementation
@@ -95,8 +95,7 @@ public class Js25Adapter : IScannerAdapter
     public void Configure()
     {
         Logger.Debug($"Configuring adapter {Name}");
-        AvailableProfiles =
-            new BufferBlock<Profile>(new DataflowBlockOptions() { BoundedCapacity = -1, EnsureOrdered = true });
+        
         try
         {
             // InternalProfileQueueLength
@@ -303,14 +302,14 @@ public class Js25Adapter : IScannerAdapter
                 {
                     // when in SyncMode, but with no triggers for more than a few seconds
                     // the first profile is always noisy and should be thrown out
-                    int removed = receivedProfiles.RemoveAll(
-                        profile =>
-                            lastTimeInHead[profile.ScanHeadId] > 0 &&
-                            lastTimeInHead[profile.ScanHeadId] - profile.TimeStampNs > 5E9);
-                    if (removed > 0)
-                    {
-                        Logger.Debug("Removed {0} possibly corrupted profiles from queue.", removed);
-                    }
+                    // int removed = receivedProfiles.RemoveAll(
+                    //     profile =>
+                    //         lastTimeInHead[profile.ScanHeadId] > 0 &&
+                    //         lastTimeInHead[profile.ScanHeadId] - profile.TimeStampNs > 5E9);
+                    // if (removed > 0)
+                    // {
+                    //     Logger.Debug("Removed {0} possibly corrupted profiles from queue.", removed);
+                    // }
 
                     foreach (var profile in receivedProfiles)
                     {
