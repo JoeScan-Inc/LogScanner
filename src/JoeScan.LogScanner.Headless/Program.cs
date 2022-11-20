@@ -2,10 +2,13 @@
 using Autofac.Extras.NLog;
 using JoeScan.LogScanner.Core;
 using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.SyntheticDataAdapter;
+
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using System;
+using System.Linq;
+using System.Threading;
 
 AutoResetEvent autoResetEvent = new AutoResetEvent(false);
 Console.CancelKeyPress += (_, e) =>
@@ -16,7 +19,6 @@ Console.CancelKeyPress += (_, e) =>
 EnableLogging();
 var builder = new ContainerBuilder();
 // builder.RegisterModule<ReplayModule>();
-builder.RegisterModule<SyntheticDataModule>();
 builder.RegisterModule<CoreModule>();
 builder.RegisterModule<NLogModule>();
 
@@ -24,7 +26,7 @@ var container = builder.Build();
 
 using var scope = container.BeginLifetimeScope();
 var engine= scope.Resolve<LogScannerEngine>();
-engine.SetActiveAdapter(engine.AvailableAdapters.First()); // we only have the replay adapter registered
+engine.SetActiveAdapter(engine.AvailableAdapters.First()); 
 engine.Start();
 
 autoResetEvent.WaitOne();

@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	  <EnableDynamicLoading>true</EnableDynamicLoading>
+	  <AssemblyName>js-50v13</AssemblyName>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="js50adapter.json" Link="js50adapter.json" />
+  
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.3.0" />
+    <PackageReference Include="JoeScan.Pinchot" Version="13.1.3">
+        
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\JoeScan.LogScanner.Core\JoeScan.LogScanner.Core.csproj" />
+  </ItemGroup>
+	
+</Project>

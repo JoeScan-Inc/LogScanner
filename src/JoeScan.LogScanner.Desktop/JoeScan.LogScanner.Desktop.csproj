@@ -32,6 +32,7 @@
     <PackageReference Include="Caliburn.Micro" Version="4.0.173" />
     <PackageReference Include="gong-wpf-dragdrop" Version="3.1.1" />
     <PackageReference Include="HelixToolkit.Core.Wpf" Version="2.20.2" />
+    <PackageReference Include="JoeScan.Pinchot" Version="13.1.3" />
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog.Schema" Version="5.0.1" />
@@ -44,11 +45,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JoeScan.LogScanner.Core\JoeScan.LogScanner.Core.csproj" />
-    <ProjectReference Include="..\JoeScan.LogScanner.Js25\JoeScan.LogScanner.Js25.csproj" />
-    <ProjectReference Include="..\JoeScan.LogScanner.Js50\JoeScan.LogScanner.Js50.csproj" />
-    <ProjectReference Include="..\JoeScan.LogScanner.Replay\JoeScan.LogScanner.Replay.csproj" />
     <ProjectReference Include="..\JoeScan.LogScanner.Shared\JoeScan.LogScanner.Shared.csproj" />
-    <ProjectReference Include="..\JoeScan.LogScanner.SyntheticDataAdapter\JoeScan.LogScanner.SyntheticDataAdapter.csproj" />
   </ItemGroup>
 
   <ItemGroup>
