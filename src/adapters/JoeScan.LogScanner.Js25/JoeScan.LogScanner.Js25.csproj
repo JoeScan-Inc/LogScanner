@@ -19,6 +19,8 @@
     <None Remove="Helpers\**" />
   </ItemGroup>
 
+
+
   <ItemGroup>
     <Folder Include="Interfaces\" />
     <Folder Include="references\" />
@@ -40,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Js25Adapter.ini">
+    <None Update="Js25Adapter.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="param.dat">

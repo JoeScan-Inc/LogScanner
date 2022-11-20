@@ -26,7 +26,7 @@ var container = builder.Build();
 
 using var scope = container.BeginLifetimeScope();
 var engine= scope.Resolve<LogScannerEngine>();
-engine.SetActiveAdapter(engine.AvailableAdapters.First()); 
+engine.SetActiveAdapter(engine.AvailableAdapters.First(q=>q.Id.Equals(Guid.Parse("{6EAE7379-E27D-4BFE-B304-CF16D40E9A9B}")))); 
 engine.Start();
 
 autoResetEvent.WaitOne();

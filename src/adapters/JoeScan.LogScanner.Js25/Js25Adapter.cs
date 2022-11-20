@@ -1,4 +1,5 @@
-﻿using JoeScan.JCamNet5;
+﻿using Config.Net;
+using JoeScan.JCamNet5;
 using JoeScan.LogScanner.Core.Events;
 using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Interfaces;
@@ -7,10 +8,12 @@ using JoeScan.LogScanner.Js25.Enums;
 using JoeScan.LogScanner.Js25.Interfaces;
 using NLog;
 using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -37,15 +40,14 @@ public class Js25Adapter : IScannerAdapter
     private Dictionary<uint, ulong> lastTimeInHead = new Dictionary<uint, ulong>();
     private long lastEncoderUpdatePos;
     private int maxRequestedProfileCount;
-    private IRawPointFilter filter;
     private List<IProfileProvider> scanners;
-    private List<short> connectedIds;
     private int encoderUpdateIncrement;
     private IPAddress baseAddress = IPAddress.None;
-    private List<ushort> cableIdList = new List<ushort>();
+    private List<short> cableIdList = new List<short>();
     private string paramFile;
     private SyncMode syncMode = SyncMode.PulseSyncMode;
     private int pulseMasterId;
+    private readonly string pluginBaseDir;
 
     #endregion
 
@@ -58,10 +60,15 @@ public class Js25Adapter : IScannerAdapter
 
     #region Lifecycle
 
-    public Js25Adapter(IJs25AdapterConfig config, ILogger logger = null)
+    public Js25Adapter(ILogger logger = null)
     {
         AvailableProfiles = new BufferBlock<Profile>();
-        Config = config;
+        // since the plugin is loaded into the main application, we need to
+        // find the plugin location first
+        pluginBaseDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
+        Config = new ConfigurationBuilder<IJs25AdapterConfig>()
+            .UseJsonFile(Path.Combine(pluginBaseDir, "Js25Adapter.json"))
+            .Build();
         // get injected logger if there is one
         Logger = logger ?? LogManager.GetCurrentClassLogger();
         IsRunning = false;
@@ -82,44 +89,20 @@ public class Js25Adapter : IScannerAdapter
     public Guid Id { get; } = Guid.Parse("{6EAE7379-E27D-4BFE-B304-CF16D40E9A9B}");
     public bool IsConfigured { get; private set; }
 
-    public void Start()
-    {
-        Logger.Debug("Attempting to start.");
-        if (IsRunning)
-        {
-            Logger.Debug("Failed because IsRunning is already true.");
-            //TODO: feedback?
-            return;
-        }
-        StartScanThread();
-    }
-
-    
-
-    public void Stop()
-    {
-        Logger.Debug("Stop()");
-        if (workerThread != null && IsRunning && cancellationTokenSource != null)
-        {
-            cancellationTokenSource.Cancel(true);
-            if (!workerThread.Join(100))
-            {
-                workerThread = null;
-                throw (new ApplicationException("Scanning Thread failed to stop"));
-            }
-        }
-    }
 
     public string Name => "JS-20/JS-25 Single Zone";
 
     public void Configure()
     {
-        Logger.Debug("Reconfigure()");
-        
+        Logger.Debug($"Configuring adapter {Name}");
+        AvailableProfiles =
+            new BufferBlock<Profile>(new DataflowBlockOptions() { BoundedCapacity = -1, EnsureOrdered = true });
+        try
+        {
             // InternalProfileQueueLength
             var internalProfileQueueLength = Config.InternalProfileQueueLength;
             Logger.Info($"InternalProfileQueueLength: {internalProfileQueueLength}");
-            AvailableProfiles = new BufferBlock<Profile>(new DataflowBlockOptions(){BoundedCapacity = -1, EnsureOrdered = true});
+           
             //EncoderUpdateIncrement
             encoderUpdateIncrement = Config.EncoderUpdateIncrement;
             Logger.Info($"EncoderUpdateIncrement: {encoderUpdateIncrement}");
@@ -146,7 +129,7 @@ public class Js25Adapter : IScannerAdapter
             string[] idStrings = idsString.Split(new[] { ',' });
             try
             {
-                cableIdList = idStrings.Select(UInt16.Parse).ToList();
+                cableIdList = idStrings.Select(Int16.Parse).ToList();
                 Logger.Info($"CableIDList: {String.Join(",", cableIdList)}");
             }
             catch (Exception e)
@@ -165,19 +148,23 @@ public class Js25Adapter : IScannerAdapter
                 throw new ApplicationException(msg);
             }
 
-            //TODO: check if file exists
-            if (!File.Exists(paramFile))
+            // combine handles absolute paths in the second argument by returning just that
+            string tmpPath = Path.Combine(pluginBaseDir, paramFile);
+            if (File.Exists(tmpPath))
             {
-                //TODO: windows / linux paths
+                paramFile = tmpPath;
+                Logger.Info($"ParamFile: {paramFile}");
+            }
+            else
+            {
                 var msg = $"Could not find ParamFile: \"{paramFile}\".";
+                Logger.Error(msg);
                 throw new ApplicationException(msg);
             }
-            Logger.Info($"ParamFile: {paramFile}");
-           
-            
-                syncMode = Config.SyncMode;
-                Logger.Info($"SyncMode: {syncMode}");
-           
+
+            syncMode = Config.SyncMode;
+            Logger.Info($"SyncMode: {syncMode}");
+
 
             if (syncMode == SyncMode.PulseSyncMode)
             {
@@ -186,7 +173,44 @@ public class Js25Adapter : IScannerAdapter
             }
 
             IsConfigured = true;
-       
+        }
+        catch(Exception e)
+        {
+            Logger.Error($"Configuraton of adapter failed with error {e.Message}");
+            IsConfigured = false;
+        }
+    }
+
+    public void Start()
+    {
+        Logger.Debug("Attempting to start.");
+        if (IsRunning)
+        {
+            Logger.Debug("Failed because IsRunning is already true.");
+            //TODO: feedback?
+            return;
+        }
+        if (!IsConfigured)
+        {
+            var msg = $"Adapter {Name} needs to be configured first.";
+            Logger.Error(msg);
+            throw new ApplicationException(msg);
+        }
+        StartScanThread();
+    }
+
+    public void Stop()
+    {
+        Logger.Debug("Stop()");
+        if (workerThread != null && IsRunning && cancellationTokenSource != null)
+        {
+            cancellationTokenSource.Cancel(true);
+            if (!workerThread.Join(100))
+            {
+                workerThread = null;
+                throw (new ApplicationException("Scanning Thread failed to stop"));
+            }
+        }
     }
 
     #endregion
@@ -235,8 +259,16 @@ public class Js25Adapter : IScannerAdapter
             IsRunning = true;
             lastEncoderUpdatePos = 0;
             OnScanningStarted(EventArgs.Empty);
-            //TODO: switch based on config
-            switch (Config.SyncMode)
+            scanners = new List<IProfileProvider>(ScannerFactory.Connect(baseAddress, cableIdList.ToArray()));
+            if (scanners.Count != cableIdList.Count)
+            {
+                // not all heads connected, bail
+                var unconnectedIds = cableIdList.Except(scanners.Select(q => q.CableID));
+                var msg = $"Failed to connect to cable ids {String.Join(',', unconnectedIds)}";
+                Logger.Error(msg);
+                throw new ApplicationException(msg);
+            }
+            switch (syncMode)
             {
                 case SyncMode.EncoderSyncMode:
                     EnterEncoderSyncMode();
@@ -250,8 +282,9 @@ public class Js25Adapter : IScannerAdapter
                     throw new ArgumentOutOfRangeException();
             }
 
-            //re-initialize the lastTimeInHead dictionary so we can restart
-            foreach (var id in connectedIds)
+            //re-initialize the lastTimeInHead dictionary
+            lastTimeInHead.Clear();
+            foreach (var id in scanners.Select(q=>q.CableID))
             {
                 lastTimeInHead[(uint)id] = 0;
             }
@@ -435,7 +468,7 @@ public class Js25Adapter : IScannerAdapter
             {
                 lastEncoderUpdatePos = p.EncoderValues[0];
                 // TODO: fix with new EncoderUpdateArgs
-              //  OnEncoderUpdated(new EncoderUpdateArgs(lastEncoderUpdatePos, p.TimeStampNs));
+                //  OnEncoderUpdated(new EncoderUpdateArgs(lastEncoderUpdatePos, p.TimeStampNs));
             }
         }
     }

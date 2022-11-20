@@ -11,9 +11,7 @@ namespace JoeScan.LogScanner.Js25
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<Js25Adapter>().As<IScannerAdapter>();
-            builder.Register(c => new ConfigurationBuilder<IJs25AdapterConfig>()
-                .UseIniFile("Js25Adapter.ini")
-                .Build()).SingleInstance();
+            
         }
 
         
