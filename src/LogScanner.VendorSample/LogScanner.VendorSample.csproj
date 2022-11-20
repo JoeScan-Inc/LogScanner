@@ -4,18 +4,12 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AssemblyName>VendorSample</AssemblyName>
+	  <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\JoeScan.LogScanner.Core\JoeScan.LogScanner.Core.csproj" />
   </ItemGroup>
-	<Target Name="CopyDLLs" AfterTargets="Build">
-		<Message Text="Executing CopyDLLs task" Importance="High" />
-
-		<Copy
-			SourceFiles="$(TargetDir)$(ProjectName).dll;$(TargetDir)$(ProjectName).pdb"
-			DestinationFolder="$(SolutionDir)JoeScan.LogScanner.Desktop\bin\$(Configuration)\net7.0-windows\vendor" />
-
-		<Message Text="Copied build files" Importance="High" />
-	</Target>
+	
 </Project>

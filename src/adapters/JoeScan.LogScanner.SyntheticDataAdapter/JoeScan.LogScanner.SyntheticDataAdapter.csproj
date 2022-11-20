@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>synthetic</AssemblyName>
+  </PropertyGroup>
+
+  
+	<ItemGroup>
+		<PackageReference Include="Autofac" Version="6.3.0" />
+		<PackageReference Include="JoeScan.Pinchot" Version="13.1.3" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\JoeScan.LogScanner.Core\JoeScan.LogScanner.Core.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="SyntheticDataAdapter.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+	
+</Project>

@@ -3,8 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
-    xmlns:desktop="clr-namespace:JoeScan.LogScanner.Desktop"
-    xmlns:logScanner="clr-namespace:JoeScan.LogScanner">
+    xmlns:desktop="clr-namespace:JoeScan.LogScanner.Desktop">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -28,7 +27,7 @@
                     <CornerRadius x:Key="{x:Static adonisUi:Dimensions.CornerRadius}">3</CornerRadius>
                     <Thickness x:Key="{x:Static adonisUi:Dimensions.BorderThickness}">1</Thickness>
                 </ResourceDictionary>
-                
+
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
