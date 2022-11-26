@@ -22,7 +22,7 @@ namespace JoeScan.LogScanner.Core.Models
         private ILogger Logger { get; }
         public ILogAssembler LogAssembler { get; }
         public LogModelBuilder ModelBuilder { get; }
-        public IEnumerable<ILogModelConsumer> Consumers { get; }
+        public IEnumerable<ILogModelConsumerPlugin> Consumers { get; }
 
         public BroadcastBlock<Profile> RawProfilesBroadcastBlock { get; private set; } 
             = new BroadcastBlock<Profile>(profile => profile);
@@ -83,7 +83,7 @@ namespace JoeScan.LogScanner.Core.Models
             ILogAssembler logAssembler,
             ILogArchiver archiver,
             LogModelBuilder modelBuilder,
-            IEnumerable<ILogModelConsumer> consumers)
+            IEnumerable<ILogModelConsumerPlugin> consumers)
         {
             this.archiver = archiver;
             Filter = filter;
@@ -151,8 +151,14 @@ namespace JoeScan.LogScanner.Core.Models
            // LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModel>((l) => { Debugger.Break(); }));
             foreach (var logModelConsumer in Consumers)
             {
-                var userBlock = new ActionBlock<LogModel>(logModelConsumer.Consume);
-                LogModelBroadcastBlock.LinkTo(userBlock);
+                logModelConsumer.Initialize();
+                if (logModelConsumer.IsInitialized)
+                {
+                    // TODO: check for version and GUID here
+                    var userBlock = new ActionBlock<LogModel>(logModelConsumer.Consume);
+                    LogModelBroadcastBlock.LinkTo(userBlock);
+                }
+               
             }
            
 
