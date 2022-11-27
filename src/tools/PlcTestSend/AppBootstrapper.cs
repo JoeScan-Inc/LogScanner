@@ -1,7 +1,6 @@
 ﻿using Autofac;
 using Autofac.Core;
 using Autofac.Extras.NLog;
-using Config.Net;
 using JoeScan.LogScanner.Core;
 using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.Shared;
