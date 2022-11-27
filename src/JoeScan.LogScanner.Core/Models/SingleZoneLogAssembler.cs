@@ -1,4 +1,5 @@
-﻿using JoeScan.LogScanner.Core.Enums;
+﻿using JoeScan.LogScanner.Core.Config;
+using JoeScan.LogScanner.Core.Enums;
 using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Interfaces;
 using NLog;
@@ -26,7 +27,8 @@ public class SingleZoneLogAssembler : ILogAssembler
         IPieceNumberProvider numerator,
         IEnumerable<ILogStatusEventConsumer> statusEventConsumers,
         ILogger logger,
-        ICoreConfig config)
+        SingleZoneLogAssemblerConfig config,
+        CoreConfig coreConfig)
     {
         this.statusEventConsumers = statusEventConsumers;
         Config = config;
@@ -42,14 +44,14 @@ public class SingleZoneLogAssembler : ILogAssembler
         // we initialize these fields here instead of reading from the config 
         // where they are used, because Config.Net has no caching and will re-read the JSON 
         // on every access
-        encoderPulseInterval = Config.SingleZoneLogAssemblerConfig.EncoderPulseInterval;
-        useLogPresenceSignal = Config.SingleZoneLogAssemblerConfig.UseLogPresenceSignal;
-        startScanInverted = Config.SingleZoneLogAssemblerConfig.StartScanInverted;
-        startLogCount = Config.SingleZoneLogAssemblerConfig.StartLogCount;
-        stopLogCount = Config.SingleZoneLogAssemblerConfig.StopLogCount;
-        minLogLength = Config.SingleZoneLogAssemblerConfig.MinLogLength;
-        maxLogLength = Config.SingleZoneLogAssemblerConfig.MaxLogLength;
-        minProfileSpacing = Config.SingleZoneLogAssemblerConfig.MinProfileSpacing;
+        encoderPulseInterval = coreConfig.EncoderPulseInterval;
+        useLogPresenceSignal = Config.UseLogPresenceSignal;
+        startScanInverted = Config.StartScanInverted;
+        startLogCount = Config.StartLogCount;
+        stopLogCount = Config.StopLogCount;
+        minLogLength = Config.MinLogLength;
+        maxLogLength = Config.MaxLogLength;
+        minProfileSpacing = Config.MinProfileSpacing;
     }
 
     #endregion
@@ -254,7 +256,7 @@ public class SingleZoneLogAssembler : ILogAssembler
     }
     #region Injected Properties
 
-    public ICoreConfig Config { get; }
+    public SingleZoneLogAssemblerConfig Config { get; }
     public IRawProfileValidator ProfileValidator { get; }
     public IPieceNumberProvider Numerator { get; }
     public ILogger Logger { get; }

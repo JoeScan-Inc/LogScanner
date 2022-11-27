@@ -9,6 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.3.0" />
+    <PackageReference Include="Config.Net" Version="4.19.0" />
+    <PackageReference Include="Config.Net.Json" Version="4.19.0" />
   </ItemGroup>
 
   <ItemGroup>

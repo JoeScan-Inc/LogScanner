@@ -19,7 +19,7 @@
   },
   "LogSectionBuilder": {
     "FilterOutliers": "false",
-    "OutlierFilterMaxDistance": 20,
+    "OutlierFilterMaxDistance": 20, 
     "ModelPointCount": 100
   } 
 }
