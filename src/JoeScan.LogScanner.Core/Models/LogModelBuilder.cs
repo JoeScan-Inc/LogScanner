@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using JoeScan.LogScanner.Core.Config;
+using NLog;
 using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
 
@@ -9,7 +10,8 @@ public class LogModelBuilder
     #region Injected Fields
 
     private readonly ILogger logger;
-    private readonly ICoreConfig config;
+    private readonly LogModelBuilderConfig config;
+    private readonly CoreConfig coreConfig;
     private readonly LogSectionBuilder sectionBuilder;
 
     #endregion
@@ -18,11 +20,13 @@ public class LogModelBuilder
 
     #region Lifecycle
 
-    public LogModelBuilder(ICoreConfig config,
+    public LogModelBuilder(LogModelBuilderConfig config,
+        CoreConfig coreConfig,
         LogSectionBuilder sectionBuilder,
         ILogger logger)
     {
         this.config = config;
+        this.coreConfig = coreConfig;
         this.sectionBuilder = sectionBuilder;
         this.logger = logger;
         BuilderBlock = new TransformBlock<RawLog, LogModel>(Build,
@@ -34,10 +38,10 @@ public class LogModelBuilder
     public LogModel Build(RawLog log)
     {
         var sw = Stopwatch.StartNew();
-        var interval = config.LogModelBuilderConfig.SectionInterval;
-        var encoderPulseInterval = config.SingleZoneLogAssemblerConfig.EncoderPulseInterval;
+        var interval = config.SectionInterval;
+        var encoderPulseInterval = coreConfig.EncoderPulseInterval;
         logger.Debug($"Building new LogModel from RawLog #{log.LogNumber}");
-        logger.Debug($"Using SectionInterval {interval} {config.Units}");
+        logger.Debug($"Using SectionInterval {interval} mm");
         List<LogSection> sections = new List<LogSection>();
         List<LogSection> rejectedSections = new List<LogSection>();
         var firstEncVal = log.ProfileData[0].EncoderValues[0];
@@ -98,8 +102,10 @@ public class LogModelBuilder
         var elapsed = sw.ElapsedMilliseconds;
         logger.Debug($"Log Model Generation took: {elapsed} ms");
         // var fitErrors = model.Sections.Select(s => s.FitError).ToArray();
-        var model = new LogModel(log.LogNumber, config.LogModelBuilderConfig.SectionInterval, log.TimeScanned, config.SectionBuilderConfig.MaxFitError,
-            config.SingleZoneLogAssemblerConfig.EncoderPulseInterval) { Sections = sections, RejectedSections = rejectedSections };
+        var model = new LogModel(log.LogNumber, config.SectionInterval, log.TimeScanned, config.MaxFitError,
+            coreConfig.EncoderPulseInterval) { Sections = sections, RejectedSections = rejectedSections };
+        var test = sections.Sum(q => q.Profiles.Count);
+        var test2 = log.ProfileData.Count;
         MeasureModel(model);
         return model;
 
@@ -112,8 +118,8 @@ public class LogModelBuilder
 
         // Measure diameters at a configurable offset from each end. This helps with 
         // models where the first few profiles are incomplete or on the cut face of the log
-        double beginZ = config.LogModelBuilderConfig.DiameterEndOffset;
-        double endZ = model.Length - config.LogModelBuilderConfig.DiameterEndOffset;
+        double beginZ = config.DiameterEndOffset;
+        double endZ = model.Length - config.DiameterEndOffset;
 
         LogSection beginSection = model.Sections[0];
         LogSection endSection = model.Sections[0];
