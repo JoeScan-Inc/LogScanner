@@ -19,6 +19,7 @@ public abstract class FilterBase
     public abstract IReadOnlyList<Point2D> Outline { get; }
     public bool IsEnabled { get; set; }
     public abstract bool IsValid { get;  }
+    public string Units { get; set; } 
 
 
 }

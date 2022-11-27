@@ -1,5 +1,7 @@
 ﻿using JoeScan.LogScanner.Core.Geometry;
 using System.Runtime.Serialization;
+using UnitsNet;
+using UnitsNet.Units;
 
 namespace JoeScan.LogScanner.Core.Filters;
 
@@ -37,6 +39,16 @@ public class BoxFilter : FilterBase
     [OnDeserialized]
     internal void OnDeserializedMethod(StreamingContext context)
     {
+        if (!String.IsNullOrEmpty(Units))
+        {
+            if (LengthUnit.TryParse(Units, out LengthUnit lu))
+            {
+                Left = UnitConverter.Convert(Left, lu, LengthUnit.Millimeter);
+                Right = UnitConverter.Convert(Right, lu, LengthUnit.Millimeter);
+                Top = UnitConverter.Convert(Top, lu, LengthUnit.Millimeter);
+                Bottom = UnitConverter.Convert(Bottom, lu, LengthUnit.Millimeter);
+            }
+        }
         isValid = Left < Right && Top > Bottom;
     }
 

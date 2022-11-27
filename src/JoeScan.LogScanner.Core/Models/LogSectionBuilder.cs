@@ -1,4 +1,5 @@
-﻿using JoeScan.LogScanner.Core.Extensions;
+﻿using JoeScan.LogScanner.Core.Config;
+using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Geometry;
 using NLog;
 
@@ -6,14 +7,17 @@ namespace JoeScan.LogScanner.Core.Models;
 
 public class LogSectionBuilder
 {
-    private readonly ICoreConfig config;
+    private readonly SectionBuilderConfig config;
     private readonly ILogger logger;
 
-    public LogSectionBuilder(ICoreConfig config, ILogger logger)
+    public LogSectionBuilder(SectionBuilderConfig config, ILogger logger)
     {
         this.config = config;
         this.logger = logger;
+       
     }
+
+
     //TODO: make a section truly immutable by keeping all the modelling here in the builder and then just 
     // calling the section constructor with all values
     public LogSection Build(IReadOnlyList<Profile> profiles, double sectionCenter)
@@ -31,20 +35,20 @@ public class LogSectionBuilder
         var boundingBox = CreateRobustBoundingBox(filteredPoints);
         var rejectedPoints = new List<Point2D>();
 
-        if (config.SectionBuilderConfig.FilterOutliers)
+        if (config.FilterOutliers)
         {
-            filteredPoints = FilterOutliers( filteredPoints, rejectedPoints, config.SectionBuilderConfig.OutlierFilterMaxNumIterations, 
-                config.SectionBuilderConfig.OutlierFilterMaxDistance);
+            filteredPoints = FilterOutliers( filteredPoints, rejectedPoints, config.OutlierFilterMaxNumIterations, 
+                config.OutlierFilterMaxDistance);
         }
 
         var ellipseModel = EllipseFit.EllipseFitDirect(filteredPoints.ToFloatArray());
         var modeledProfile = GenerateModeledSection(filteredPoints,
-            config.SectionBuilderConfig.ModelPointCount, ellipseModel, config.SectionBuilderConfig.BarkAllowance);
+            config.ModelPointCount, ellipseModel, config.BarkAllowance);
 
 
         var section = new LogSection(profiles, sectionCenter)
         {
-            BarkAllowance = config.SectionBuilderConfig.BarkAllowance,
+            BarkAllowance = config.BarkAllowance,
             BoundingBox = boundingBox,
             EllipseModel = ellipseModel,
             AcceptedPoints = filteredPoints,
@@ -285,28 +289,28 @@ public class LogSectionBuilder
         //assume section is valid until we find a problem
         bool valid = true;
         
-        if (section.DiameterMax / section.DiameterMin > config.SectionBuilderConfig.MaxOvality)
+        if (section.DiameterMax / section.DiameterMin > config.MaxOvality)
         {
             logger.Debug($"Excessively oval section {section.DiameterMax}/{section.DiameterMin} = {section.Ovality}");
             valid = false;
         }
 
-        if (section.DiameterMin < config.SectionBuilderConfig.MinimumLogDiameter)
+        if (section.DiameterMin < config.MinimumLogDiameter)
         {
             logger.Debug($"Unreasonably small diameter {section.DiameterMin}");
             valid = false;
         }
 
-        if (section.DiameterMax > config.SectionBuilderConfig.MaximumLogDiameter)
+        if (section.DiameterMax > config.MaximumLogDiameter)
         {
             logger.Debug($"Unreasonably large diameter {section.DiameterMax}");
             valid = false;
         }
 
-        if (section.CentroidX > config.SectionBuilderConfig.LogMaximumPositionX 
-            || section.CentroidX < config.SectionBuilderConfig.LogMinimumPositionX 
-            || section.CentroidY > config.SectionBuilderConfig.LogMaximumPositionY 
-            || section.CentroidY < config.SectionBuilderConfig.LogMinimumPositionY)
+        if (section.CentroidX > config.LogMaxPositionX 
+            || section.CentroidX < config.LogMinPositionX 
+            || section.CentroidY > config.LogMaxPositionY 
+            || section.CentroidY < config.LogMinPositionY)
         {
             logger.Debug($"Out of range centroid ({section.CentroidX},{section.CentroidY}");
             valid = false;

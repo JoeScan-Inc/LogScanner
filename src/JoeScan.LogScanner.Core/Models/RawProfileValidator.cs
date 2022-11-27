@@ -1,17 +1,13 @@
-﻿using Autofac.Features.AttributeFilters;
-using JoeScan.LogScanner.Core.Interfaces;
+﻿using JoeScan.LogScanner.Core.Interfaces;
 using NLog;
 
 namespace JoeScan.LogScanner.Core.Models;
 
-class RawProfileValidator : IRawProfileValidator
+internal class RawProfileValidator : IRawProfileValidator
 {
-    public ICoreConfig Config { get; }
-
-    public RawProfileValidator(ICoreConfig config,
+    public RawProfileValidator(
         ILogger logger)
     {
-        Config = config;
     }
 
     public bool IsValid(Profile p)

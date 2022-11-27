@@ -1,10 +1,12 @@
 ﻿using Autofac;
+using Autofac.Extras.NLog;
 using Autofac.Features.AttributeFilters;
-using Config.Net;
 using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using McMaster.NETCore.Plugins;
+using Nini.Config;
+using NLog;
 using System.Reflection;
 using Module = Autofac.Module;
 
@@ -14,38 +16,44 @@ public class CoreModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
+        builder.RegisterModule<NLogModule>();
+
         builder.RegisterType<LogScannerEngine>().AsSelf().SingleInstance();
         builder.RegisterType<SingleZoneLogAssembler>().As<ILogAssembler>().SingleInstance();
         builder.RegisterType<RawProfileValidator>().As<IRawProfileValidator>();
-        builder.RegisterType<PieceNumberProvider>().As<IPieceNumberProvider>().SingleInstance().OnRelease(instance=>instance.Dispose());
+        builder.RegisterType<PieceNumberProvider>().As<IPieceNumberProvider>().SingleInstance().OnRelease(instance => instance.Dispose());
         builder.RegisterType<RawLogArchiver>().As<ILogArchiver>().SingleInstance();
 
         builder.RegisterType<FlightsAndWindowFilter>().As<IFlightsAndWindowFilter>().SingleInstance();
-       
+
         builder.RegisterType<LogModelBuilder>().AsSelf().SingleInstance();
         builder.RegisterType<LogSectionBuilder>().AsSelf().SingleInstance();
+        builder.RegisterType<RawProfileDumper>().AsSelf().SingleInstance();
 
 
         builder.RegisterType<DefaultConfigLocator>().As<IConfigLocator>();
-        // this is a bit of a mouthful and almost java-like, but: 
-        // whenever an instance of ICoreConfig is needed, we first resolve the IConfigLocator, which gives 
-        // us the path to where our config files are stored. Then, we combine that path with the name for our main
-        // core config file, let the Config.NET ConfigurationBuilder read it, and return it as an instance of ICoreConfig.
-        // the upside is that we can easily change the location of where our config files live, in a centralized location.
-        // 
-        // Giving the Registration two files creates a merge. The idea here is that coreconfig contains 
-        // factory defaults, and will be updated from the contents of the git repo.
-        // The version with the _user suffix can be used to selectively override values specific for that site
-        // see here for details: https://github.com/aloneguid/config#using-multiple-sources
+       
 
-        builder.Register(c => new ConfigurationBuilder<ICoreConfig>()
-            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetUserConfigLocation(), "coreconfig_user.json"))
-            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(),"coreconfig.json"))
-            .Build()).As<ICoreConfig>().SingleInstance();
-        
+        // builder.Register(c => new ConfigurationBuilder<ICoreConfig>()
+        //     .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetUserConfigLocation(), "coreconfig_user.json"))
+        //     .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "coreconfig.json"))
+        //     .Build()).As<ICoreConfig>().SingleInstance();
 
-       RegisterPlugins(builder, GetPluginLoaders("adapters"));
-       RegisterPlugins(builder, GetPluginLoaders("extensions"));
+        builder.Register(c =>
+            new CoreConfig(new IniConfigSource("core.ini").Configs["Core"])).AsSelf();
+        builder.Register(c =>
+            new SingleZoneLogAssemblerConfig(new IniConfigSource("core.ini").Configs["SingleZoneLogAssembler"]));
+        builder.Register(c =>
+            new LogModelBuilderConfig(new IniConfigSource("core.ini").Configs["LogModelBuilder"]));
+        builder.Register(c =>
+                    new RawLogArchiverConfig(new IniConfigSource("core.ini").Configs["RawLogArchiver"]));
+        builder.Register(c =>
+                            new RawDumperConfig(new IniConfigSource("core.ini").Configs["RawDumper"]));
+builder.Register(c =>
+                            new SectionBuilderConfig(new IniConfigSource("core.ini").Configs["SectionBuilder"]));
+
+        RegisterPlugins(builder, GetPluginLoaders("adapters"));
+        RegisterPlugins(builder, GetPluginLoaders("extensions"));
 
     }
     private static void RegisterPlugins(ContainerBuilder builder, List<PluginLoader> loaders)
@@ -99,7 +107,7 @@ public class CoreModule : Module
         // but during development, we rely on a relative path. Hopefully, one or the other exists
         string? adapterpath = null;
         var path = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
-        if (Path.Exists(Path.Combine(path!,subFolder)))
+        if (Path.Exists(Path.Combine(path!, subFolder)))
         {
             // we are in a deployed system, the adapters folder is right next to the executable
             adapterpath = Path.Combine(path!, subFolder);

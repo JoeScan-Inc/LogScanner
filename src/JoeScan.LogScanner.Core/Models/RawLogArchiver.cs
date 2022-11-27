@@ -1,4 +1,5 @@
-﻿using JoeScan.LogScanner.Core.Interfaces;
+﻿using JoeScan.LogScanner.Core.Config;
+using JoeScan.LogScanner.Core.Interfaces;
 using NLog;
 using System.IO.Compression;
 
@@ -7,17 +8,18 @@ namespace JoeScan.LogScanner.Core.Models;
 public class RawLogArchiver : ILogArchiver
 {
     public ILogger Logger { get; }
-    private IRawLogArchiverConfig config;
-    public RawLogArchiver(ICoreConfig coreConfig, ILogger logger)
+    private RawLogArchiverConfig config;
+    public RawLogArchiver(RawLogArchiverConfig config, ILogger logger)
     {
+        this.config = config;
         Logger = logger;
-        config = coreConfig.RawLogArchiverConfig;
+        
         Logger.Debug("Created RawLogArchiver");
     }
 
     public void ArchiveLog(RawLog rawLog)
     {
-        if (!config.Enabled)
+        if (!config.IsEnabled)
         {
             return;
         }

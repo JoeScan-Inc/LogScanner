@@ -1,4 +1,5 @@
 ﻿using Autofac.Features.AttributeFilters;
+using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.Core.Events;
 using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Geometry;
@@ -12,9 +13,9 @@ namespace JoeScan.LogScanner.Core.Models
     public class LogScannerEngine : IDisposable
     {
         private readonly ILogArchiver archiver;
-        private RawProfileDumper dumper;
+        private readonly RawProfileDumper dumper;
         public IFlightsAndWindowFilter Filter { get; }
-        public ICoreConfig Config { get; }
+        public CoreConfig Config { get; }
         private readonly IEnumerable<IScannerAdapter> availableAdapters;
         private IDisposable? unlinker;
         public IReadOnlyList<IScannerAdapter> AvailableAdapters => new List<IScannerAdapter>(availableAdapters);
@@ -31,7 +32,6 @@ namespace JoeScan.LogScanner.Core.Models
         public BroadcastBlock<LogModel> LogModelBroadcastBlock { get; }
             = new BroadcastBlock<LogModel>(r => r);
 
-        public UnitSystem Units { get; }
         public bool IsRunning => ActiveAdapter is { IsRunning: true };
         
 
@@ -76,16 +76,19 @@ namespace JoeScan.LogScanner.Core.Models
 
         #region Lifecycle
 
-        public LogScannerEngine(ICoreConfig config,
+        public LogScannerEngine(
             IEnumerable<IScannerAdapter> availableAdapters,
             IFlightsAndWindowFilter filter,
             ILogger logger,
             ILogAssembler logAssembler,
             ILogArchiver archiver,
             LogModelBuilder modelBuilder,
-            IEnumerable<ILogModelConsumerPlugin> consumers)
+            RawProfileDumper dumper,
+            IEnumerable<ILogModelConsumerPlugin> consumers,
+            CoreConfig config)
         {
             this.archiver = archiver;
+            this.dumper = dumper;
             Filter = filter;
             Config = config;
             this.availableAdapters = availableAdapters;
@@ -94,7 +97,7 @@ namespace JoeScan.LogScanner.Core.Models
             LogAssembler = logAssembler;
             ModelBuilder = modelBuilder;
             Consumers = consumers;
-            Units = Config.Units;
+            
             foreach (var a in AvailableAdapters)
             {
                  logger.Debug($"Available Adapter: {a.Name} ");
@@ -115,10 +118,8 @@ namespace JoeScan.LogScanner.Core.Models
                 PropagateCompletion = true
             };
 
-            dumper = new RawProfileDumper(Logger);
-            dumper.OutputDir = Config.RawDumperConfig.RawDumpLocation;
             
-            var unitConverterBlock = new TransformBlock<Profile, Profile>((p) => UnitConverter.Convert(ActiveAdapter.Units, Units, p));
+            var unitConverterBlock = new TransformBlock<Profile, Profile>((p) => UnitConverter.Convert(ActiveAdapter.Units, UnitSystem.Millimeters, p));
             // dumper.DumpBlock is a pass-through from the source block where the profiles originate, scannerAdapter.AvailableProfiles
             dumper.DumpBlock.LinkTo(unitConverterBlock, linkOptions);
             var boundingBoxBlock = new TransformBlock<Profile, Profile>(BoundingBox.UpdateBoundingBox, blockOptions);
