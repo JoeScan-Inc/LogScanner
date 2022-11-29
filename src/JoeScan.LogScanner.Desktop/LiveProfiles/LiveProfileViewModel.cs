@@ -1,8 +1,9 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
+using JoeScan.LogScanner.Desktop.Config;
 using JoeScan.LogScanner.Desktop.Engine;
-using JoeScan.LogScanner.Desktop.Main;
+using JoeScan.LogScanner.Desktop.Enums;
 using JoeScan.LogScanner.Shared.Helpers;
 using OxyPlot;
 using OxyPlot.Annotations;
@@ -43,6 +44,7 @@ public sealed class LiveProfileViewModel : Screen
     #region Pipeline Endpoint
 
     private ActionBlock<Profile> displayActionBlock;
+    private readonly double scaler;
 
     #endregion
 
@@ -50,17 +52,22 @@ public sealed class LiveProfileViewModel : Screen
 
     public EngineViewModel Model { get; }
     public IFlightsAndWindowFilter Filter { get; }
+    public ILogScannerConfig Config { get; }
 
     #endregion
 
     #region Lifecycle
 
     public LiveProfileViewModel(EngineViewModel model,
-        IFlightsAndWindowFilter filter)
+        IFlightsAndWindowFilter filter,
+        ILogScannerConfig config)
     {
         paused = false;
         Model = model;
         Filter = filter;
+        Config = config;
+        scaler = Config.Units == DisplayUnits.Millimeters ? 1.0 : 1 / 25.4;
+        showFilters = Config.LiveProfileConfig.ShowFilters;
         SetupPlotModel();
         dispatcherTimer = new DispatcherTimer
         {
@@ -70,6 +77,7 @@ public sealed class LiveProfileViewModel : Screen
         dispatcherTimer.Start();
         displayActionBlock = new ActionBlock<Profile>(StoreProfiles);
         Model.RawProfilesBroadcast.LinkTo(displayActionBlock);
+        
     }
 
     #endregion
@@ -116,6 +124,7 @@ public sealed class LiveProfileViewModel : Screen
                 }
                 LiveView.InvalidatePlot(false);
                 NotifyOfPropertyChange(() => ShowFilters);
+                Config.LiveProfileConfig.ShowFilters = showFilters;
             }
         }
     }
@@ -151,7 +160,7 @@ public sealed class LiveProfileViewModel : Screen
         {
             var series = GetSeries(key);
             series.Points.Clear();
-            series.Points.AddRange(headCamDict[key].Data.Select(q => new ScatterPoint(q.X, q.Y)));
+            series.Points.AddRange(headCamDict[key].Data.Select(q => new ScatterPoint(q.X*scaler, q.Y*scaler)));
             LiveView!.InvalidatePlot(true);
         }
         headCamDict.Clear();
@@ -197,11 +206,12 @@ public sealed class LiveProfileViewModel : Screen
             LegendPosition = LegendPosition.TopRight,
             LegendTextColor = OxyColorsForStyle.LegendTextColor
         });
-
+       
+        Func<double, string> labelFormatter = Config.Units == DisplayUnits.Millimeters ? x => $"{x:F1} mm" : x => $"{x:F2} \"";  
         var columnAxis = new LinearAxis
         {
-            Minimum = -100,
-            Maximum = 500,
+            Minimum = -100 * scaler,
+            Maximum = 500 * scaler,
             PositionAtZeroCrossing = true,
             AxislineStyle = LineStyle.Solid,
             AxislineColor = OxyColorsForStyle.MajorGridLineColor,
@@ -214,14 +224,14 @@ public sealed class LiveProfileViewModel : Screen
             MinorGridlineColor = OxyColorsForStyle.MinorGridLineColor,
             IsZoomEnabled = true,
             TextColor = OxyColorsForStyle.AxisTextColor,
-            // LabelFormatter = x => null
+            LabelFormatter = labelFormatter
         };
         LiveView.Axes.Add(columnAxis);
 
         var rowAxis = new LinearAxis
         {
-            Minimum = -300,
-            Maximum = 300,
+            Minimum = -300 * scaler ,
+            Maximum = 300 * scaler ,
             Position = AxisPosition.Bottom,
             PositionAtZeroCrossing = true,
             AxislineStyle = LineStyle.Solid,
@@ -235,7 +245,7 @@ public sealed class LiveProfileViewModel : Screen
             MinorGridlineColor = OxyColorsForStyle.MinorGridLineColor,
             IsZoomEnabled = true,
             TextColor = OxyColorsForStyle.AxisTextColor,
-            // LabelFormatter = x => null
+            LabelFormatter = labelFormatter
         };
         LiveView.Axes.Add(rowAxis);
 
@@ -249,7 +259,7 @@ public sealed class LiveProfileViewModel : Screen
                 StrokeThickness = 1.0,
                 LineStyle = LineStyle.Dot
             };
-            filterOutline.Points.AddRange(Filter[f].Outline.Select(q => new DataPoint(q.X, q.Y)));
+            filterOutline.Points.AddRange(Filter[f].Outline.Select(q => new DataPoint(q.X*scaler, q.Y*scaler)));
             annotations.Add(filterOutline);
             if (showFilters)
             {
