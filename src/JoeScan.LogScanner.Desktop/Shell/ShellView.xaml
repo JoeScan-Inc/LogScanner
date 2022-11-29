@@ -11,7 +11,7 @@
     FontFamily="{StaticResource InterUI}"
     IconVisibility="Hidden"
     PlaceTitleBarOverContent="False"
-    TextElement.FontSize="14"
+    TextElement.FontSize="11"
     TextOptions.TextFormattingMode="Ideal"
     TextOptions.TextRenderingMode="Auto"
     TitleVisibility="Hidden"
