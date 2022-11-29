@@ -1,10 +1,12 @@
 ﻿using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Models;
+using NLog;
 
 namespace JoeScan.LogScanner.SyntheticDataAdapter;
 
 public class FakeLogGenerator
 {
+    private readonly ILogger logger;
     public ISyntheticDataAdapterConfig Config { get; }
 
     public record struct HeadCamPair(uint head, uint cam, double angle);
@@ -38,13 +40,15 @@ public class FakeLogGenerator
     private UnitSystem units;
     private double startDiameter;
     private double endDiameter;
-
-    public FakeLogGenerator(ISyntheticDataAdapterConfig config)
+ long profilesGenerated;
+    public FakeLogGenerator(ISyntheticDataAdapterConfig config, ILogger logger)
     {
+        this.logger = logger;
         Config = config;
         encoderPulseInterval = Config.EncoderPulseInterval;
         units = Config.Units;
-
+        logger.Debug("FakeLogGenerator");
+       
     }
 
     public IEnumerable<Profile> ProfileForEncoderValue(long encVal, long timeStampNs)
@@ -64,19 +68,25 @@ public class FakeLogGenerator
         if (pos > dataEnd)
         {
             inLog = false;
+            logger.Debug($"Profiles generated: {profilesGenerated}");
+            profilesGenerated = 0;
             return new List<Profile>(); // no profiles
         }
 
         if (pos < logStart || (pos > logEnd))
         {
             // send empty (maybe noisy) profiles
-            return CreateEmptyProfiles(encVal, timeStampNs);
+            var emptyProfiles = CreateEmptyProfiles(encVal, timeStampNs);
+            profilesGenerated += emptyProfiles.Count();
+            return emptyProfiles;
         }
         else
         {
             // send real profile based on pos within log
             var scaler = (pos - logStart) / (logEnd - logStart);
-            return CreateValidProfiles(scaler, encVal, timeStampNs);
+            var validProfiles = CreateValidProfiles(scaler, encVal, timeStampNs);
+            profilesGenerated += validProfiles.Count();
+            return validProfiles;
         }
     }
 

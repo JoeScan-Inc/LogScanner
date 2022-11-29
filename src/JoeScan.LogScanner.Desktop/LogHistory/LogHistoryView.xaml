@@ -8,29 +8,17 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <GroupBox Padding="0">
-        <GroupBox.Header>
-            <DockPanel MinHeight="30" LastChildFill="False">
-                <Border
-                    MinHeight="24"
-                    VerticalAlignment="Center"
-                    BorderBrush="{x:Null}"
-                    DockPanel.Dock="Left">
-                    <TextBlock Margin="30,0">Log History</TextBlock>
-                </Border>
-            </DockPanel>
-        </GroupBox.Header>
-        <Grid>
-            <ListView Name="lvUsers">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Name" />
-                        <GridViewColumn DisplayMemberBinding="{Binding Age}" Header="Age" />
-                        <GridViewColumn DisplayMemberBinding="{Binding Mail}" Header="Mail" />
-                    </GridView>
-                </ListView.View>
-            </ListView>
+    <Grid>
+        <ListView Name="lvUsers">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Name" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Age}" Header="Age" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Mail}" Header="Mail" />
+                </GridView>
+            </ListView.View>
+        </ListView>
 
-        </Grid>
-    </GroupBox>
+    </Grid>
+
 </UserControl>

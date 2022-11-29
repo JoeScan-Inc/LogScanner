@@ -11,8 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\config\coreconfig.json" Link="coreconfig.json" />
-    <Content Include="..\..\config\coreconfig_user.json" Link="coreconfig_user.json" />
     <Content Include="..\..\config\rawfilters.json" Link="rawfilters.json" />
   </ItemGroup>
 
