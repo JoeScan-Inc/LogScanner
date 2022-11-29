@@ -4,6 +4,7 @@ using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using JoeScan.Pinchot;
+using NLog;
 using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
 using Profile = JoeScan.LogScanner.Core.Models.Profile;
@@ -13,6 +14,7 @@ namespace JoeScan.LogScanner.SyntheticDataAdapter;
 public class SyntheticDataAdapter : IScannerAdapter
 {
     private readonly FakeLogGenerator fakeLogGenerator;
+    private readonly ILogger logger;
     public ISyntheticDataAdapterConfig Config { get; }
 
     #region Private Fields
@@ -27,9 +29,10 @@ public class SyntheticDataAdapter : IScannerAdapter
     #region Lifecycle
 
     public SyntheticDataAdapter(ISyntheticDataAdapterConfig config,
-        FakeLogGenerator fakeLogGenerator)
+        FakeLogGenerator fakeLogGenerator, ILogger logger)
     {
         this.fakeLogGenerator = fakeLogGenerator;
+        this.logger = logger;
         Config = config;
         timeBase = new Stopwatch();
         tickFrequency = (double) Stopwatch.Frequency;
@@ -76,7 +79,6 @@ public class SyntheticDataAdapter : IScannerAdapter
         }
     }
 
-    public string Name => "Synthetic Data";
     public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
     public event EventHandler? ScanningStarted;
     public event EventHandler? ScanningStopped;
@@ -161,6 +163,7 @@ public class SyntheticDataAdapter : IScannerAdapter
 
     #endregion
 
+    public string Name => "Synthetic Data";
     public uint VersionMajor => 1;
     public uint VersionMinor => 0;
     public uint VersionPatch => 0;

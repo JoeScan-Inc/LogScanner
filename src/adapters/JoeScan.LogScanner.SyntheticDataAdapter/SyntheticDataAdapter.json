@@ -2,12 +2,12 @@
   "Units": "Millimeters",
   "EncoderPulseInterval": 0.060,
   "ChainSpeed": 1000,
-  "MinLogLength": 1500,
-  "MaxLogLength": 5000,
+  "MinLogLength": 3000,
+  "MaxLogLength": 3000,
   "MinLogDiameter": 150,
-  "MaxLogDiameter": 300,
-  "MaxDiameterVariation": 100,
-  "MaxCurvature": 50,
+  "MaxLogDiameter": 150,
+  "MaxDiameterVariation": 0,
+  "MaxCurvature": 0,
   "LeadingGap": 500,
   "TrailingGap" :  300 
 }
