@@ -36,10 +36,12 @@
                 DockPanel.Dock="Right"
                 Focusable="False"
                 Style="{StaticResource {x:Type ToggleButton}}">
-                <iconPacks:Material
-                    Width="16"
-                    Height="16"
-                    Kind="Pause" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontFamily="{StaticResource MaterialDesignIcons}"
+                    FontSize="16">
+                    &#xF1592;
+                </TextBlock>
                 <ToggleButton.ToolTip>
                     <TextBlock>Pause the Live Display. Acquisition and Measurement will not be affected.</TextBlock>
                 </ToggleButton.ToolTip>
@@ -53,10 +55,12 @@
                 DockPanel.Dock="Right"
                 Focusable="False"
                 Style="{StaticResource {x:Type ToggleButton}}">
-                <iconPacks:Material
-                    Width="16"
-                    Height="16"
-                    Kind="Select" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontFamily="{StaticResource MaterialDesignIcons}"
+                    FontSize="16">
+                    &#xF0485;
+                </TextBlock>
                 <ToggleButton.ToolTip>
                     <TextBlock>Show/Hide Raw Profile Filter Outlines.</TextBlock>
                 </ToggleButton.ToolTip>
