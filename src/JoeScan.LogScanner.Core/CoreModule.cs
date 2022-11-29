@@ -33,12 +33,6 @@ public class CoreModule : Module
 
         builder.RegisterType<DefaultConfigLocator>().As<IConfigLocator>();
        
-
-        // builder.Register(c => new ConfigurationBuilder<ICoreConfig>()
-        //     .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetUserConfigLocation(), "coreconfig_user.json"))
-        //     .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "coreconfig.json"))
-        //     .Build()).As<ICoreConfig>().SingleInstance();
-
         builder.Register(c =>
             new CoreConfig(new IniConfigSource("core.ini").Configs["Core"])).AsSelf();
         builder.Register(c =>
