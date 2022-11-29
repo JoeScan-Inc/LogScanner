@@ -15,12 +15,18 @@
             DockPanel.Dock="Right"
             IsReadOnly="True" />
         <Label VerticalContentAlignment="Center" DockPanel.Dock="Right">Build:</Label>
-        <TextBox
-            x:Name="Adapter"
-            MinWidth="160"
-            Margin="3"
+        <ComboBox
+           
+            MinWidth="180"
+            Margin="5,5,30,5"
+            VerticalAlignment="Center"
+            DisplayMemberPath="Name"
             DockPanel.Dock="Right"
-            IsReadOnly="True" />
+            Focusable="False"
+            ItemsSource="{Binding Adapters}"
+            SelectedValue="{Binding SelectedAdapter}"
+            Visibility="Visible" />
+
         <Label VerticalContentAlignment="Center" DockPanel.Dock="Right">Adapter:</Label>
         <TextBox
             MinWidth="160"
