@@ -5,6 +5,8 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+	  <OutputType>Exe</OutputType>
+	  <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +22,9 @@
     <None Remove="Fonts\Inter-Regular.ttf" />
     <None Remove="Fonts\Inter-SemiBold.ttf" />
     <None Remove="Fonts\Inter-Thin.ttf" />
+    <None Remove="Fonts\materialdesignicons-webfont.ttf" />
     <None Remove="Interfaces\**" />
+    <None Remove="NLogViewer\**" />
     <None Remove="Themes\**" />
   </ItemGroup>
 
@@ -53,6 +57,8 @@
   <ItemGroup>
     <Folder Include="Config\" />
     <Folder Include="Engine\" />
+    <Folder Include="Main\" />
+    <Folder Include="Enums\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,6 +73,7 @@
     <Resource Include="Fonts\Inter-Regular.ttf" />
     <Resource Include="Fonts\Inter-SemiBold.ttf" />
     <Resource Include="Fonts\Inter-Thin.ttf" />
+    <Resource Include="Fonts\materialdesignicons-webfont.ttf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -77,16 +84,19 @@
 
   <ItemGroup>
     <Compile Remove="Interfaces\**" />
+    <Compile Remove="NLogViewer\**" />
     <Compile Remove="Themes\**" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Remove="Interfaces\**" />
+    <EmbeddedResource Remove="NLogViewer\**" />
     <EmbeddedResource Remove="Themes\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Page Remove="Interfaces\**" />
+    <Page Remove="NLogViewer\**" />
     <Page Remove="Themes\**" />
   </ItemGroup>
 

@@ -1,3 +1,7 @@
 {
-  "ActiveAdapter": "JS-25"
+  "ActiveAdapter": "Synthetic Data",
+  "Units": "Inches",
+  "LiveProfileConfig": {
+    "ShowFilters" :  false
+  }
 }
