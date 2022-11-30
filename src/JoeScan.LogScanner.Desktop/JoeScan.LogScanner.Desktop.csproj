@@ -24,6 +24,7 @@
     <None Remove="Fonts\Inter-Thin.ttf" />
     <None Remove="Fonts\materialdesignicons-webfont.ttf" />
     <None Remove="Interfaces\**" />
+    <None Remove="Main\**" />
     <None Remove="NLogViewer\**" />
     <None Remove="Themes\**" />
   </ItemGroup>
@@ -56,7 +57,6 @@
   <ItemGroup>
     <Folder Include="Config\" />
     <Folder Include="Engine\" />
-    <Folder Include="Main\" />
     <Folder Include="Enums\" />
   </ItemGroup>
 
@@ -83,18 +83,21 @@
 
   <ItemGroup>
     <Compile Remove="Interfaces\**" />
+    <Compile Remove="Main\**" />
     <Compile Remove="NLogViewer\**" />
     <Compile Remove="Themes\**" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Remove="Interfaces\**" />
+    <EmbeddedResource Remove="Main\**" />
     <EmbeddedResource Remove="NLogViewer\**" />
     <EmbeddedResource Remove="Themes\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Page Remove="Interfaces\**" />
+    <Page Remove="Main\**" />
     <Page Remove="NLogViewer\**" />
     <Page Remove="Themes\**" />
   </ItemGroup>

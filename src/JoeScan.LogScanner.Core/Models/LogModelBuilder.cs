@@ -104,11 +104,8 @@ public class LogModelBuilder
         // var fitErrors = model.Sections.Select(s => s.FitError).ToArray();
         var model = new LogModel(log.LogNumber, config.SectionInterval, log.TimeScanned, config.MaxFitError,
             coreConfig.EncoderPulseInterval) { Sections = sections, RejectedSections = rejectedSections };
-        var test = sections.Sum(q => q.Profiles.Count);
-        var test2 = log.ProfileData.Count;
         MeasureModel(model);
         return model;
-
     }
 
     private void MeasureModel(LogModel model)

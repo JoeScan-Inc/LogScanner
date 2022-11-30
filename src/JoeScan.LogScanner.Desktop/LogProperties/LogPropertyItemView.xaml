@@ -23,14 +23,14 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <DockPanel Grid.Row="0">
-                <Button DockPanel.Dock="Right" Style="{DynamicResource {x:Static adonisUi:Styles.ToolbarButton}}">
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        FontFamily="{StaticResource MaterialDesignIcons}"
-                        FontSize="16">
-                        &#xF01D8;
-                    </TextBlock>
-                </Button>
+                <!-- <Button DockPanel.Dock="Right" Style="{DynamicResource {x:Static adonisUi:Styles.ToolbarButton}}"> -->
+                <!--  <TextBlock  -->
+                <!--  VerticalAlignment="Center"  -->
+                <!--  FontFamily="{StaticResource MaterialDesignIcons}"  -->
+                <!--  FontSize="16">  -->
+                <!--  &#xF01D8;  -->
+                <!--     </TextBlock> -->
+                <!-- </Button> -->
                 <TextBlock
                     Padding="2"
                     DockPanel.Dock="Left"
@@ -52,6 +52,7 @@
                     DockPanel.Dock="Left"
                     FontFamily="{StaticResource InterUIBold}"
                     FontSize="22"
+                    Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}"
                     Text="{Binding PropertyValue}"
                     TextAlignment="Right" />
             </DockPanel>

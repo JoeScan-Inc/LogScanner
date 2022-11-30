@@ -12,7 +12,7 @@ namespace JoeScan.LogScanner.Desktop.TopAndSide
 
     public class TopAndSideViewModel : Screen
     {
-        private LogData currentLog;
+       
         public PlotModel TopView { get; private set; }
         public PlotModel LeftView { get; private set; }
 
@@ -116,15 +116,8 @@ namespace JoeScan.LogScanner.Desktop.TopAndSide
         public LinearAxis TopViewRowAxis { get; set; }
 
         public LinearAxis TopViewColumnAxis { get; set; }
-        public Task HandleAsync(LogData logData, CancellationToken cancellationToken)
-        {
-            return Task.Run(() => CurrentLog = logData, cancellationToken);
-        }
+       
 
-        public LogData CurrentLog
-        {
-            get => currentLog;
-            set => currentLog = value;
-        }
+       
     }
 }
