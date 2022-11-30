@@ -42,6 +42,7 @@ public class LogModelBuilder
         var encoderPulseInterval = coreConfig.EncoderPulseInterval;
         logger.Debug($"Building new LogModel from RawLog #{log.LogNumber}");
         logger.Debug($"Using SectionInterval {interval} mm");
+        
         List<LogSection> sections = new List<LogSection>();
         List<LogSection> rejectedSections = new List<LogSection>();
         var firstEncVal = log.ProfileData[0].EncoderValues[0];
@@ -103,7 +104,7 @@ public class LogModelBuilder
         logger.Debug($"Log Model Generation took: {elapsed} ms");
         // var fitErrors = model.Sections.Select(s => s.FitError).ToArray();
         var model = new LogModel(log.LogNumber, config.SectionInterval, log.TimeScanned, config.MaxFitError,
-            coreConfig.EncoderPulseInterval) { Sections = sections, RejectedSections = rejectedSections };
+            coreConfig.EncoderPulseInterval) { Sections = sections, RejectedSections = rejectedSections, RawLog = log };
         MeasureModel(model);
         return model;
     }

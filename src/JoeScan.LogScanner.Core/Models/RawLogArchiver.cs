@@ -49,6 +49,7 @@ public class RawLogArchiver : ILogArchiver
         try
         {
             rawLog.Write(writer);
+            rawLog.ArchiveFileName = fileName;
 
         }
         catch (Exception e)

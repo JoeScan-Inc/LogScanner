@@ -16,6 +16,8 @@ public class RawLog
     public DateTime TimeScanned { get; set; }
 
     public Guid Id { get; init; }
+    public string? ArchiveFileName { get; set; }
+
     public RawLog(int logNumber, IEnumerable<Profile> profiles)
     {
         LogNumber = logNumber;
@@ -86,23 +88,8 @@ public static class RawLogReaderWriter
         using var fs = new FileStream(fileName, FileMode.Open);
         using var gzip = new GZipStream(fs, CompressionMode.Decompress);
         using var reader = new BinaryReader(gzip);
-        return Read(reader);
+        var rawLog = Read(reader);
+        rawLog.ArchiveFileName = fileName;
+        return rawLog;
     }
-    // TODO: benchmark and potentially use InsertionSort 
-
-    // private void InsertionSort(int[] arr)
-    // {
-    //     int j, temp;
-    //     for (int i = 1; i <= arr.Length - 1; i++)
-    //     {
-    //         temp = arr[i];
-    //         j = i - 1;
-    //         while (j >= 0 && arr[j] > temp)
-    //         {
-    //             arr[j + 1] = arr[j];
-    //             j--;
-    //         }
-    //         arr[j + 1] = temp;
-    //     }
-    // }
 }

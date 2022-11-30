@@ -3,8 +3,10 @@ using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.Core.Events;
 using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Geometry;
+using JoeScan.LogScanner.Core.Helpers;
 using JoeScan.LogScanner.Core.Interfaces;
 using NLog;
+using NLog.LayoutRenderers.Wrappers;
 using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
 
@@ -14,6 +16,8 @@ namespace JoeScan.LogScanner.Core.Models
     {
         private readonly ILogArchiver archiver;
         private readonly RawProfileDumper dumper;
+        private readonly List<IHeartBeatSubscriber> heartBeatSubscribers;
+        private readonly CancellationTokenSource statusCheckerSource = new CancellationTokenSource();
         public IFlightsAndWindowFilter Filter { get; }
         public CoreConfig Config { get; }
         private readonly IEnumerable<IScannerAdapter> availableAdapters;
@@ -85,10 +89,15 @@ namespace JoeScan.LogScanner.Core.Models
             LogModelBuilder modelBuilder,
             RawProfileDumper dumper,
             IEnumerable<ILogModelConsumerPlugin> consumers,
-            CoreConfig config)
+            CoreConfig config
+           )
         {
             this.archiver = archiver;
             this.dumper = dumper;
+            // this is a bit hacky, I would rather have a separate list of registered IHeartBeatSubscribers,
+            // but I couldn't figure out how to resolve them. This works.
+            heartBeatSubscribers = consumers!.ToList().OfType<IHeartBeatSubscriber>().ToList();
+
             Filter = filter;
             Config = config;
             this.availableAdapters = availableAdapters;
@@ -104,8 +113,14 @@ namespace JoeScan.LogScanner.Core.Models
             }
 
             SetupPipeline();
+            // set up the background task that every 5 seconds checks the adapter
+            if (heartBeatSubscribers.Any())
+            {
+                RecurringTaskHelper.RecurringTask(CheckScanningStatus, 
+                    heartBeatSubscribers.Min(q=>q!.RequestedInterval), statusCheckerSource.Token);
+            }
         }
-
+        
         private void SetupPipeline()
         {
             var blockOptions = new ExecutionDataflowBlockOptions()
@@ -161,8 +176,6 @@ namespace JoeScan.LogScanner.Core.Models
                 }
                
             }
-           
-
         }
 
         #endregion
@@ -298,7 +311,13 @@ namespace JoeScan.LogScanner.Core.Models
                 throw new ApplicationException(msg);
             }
         }
-
+        private void CheckScanningStatus()
+        {
+            foreach (var heartBeatSubscriber in heartBeatSubscribers)
+            {
+                heartBeatSubscriber.Callback(ActiveAdapter is { IsRunning: true });
+            }
+        }
         #endregion
 
         #region IDisposable Implementation
@@ -306,6 +325,7 @@ namespace JoeScan.LogScanner.Core.Models
         public void Dispose()
         {
             unlinker?.Dispose();
+            statusCheckerSource.Cancel();
            
         }
 
