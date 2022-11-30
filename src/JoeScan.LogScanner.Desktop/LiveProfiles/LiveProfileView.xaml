@@ -9,64 +9,62 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <GroupBox Padding="0">
-        <GroupBox.Header>
-            <DockPanel MinHeight="30" LastChildFill="False">
-                <Border
+
+    <Grid>
+        <oxy:PlotView
+            Margin="0"
+            Padding="0"
+            Model="{Binding LiveView}" />
+        <TextBlock
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            FontFamily="{StaticResource InterThin}"
+            FontSize="44"
+            Visibility="{Binding PausedIndicatorVisibility}">
+            Paused
+        </TextBlock>
+        <StackPanel
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Orientation="Horizontal">
+            <ToggleButton
+                x:Name="Paused"
+                Width="24"
+                Height="24"
+                Margin="3"
+                Padding="3"
+                DockPanel.Dock="Right"
+                Focusable="False"
+                Style="{StaticResource {x:Type ToggleButton}}">
+                <TextBlock
                     VerticalAlignment="Center"
-                    BorderBrush="{x:Null}"
-                    DockPanel.Dock="Left">
-                    <TextBlock Margin="30,0">Live Profiles</TextBlock>
-                </Border>
-                <ToggleButton
-                    x:Name="Paused"
-                    Width="24"
-                    Height="24"
-                    Margin="3"
-                    Padding="3"
-                    DockPanel.Dock="Right"
-                    Focusable="False"
-                    Style="{StaticResource {x:Type ToggleButton}}">
-                    <iconPacks:Material
-                        Width="16"
-                        Height="16"
-                        Kind="Pause" />
-                    <ToggleButton.ToolTip>
-                        <TextBlock>Pause the Live Display. Acquisition and Measurement will not be affected.</TextBlock>
-                    </ToggleButton.ToolTip>
-                </ToggleButton>
-                <ToggleButton
-                    x:Name="ShowFilters"
-                    Width="24"
-                    Height="24"
-                    Margin="3"
-                    Padding="3"
-                    DockPanel.Dock="Right"
-                    Focusable="False"
-                    Style="{StaticResource {x:Type ToggleButton}}">
-                    <iconPacks:Material
-                        Width="16"
-                        Height="16"
-                        Kind="Select" />
-                    <ToggleButton.ToolTip>
-                        <TextBlock>Show/Hide Raw Profile Filter Outlines.</TextBlock>
-                    </ToggleButton.ToolTip>
-                </ToggleButton>
-            </DockPanel>
-        </GroupBox.Header>
-        <Grid>
-            <oxy:PlotView
-                Margin="0"
-                Padding="0"
-                Model="{Binding LiveView}" />
-            <TextBlock
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                FontFamily="{StaticResource InterThin}"
-                FontSize="44"
-                Visibility="{Binding PausedIndicatorVisibility}">
-                Paused
-            </TextBlock>
-        </Grid>
-    </GroupBox>
+                    FontFamily="{StaticResource MaterialDesignIcons}"
+                    FontSize="16">
+                    &#xF1592;
+                </TextBlock>
+                <ToggleButton.ToolTip>
+                    <TextBlock>Pause the Live Display. Acquisition and Measurement will not be affected.</TextBlock>
+                </ToggleButton.ToolTip>
+            </ToggleButton>
+            <ToggleButton
+                x:Name="ShowFilters"
+                Width="24"
+                Height="24"
+                Margin="3"
+                Padding="3"
+                DockPanel.Dock="Right"
+                Focusable="False"
+                Style="{StaticResource {x:Type ToggleButton}}">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontFamily="{StaticResource MaterialDesignIcons}"
+                    FontSize="16">
+                    &#xF0485;
+                </TextBlock>
+                <ToggleButton.ToolTip>
+                    <TextBlock>Show/Hide Raw Profile Filter Outlines.</TextBlock>
+                </ToggleButton.ToolTip>
+            </ToggleButton>
+        </StackPanel>
+    </Grid>
 </UserControl>

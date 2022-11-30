@@ -2,11 +2,13 @@
 using Autofac.Extras.NLog;
 using JoeScan.LogScanner.Core;
 using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.Replay;
-using JoeScan.LogScanner.SyntheticDataAdapter;
+
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using System;
+using System.Linq;
+using System.Threading;
 
 AutoResetEvent autoResetEvent = new AutoResetEvent(false);
 Console.CancelKeyPress += (_, e) =>
@@ -16,8 +18,7 @@ Console.CancelKeyPress += (_, e) =>
 };
 EnableLogging();
 var builder = new ContainerBuilder();
-//builder.RegisterModule<ReplayModule>();
-builder.RegisterModule<SyntheticDataModule>();
+// builder.RegisterModule<ReplayModule>();
 builder.RegisterModule<CoreModule>();
 builder.RegisterModule<NLogModule>();
 
@@ -25,7 +26,8 @@ var container = builder.Build();
 
 using var scope = container.BeginLifetimeScope();
 var engine= scope.Resolve<LogScannerEngine>();
-engine.SetActiveAdapter(engine.AvailableAdapters.First()); // we only have the replay adapter registered
+//engine.SetActiveAdapter(engine.AvailableAdapters.First(q=>q.Id.Equals(Guid.Parse("{6EAE7379-E27D-4BFE-B304-CF16D40E9A9B}")))); // JS-25
+engine.SetActiveAdapter(engine.AvailableAdapters.First(q=>q.Id.Equals(Guid.Parse("{C79255EF-9AB8-4B6D-B3F1-FA4D37AFD021}")))); // Synthetic
 engine.Start();
 
 autoResetEvent.WaitOne();

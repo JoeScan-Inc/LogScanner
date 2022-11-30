@@ -13,14 +13,12 @@ public class RawLog
     private readonly List<Profile> profileData;
     public IReadOnlyList<Profile> ProfileData => profileData;
     public int LogNumber { get; }
-    public UnitSystem Units { get; }
     public DateTime TimeScanned { get; set; }
 
     public Guid Id { get; init; }
-    public RawLog(int logNumber, UnitSystem units, IEnumerable<Profile> profiles)
+    public RawLog(int logNumber, IEnumerable<Profile> profiles)
     {
         LogNumber = logNumber;
-        Units = units;
         profileData = profiles.OrderBy(q => q.EncoderValues[0]).ToList();
         TimeScanned = DateTime.Now;
         Id = Guid.NewGuid();
@@ -37,7 +35,7 @@ public static class RawLogReaderWriter
     public static void Write(this RawLog r, BinaryWriter bw)        
     {
         bw.Write(currentVersion); // 32 bit int
-        bw.Write((byte) r.Units); // 1 byte 
+        bw.Write((byte) UnitSystem.Millimeters); // 1 byte 
         bw.Write(r.LogNumber); // 32 bit int
         bw.Write(r.Id.ToByteArray()); // 16 byte array
         bw.Write(r.TimeScanned.ToBinary()); // 64 bits encoding datetime and ticks
@@ -80,7 +78,7 @@ public static class RawLogReaderWriter
                 throw new Exception("Failed to read profile from stream.");
             }
         }
-        return new RawLog(number,units, l) { Id = guid, TimeScanned = datetime };
+        return new RawLog(number, l) { Id = guid, TimeScanned = datetime };
     }
 
     public static RawLog Read(string fileName)

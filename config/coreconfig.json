@@ -1,10 +1,11 @@
 ﻿{
-  "Units": "Millimeters",
+  "Units": "Inches",
 
   "SingleZoneLogAssemblerConfig": {
-    "EncoderPulseInterval": 0.06045,
-    "MinProfileSpacing": 1.0,
-    "MinLogLength" :  500 
+    "EncoderPulseInterval": 0.000565866,
+    "MinProfileSpacing": 0.03,
+    "MinLogLength": 100,
+    "MaxLogLength": 150
   },
   "RawLogArchiverConfig": {
     "Location": "C:/tmp/test/rawlogs/",
@@ -14,11 +15,11 @@
     "RawDumpLocation": "C:/tmp/test/rawdumps"
   },
   "LogModelBuilder": {
-    "SectionInterval": 100
+    "SectionInterval": 4
   },
   "LogSectionBuilder": {
-    "FilterOutliers": "true",
-    "OutlierFilterMaxDistance": 20,
+    "FilterOutliers": "false",
+    "OutlierFilterMaxDistance": 20, 
     "ModelPointCount": 100
   } 
 }

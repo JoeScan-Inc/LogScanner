@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+
+	  
+	  <AssemblyName>js-25</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Events\**" />
+    <Compile Remove="Helpers\**" />
+    <EmbeddedResource Remove="Events\**" />
+    <EmbeddedResource Remove="Helpers\**" />
+    <None Remove="Events\**" />
+    <None Remove="Helpers\**" />
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
+    <Folder Include="references\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.3.0" />
+    <PackageReference Include="Config.Net" Version="4.19.0" />
+    <PackageReference Include="Config.Net.Json" Version="4.19.0" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\JoeScan.LogScanner.Core\JoeScan.LogScanner.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="JoeScan.JCamNet5">
+      <HintPath>references\JoeScan.JCamNet5.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Js25Adapter.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="param.dat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+	
+</Project>

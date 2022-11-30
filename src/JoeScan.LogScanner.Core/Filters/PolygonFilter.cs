@@ -1,6 +1,8 @@
 ﻿using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Interfaces;
 using System.Runtime.Serialization;
+using UnitsNet;
+using UnitsNet.Units;
 
 namespace JoeScan.LogScanner.Core.Filters;
 
@@ -43,6 +45,15 @@ public class PolygonFilter : FilterBase
     [OnDeserialized]
     internal void OnDeserializedMethod(StreamingContext context)
     {
+        if (!String.IsNullOrEmpty(Units))
+        {
+            if (Enum.TryParse(Units, out LengthUnit lu))
+            {
+                Vertices = Vertices!.Select(q => new Point2D(UnitConverter.Convert(q.X, lu, LengthUnit.Millimeter),
+                    UnitConverter.Convert(q.Y, lu, LengthUnit.Millimeter), 0)).ToList();
+                
+            }
+        }
         isValid = Vertices is { Count: > 3 };
     }
 }

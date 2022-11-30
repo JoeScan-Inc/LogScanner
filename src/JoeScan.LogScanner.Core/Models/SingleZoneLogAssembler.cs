@@ -1,4 +1,6 @@
-﻿using JoeScan.LogScanner.Core.Enums;
+﻿using JoeScan.LogScanner.Core.Config;
+using JoeScan.LogScanner.Core.Enums;
+using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Interfaces;
 using NLog;
 using System.Diagnostics;
@@ -8,6 +10,7 @@ namespace JoeScan.LogScanner.Core.Models;
 
 public class SingleZoneLogAssembler : ILogAssembler
 {
+    private readonly IEnumerable<ILogStatusEventConsumer> statusEventConsumers;
     private readonly double encoderPulseInterval;
     private readonly bool useLogPresenceSignal;
     private readonly bool startScanInverted;
@@ -22,9 +25,12 @@ public class SingleZoneLogAssembler : ILogAssembler
     public SingleZoneLogAssembler(
         IRawProfileValidator profileValidator,
         IPieceNumberProvider numerator,
+        IEnumerable<ILogStatusEventConsumer> statusEventConsumers,
         ILogger logger,
-        ICoreConfig config)
+        SingleZoneLogAssemblerConfig config,
+        CoreConfig coreConfig)
     {
+        this.statusEventConsumers = statusEventConsumers;
         Config = config;
         ProfileValidator = profileValidator;
         Numerator = numerator;
@@ -38,14 +44,14 @@ public class SingleZoneLogAssembler : ILogAssembler
         // we initialize these fields here instead of reading from the config 
         // where they are used, because Config.Net has no caching and will re-read the JSON 
         // on every access
-        encoderPulseInterval = Config.SingleZoneLogAssemblerConfig.EncoderPulseInterval;
-        useLogPresenceSignal = Config.SingleZoneLogAssemblerConfig.UseLogPresenceSignal;
-        startScanInverted = Config.SingleZoneLogAssemblerConfig.StartScanInverted;
-        startLogCount = Config.SingleZoneLogAssemblerConfig.StartLogCount;
-        stopLogCount = Config.SingleZoneLogAssemblerConfig.StopLogCount;
-        minLogLength = Config.SingleZoneLogAssemblerConfig.MinLogLength;
-        maxLogLength = Config.SingleZoneLogAssemblerConfig.MaxLogLength;
-        minProfileSpacing = Config.SingleZoneLogAssemblerConfig.MinProfileSpacing;
+        encoderPulseInterval = coreConfig.EncoderPulseInterval;
+        useLogPresenceSignal = Config.UseLogPresenceSignal;
+        startScanInverted = Config.StartScanInverted;
+        startLogCount = Config.StartLogCount;
+        stopLogCount = Config.StopLogCount;
+        minLogLength = Config.MinLogLength;
+        maxLogLength = Config.MaxLogLength;
+        minProfileSpacing = Config.MinProfileSpacing;
     }
 
     #endregion
@@ -148,6 +154,10 @@ public class SingleZoneLogAssembler : ILogAssembler
                     {
                         // we  have a bona fide log
                         // signal and break
+                        foreach (var logStatusEventConsumer in statusEventConsumers)
+                        {
+                            Task.Run(() => logStatusEventConsumer.LogCollectionAborted()).Forget();
+                        }
                         LogReady();
                     }
 
@@ -158,6 +168,10 @@ public class SingleZoneLogAssembler : ILogAssembler
 
                 if (scannedSoFar >= maxLogLength)
                 {
+                    foreach (var logStatusEventConsumer in statusEventConsumers)
+                    {
+                        Task.Run(() => logStatusEventConsumer.LogCollectionAborted()).Forget();
+                    }
                     LogReady();
                     SetCurrentState(LogAssemblerState.Idle);
                 }
@@ -235,14 +249,14 @@ public class SingleZoneLogAssembler : ILogAssembler
     private async void LogReady()
     {
         Stopwatch sw = Stopwatch.StartNew();
-        RawLog rawLog = new RawLog(Numerator.GetNextPieceNumber(), Config.Units, accumulatedProfiles);
+        RawLog rawLog = new RawLog(Numerator.GetNextPieceNumber(), accumulatedProfiles);
         sw.Stop();
         Logger.Trace($"Sorting raw profiles took {sw.ElapsedMilliseconds} ms");
         await RawLogs.SendAsync(rawLog).ConfigureAwait(false);
     }
     #region Injected Properties
 
-    public ICoreConfig Config { get; }
+    public SingleZoneLogAssemblerConfig Config { get; }
     public IRawProfileValidator ProfileValidator { get; }
     public IPieceNumberProvider Numerator { get; }
     public ILogger Logger { get; }
@@ -277,6 +291,17 @@ public class SingleZoneLogAssembler : ILogAssembler
                 accumulatedProfiles.Clear();
                 consecutiveNoLogProfiles = 0;
                 // FlagCount = 0;
+                foreach (var logStatusEventConsumer in statusEventConsumers)
+                {
+                    Task.Run(() => logStatusEventConsumer.LogCollectionIdleStarted()).Forget();
+                }
+            }
+            else
+            {
+                foreach (var logStatusEventConsumer in statusEventConsumers)
+                {
+                    Task.Run(() => logStatusEventConsumer.LogCollectionIdleEnded()).Forget();
+                }
             }
 
             //TODO: enable state change event

@@ -79,14 +79,13 @@ public class LogModel
 
     #region Lifecycle
 
-    internal LogModel(int logNumber, double interval, DateTime timeScanned, double maxFitError, double encoderPulseInterval, UnitSystem units)
+    internal LogModel(int logNumber, double interval, DateTime timeScanned, double maxFitError, double encoderPulseInterval)
     {
         this.maxFitError = maxFitError;
         this.encoderPulseInterval = encoderPulseInterval;
         LogNumber = logNumber;
         Interval = interval;
         TimeScanned = timeScanned;
-        Units = units;
         length = new Lazy<double>(() => (LastGoodProfile.EncoderValues[0] - FirstGoodProfile.EncoderValues[0])*encoderPulseInterval);
         lastGoodProfile = new Lazy<Profile>(() =>
         {

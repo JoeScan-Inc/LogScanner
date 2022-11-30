@@ -5,35 +5,176 @@
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
     xmlns:controls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="JoeScan LogScanner"
-    Width="1920"
-    Height="1080"
-    FontFamily="{StaticResource InterLight}"
-    IconVisibility="Collapsed"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    FontFamily="{StaticResource InterUI}"
+    IconVisibility="Hidden"
     PlaceTitleBarOverContent="False"
-    TextElement.FontSize="13"
-    TextElement.FontWeight="Regular"
+    TextElement.FontSize="11"
     TextOptions.TextFormattingMode="Ideal"
     TextOptions.TextRenderingMode="Auto"
-    TitleVisibility="Collapsed"
+    TitleVisibility="Hidden"
     mc:Ignorable="d">
-
-    <Window.Resources />
     <Window.Style>
         <Style BasedOn="{StaticResource {x:Type Window}}" TargetType="Window" />
     </Window.Style>
-    <controls:AdonisWindow.TitleBarContent>
-        <DockPanel>
-            <TextBlock
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                DockPanel.Dock="Left"
-                Text="{Binding Title}" />
-        </DockPanel>
-    </controls:AdonisWindow.TitleBarContent>
     <Grid>
-        <ContentControl x:Name="UI" />
+        <Grid.RowDefinitions>
+            <!--  toolbar (0)  -->
+            <RowDefinition Height="Auto" />
+            <!--  top and left view (1)  -->
+            <RowDefinition Height="*" />
+            <!--  splitter (2)  -->
+            <RowDefinition Height="Auto" />
+            <!--  3-D view (3)  -->
+            <RowDefinition Height="*" />
+            <!--  splitter (4)  -->
+            <RowDefinition Height="Auto" />
+            <!--  log list (5)  -->
+            <RowDefinition Height="*" />
+            <!--  status bar (6)  -->
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <ContentControl
+            x:Name="Toolbar"
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="4" />
+        <ContentControl
+            x:Name="TopAndSide"
+            Grid.Row="1"
+            Grid.Column="1" />
+
+        <GridSplitter
+            Grid.Row="2"
+            Grid.Column="1"
+            MinHeight="5"
+            HorizontalAlignment="Stretch" />
+        <GroupBox
+            Grid.Row="3"
+            Grid.Column="1"
+            Margin="3"
+            Padding="0">
+            <GroupBox.Header>
+                <StackPanel MinHeight="25" Orientation="Horizontal">
+                    <TextBlock
+                        Margin="3"
+                        VerticalAlignment="Center"
+                        FontFamily="{StaticResource MaterialDesignIcons}"
+                        Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}">
+                        &#xF0D49;
+                    </TextBlock>
+                    <TextBlock Margin="3" VerticalAlignment="Center">3-D View</TextBlock>
+                </StackPanel>
+            </GroupBox.Header>
+
+            <ContentControl x:Name="Live3D" />
+        </GroupBox>
+        <GridSplitter
+            Grid.Row="4"
+            Grid.Column="1"
+            MinHeight="5"
+            HorizontalAlignment="Stretch" />
+        <GroupBox
+            Grid.Row="5"
+            Grid.Column="1"
+            Margin="3"
+            Padding="0">
+            <GroupBox.Header>
+                <StackPanel MinHeight="25" Orientation="Horizontal">
+                    <TextBlock
+                        Margin="3"
+                        VerticalAlignment="Center"
+                        FontFamily="{StaticResource MaterialDesignIcons}"
+                        Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}">
+                        &#xF1452;
+                    </TextBlock>
+                    <TextBlock Margin="3" VerticalAlignment="Center">History</TextBlock>
+                </StackPanel>
+            </GroupBox.Header>
+
+            <ContentControl x:Name="LogHistory" />
+
+        </GroupBox>
+
+
+        <ContentControl
+            x:Name="StatusBar"
+            Grid.Row="6"
+            Grid.Column="0"
+            Grid.ColumnSpan="4" />
+        <GridSplitter
+            Grid.Row="1"
+            Grid.RowSpan="5"
+            Grid.Column="2"
+            MinWidth="5"
+            VerticalAlignment="Stretch" />
+        <Grid
+            Grid.Row="1"
+            Grid.RowSpan="5"
+            Grid.Column="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="3*" />
+            </Grid.RowDefinitions>
+            <GroupBox
+                Grid.Row="0"
+                Margin="3"
+                Padding="0">
+                <GroupBox.Header>
+                    <StackPanel MinHeight="25" Orientation="Horizontal">
+                        <TextBlock
+                            Margin="3"
+                            VerticalAlignment="Center"
+                            FontFamily="{StaticResource MaterialDesignIcons}"
+                            Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}">
+                            &#xF0A38;
+                        </TextBlock>
+                        <TextBlock Margin="3" VerticalAlignment="Center">Log Properties</TextBlock>
+                    </StackPanel>
+                </GroupBox.Header>
+                <ContentControl
+                    x:Name="LogProperties"
+                    Margin="0"
+                    BorderThickness="0" />
+            </GroupBox>
+
+
+            <GridSplitter
+                Grid.Row="1"
+                MinHeight="5"
+                VerticalAlignment="Stretch" />
+            <GroupBox
+                Grid.Row="2"
+                Margin="3"
+                Padding="0">
+                <GroupBox.Header>
+                    <StackPanel MinHeight="25" Orientation="Horizontal">
+                        <TextBlock
+                            Margin="3"
+                            VerticalAlignment="Center"
+                            FontFamily="{StaticResource MaterialDesignIcons}"
+                            Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}">
+                            &#xF1978;
+                        </TextBlock>
+                        <TextBlock Margin="3" VerticalAlignment="Center">Live View</TextBlock>
+                    </StackPanel>
+                </GroupBox.Header>
+                <ContentControl
+                    x:Name="LiveView"
+                    Margin="0"
+                    BorderThickness="0" />
+            </GroupBox>
+        </Grid>
+
     </Grid>
+
 </controls:AdonisWindow>

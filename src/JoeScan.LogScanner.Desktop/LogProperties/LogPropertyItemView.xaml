@@ -14,7 +14,8 @@
         MaxWidth="180"
         Padding="3"
         Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}"
-        BorderThickness="1" CornerRadius="3">
+        BorderThickness="1"
+        CornerRadius="3">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -23,19 +24,20 @@
             </Grid.RowDefinitions>
             <DockPanel Grid.Row="0">
                 <Button DockPanel.Dock="Right" Style="{DynamicResource {x:Static adonisUi:Styles.ToolbarButton}}">
-                    <iconPacks:Material
-                        Width="9"
-                        Height="9"
-                        Kind="DotsHorizontal" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontFamily="{StaticResource MaterialDesignIcons}"
+                        FontSize="16">
+                        &#xF01D8;
+                    </TextBlock>
                 </Button>
                 <TextBlock
                     Padding="2"
-                    
                     DockPanel.Dock="Left"
                     FontFamily="{StaticResource InterLight}"
                     Text="{Binding PropertyName}" />
             </DockPanel>
-            <DockPanel Grid.Row="1" >
+            <DockPanel Grid.Row="1">
                 <TextBlock
                     Padding="2"
                     VerticalAlignment="Bottom"

@@ -9,61 +9,50 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <GroupBox Padding="0">
-        <GroupBox.Header>
-            <DockPanel MinHeight="30" LastChildFill="False">
-                <Border
-                    VerticalAlignment="Center"
-                    BorderBrush="{x:Null}"
-                    DockPanel.Dock="Left">
-                    <TextBlock Margin="10,0,0,0">Live 3D View</TextBlock>
-                </Border>
-            </DockPanel>
-        </GroupBox.Header>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <h:HelixViewport3D
-                x:Name="Viewport"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                CameraMode="Inspect"
-                CameraRotationMode="Trackball"
-                ModelUpDirection="0,1,0"
-                Orthographic="{Binding IsChecked, ElementName=UseOrthographicCamera}"
-                ShowCameraInfo="False"
-                ShowCoordinateSystem="True"
-                ZoomAroundMouseDownPoint="True"
-                ZoomExtentsWhenLoaded="True">
-                <h:SunLight />
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <h:HelixViewport3D
+            x:Name="Viewport"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            CameraMode="Inspect"
+            CameraRotationMode="Trackball"
+            ModelUpDirection="0,1,0"
+            Orthographic="{Binding IsChecked, ElementName=UseOrthographicCamera}"
+            ShowCameraInfo="False"
+            ShowCoordinateSystem="True"
+            ZoomAroundMouseDownPoint="True"
+            ZoomExtentsWhenLoaded="True">
+            <h:SunLight />
 
-                <h:HelixViewport3D.DefaultCamera>
+            <h:HelixViewport3D.DefaultCamera>
 
-                    <PerspectiveCamera
-                        LookDirection="-4000,0,3000"
-                        Position="4000,100,3000"
-                        UpDirection="0,1,0" />
-                </h:HelixViewport3D.DefaultCamera>
-            </h:HelixViewport3D>
-            <DockPanel
-                Grid.Column="0"
-                Margin="3"
-                LastChildFill="False">
+                <PerspectiveCamera
+                    LookDirection="-4000,0,3000"
+                    Position="4000,100,3000"
+                    UpDirection="0,1,0" />
+            </h:HelixViewport3D.DefaultCamera>
+        </h:HelixViewport3D>
+        <DockPanel
+            Grid.Column="0"
+            Margin="3"
+            LastChildFill="False">
 
-                <CheckBox x:Name="ShowRawPoints" DockPanel.Dock="Top">Raw Points</CheckBox>
+            <CheckBox x:Name="ShowRawPoints" DockPanel.Dock="Top">Raw Points</CheckBox>
 
-                <CheckBox x:Name="ShowModelPoints" DockPanel.Dock="Top">Model Points</CheckBox>
+            <CheckBox x:Name="ShowModelPoints" DockPanel.Dock="Top">Model Points</CheckBox>
 
-                <CheckBox x:Name="ShowModel" DockPanel.Dock="Top">Model</CheckBox>
+            <CheckBox x:Name="ShowModel" DockPanel.Dock="Top">Model</CheckBox>
 
-                <CheckBox x:Name="ShowSectionCenters" DockPanel.Dock="Top">Section Centers</CheckBox>
-                <CheckBox x:Name="ShowDebugStuff" DockPanel.Dock="Top">Debug Stuff</CheckBox>
-                <CheckBox x:Name="UseOrthographicCamera" DockPanel.Dock="Bottom">Orthographic</CheckBox>
+            <CheckBox x:Name="ShowSectionCenters" DockPanel.Dock="Top">Section Centers</CheckBox>
+            <CheckBox x:Name="ShowDebugStuff" DockPanel.Dock="Top">Debug Stuff</CheckBox>
+            <CheckBox x:Name="UseOrthographicCamera" DockPanel.Dock="Bottom">Orthographic</CheckBox>
 
-            </DockPanel>
-        </Grid>
-    </GroupBox>
+        </DockPanel>
+    </Grid>
+
 
 </UserControl>

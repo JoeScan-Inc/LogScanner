@@ -1,7 +1,6 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Desktop.Engine;
-using JoeScan.LogScanner.Desktop.Main;
 using NLog;
 
 // ReSharper disable MemberCanBePrivate.Global
@@ -15,13 +14,9 @@ public class ToolbarViewModel : Screen
     private string selectedAdapter;
     private EngineViewModel Model { get; }
 
-    public IScannerAdapter? SelectedAdapter
-    {
-        get => Model.ActiveAdapter;
-        set => Model!.ActiveAdapter = value;
-    }
+    
 
-    public IObservableCollection<IScannerAdapter> Adapters => Model.Adapters;
+    
 
     public ToolbarViewModel(EngineViewModel model,
         ILogger logger)

@@ -1,0 +1,13 @@
+{
+  "ScanThread": {
+    "InternalProfileQueueLength": "10",
+    "BaseAddress": "192.168.10.100",
+    "EncoderUpdateIncrement": "1000",
+    "MaxRequestedProfileCount": "4",
+    "CableIdList": "10,11",
+    "ParamFile": "param.dat",
+    "SyncMode": "EncoderSyncMode",
+    "Pulseinterval": "5000",
+    "PulseMasterId": "0"
+  }
+}

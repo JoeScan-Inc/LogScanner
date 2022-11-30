@@ -36,4 +36,10 @@ public interface IScannerAdapter
     // mostly to avoid that the raw dumper fills up the disk with garbage
     public bool IsReplay { get; }
 
+    public uint VersionMajor { get; }
+    public uint VersionMinor { get; }
+    public uint VersionPatch { get; }
+
+    public Guid Id { get; }
+
 }
