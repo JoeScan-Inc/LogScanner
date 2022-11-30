@@ -196,7 +196,7 @@ public class ShellViewModel : Screen
             await Task.Delay(500);
             HeartBeatVisible = false;
             NotifyOfPropertyChange(() => HeartBeatVisible);
-          //  SendArchiveValue(WatchdogTagName, 1);
+            SendArchiveValue(WatchdogTagName, 1);
         }
     }
 
