@@ -12,10 +12,18 @@ public interface ILogScannerConfig
     DisplayUnits Units { get; set; }
 
     ILiveProfileViewConfig LiveProfileConfig { get; set; }
+    ILogHistoryViewConfig LogHistoryConfig { get; set; }
+
 }
 
 public interface ILiveProfileViewConfig
 {
     [Option(DefaultValue = true)]
     bool ShowFilters { get; set; }
+}
+
+public interface ILogHistoryViewConfig
+{
+    [Option(DefaultValue = 100)]
+    int MaxLength { get; set; }
 }
