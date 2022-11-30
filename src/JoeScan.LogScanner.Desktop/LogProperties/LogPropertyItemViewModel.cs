@@ -1,33 +1,30 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Models;
-using System.ComponentModel;
-using System.Reflection;
-using UnitsNet;
+using System;
+// ReSharper disable MemberCanBePrivate.Global
 
 #pragma warning disable CS0618
 
 namespace JoeScan.LogScanner.Desktop.LogProperties;
 
-public class LogPropertyItemViewModel : PropertyChangedBase 
+public class LogPropertyItemViewModel : PropertyChangedBase
 {
-    public string PropertyName { get; init; } 
+    private readonly Func<LogModel, string> displayFunc;
+    public string PropertyName { get; init; }
     public string PropertyValue { get; private set; } = "";
     public string UnitString { get; private set; } = "";
-   
     
-    public LogPropertyItemViewModel(string propertyName)
+    
+    public LogPropertyItemViewModel(string propertyName, string unit, Func<LogModel, string> displayFunc)
     {
-       
+        this.displayFunc = displayFunc;
+        PropertyName = propertyName;
+        UnitString = unit;
     }
 
-    public void UpdateWith(LogData ld)
+    public void UpdateWith(LogModel model)
     {
-       
-       
-    }
-
-    private static string SplitCamelCase(string input)
-    {
-        return System.Text.RegularExpressions.Regex.Replace(input, "([A-Z])", " $1", System.Text.RegularExpressions.RegexOptions.Compiled).Trim();
+        PropertyValue = displayFunc(model) ;
+        Refresh();
     }
 }
