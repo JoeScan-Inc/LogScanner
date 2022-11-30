@@ -45,7 +45,6 @@ public class LogModel
     [Unit(QuantityType.Undefined)]
     public DateTime TimeScanned { get;  }
 
-    public UnitSystem Units { get; }
 
     /// <summary>
     /// Data and measurements at each section
