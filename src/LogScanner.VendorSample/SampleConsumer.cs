@@ -1,10 +1,12 @@
 ﻿using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
+using NLog;
 using System.Diagnostics;
 
 namespace LogScanner.VendorSample;
-public class SampleConsumer : ILogModelConsumerPlugin
+public class SampleConsumer : ILogModelConsumerPlugin, IHeartBeatSubscriber
 {
+    public ILogger Logger { get; }
     public string PluginName { get; } = "SampleConsumerPlugin";
     public int VersionMajor { get; } = 1;
     public int VersionMinor { get; } = 0;
@@ -32,5 +34,16 @@ public class SampleConsumer : ILogModelConsumerPlugin
     public void Dispose()
     {
 
+    }
+
+    public SampleConsumer()
+    {
+        Logger = LogManager.GetCurrentClassLogger();
+    }
+
+    public TimeSpan RequestedInterval { get; } = TimeSpan.FromSeconds(5);
+    public void Callback(bool isRunning)
+    {
+        Logger.Trace(isRunning?"Adapter is up and running.":"Adapter not running.");
     }
 }
