@@ -282,7 +282,6 @@ public class LogModelBuilder
 
         model.CompoundSweep = CompoundSweepS;
         model.CompoundSweep90 = CompoundSweep90;
-        throw new ApplicationException("test");
     }
 
     private static  double[] WeightedMovingAverage(double[] v)
