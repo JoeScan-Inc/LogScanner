@@ -16,7 +16,7 @@ public class LogModelBuilder
 
     #endregion
 
-    public TransformBlock<RawLog, LogModel> BuilderBlock { get; }
+    public TransformBlock<RawLog, LogModelResult> BuilderBlock { get; }
 
     #region Lifecycle
 
@@ -29,84 +29,93 @@ public class LogModelBuilder
         this.coreConfig = coreConfig;
         this.sectionBuilder = sectionBuilder;
         this.logger = logger;
-        BuilderBlock = new TransformBlock<RawLog, LogModel>(Build,
+        BuilderBlock = new TransformBlock<RawLog, LogModelResult>(Build,
             new ExecutionDataflowBlockOptions() { EnsureOrdered = true, SingleProducerConstrained = true, MaxDegreeOfParallelism = 2 });
     }
 
     #endregion
 
-    public LogModel Build(RawLog log)
+    public LogModelResult Build(RawLog log)
     {
-        var sw = Stopwatch.StartNew();
-        var interval = config.SectionInterval;
-        var encoderPulseInterval = coreConfig.EncoderPulseInterval;
-        logger.Debug($"Building new LogModel from RawLog #{log.LogNumber}");
-        logger.Debug($"Using SectionInterval {interval} mm");
+        LogModel? model = null;
+        try
+        {
+            var sw = Stopwatch.StartNew();
+            var interval = config.SectionInterval;
+            var encoderPulseInterval = coreConfig.EncoderPulseInterval;
+            logger.Debug($"Building new LogModel from RawLog #{log.LogNumber}");
+            logger.Debug($"Using SectionInterval {interval} mm");
         
-        List<LogSection> sections = new List<LogSection>();
-        List<LogSection> rejectedSections = new List<LogSection>();
-        var firstEncVal = log.ProfileData[0].EncoderValues[0];
+            List<LogSection> sections = new List<LogSection>();
+            List<LogSection> rejectedSections = new List<LogSection>();
+            var firstEncVal = log.ProfileData[0].EncoderValues[0];
 
-        // this will contain the z position of each profile - for the JS-25 we will need more work as the encoder may be de-synced
-        // but for the JS-50 series we have always synchronized encoder positions for all heads
-        var zPositions = log.ProfileData.Select(q =>
-            (q.EncoderValues[0] - firstEncVal) * encoderPulseInterval).ToArray();
+            // this will contain the z position of each profile - for the JS-25 we will need more work as the encoder may be de-synced
+            // but for the JS-50 series we have always synchronized encoder positions for all heads
+            var zPositions = log.ProfileData.Select(q =>
+                (q.EncoderValues[0] - firstEncVal) * encoderPulseInterval).ToArray();
 
-        double nextSection = interval;
-        var startOffset = 0;
-        double firstZ = zPositions[startOffset];
-        double maxZ = zPositions[^1];
-        var currentRawSection = new List<Profile>();
-        for (int i = startOffset; i < zPositions.Length; i++)
-        {
-            if ((zPositions[i] - firstZ) > nextSection)
+            double nextSection = interval;
+            var startOffset = 0;
+            double firstZ = zPositions[startOffset];
+            double maxZ = zPositions[^1];
+            var currentRawSection = new List<Profile>();
+            for (int i = startOffset; i < zPositions.Length; i++)
             {
-
-                if (currentRawSection.Count > 0)
+                if ((zPositions[i] - firstZ) > nextSection)
                 {
-                    var s = sectionBuilder.Build(currentRawSection, nextSection - interval / 2.0);
-                    if (s.IsValid)
+
+                    if (currentRawSection.Count > 0)
                     {
-                        sections.Add(s);
+                        var s = sectionBuilder.Build(currentRawSection, nextSection - interval / 2.0);
+                        if (s.IsValid)
+                        {
+                            sections.Add(s);
+                        }
+                        else
+                        {
+                            rejectedSections.Add(s);
+                        }
                     }
-                    else
+                    do
                     {
-                        rejectedSections.Add(s);
+                        nextSection += interval;
+                    } while ((zPositions[i] - firstZ) > nextSection);
+
+                    if ((maxZ > nextSection) && ((maxZ - nextSection) < (interval / 2)))
+                    {
+                        interval += (maxZ - nextSection);
+                        nextSection = maxZ + 1; // make sure last profile makes it into the bin
                     }
-                }
-                do
-                {
-                    nextSection += interval;
-                } while ((zPositions[i] - firstZ) > nextSection);
 
-                if ((maxZ > nextSection) && ((maxZ - nextSection) < (interval / 2)))
-                {
-                    interval += (maxZ - nextSection);
-                    nextSection = maxZ + 1; // make sure last profile makes it into the bin
+                    currentRawSection = new List<Profile>();
                 }
+                currentRawSection.Add(log.ProfileData[i]);
 
-                currentRawSection = new List<Profile>();
             }
-            currentRawSection.Add(log.ProfileData[i]);
+            var s2 = sectionBuilder.Build(currentRawSection, nextSection - interval / 2);
+            if (s2.IsValid)
+            {
+                sections.Add(s2);
+            }
+            else
+            {
+                rejectedSections.Add(s2);
+            }
 
+            var elapsed = sw.ElapsedMilliseconds;
+            logger.Debug($"Log Model Generation took: {elapsed} ms");
+            // var fitErrors = model.Sections.Select(s => s.FitError).ToArray();
+             model = new LogModel(log.LogNumber, config.SectionInterval, log.TimeScanned, config.MaxFitError,
+                coreConfig.EncoderPulseInterval) { Sections = sections, RejectedSections = rejectedSections, RawLog = log };
+            MeasureModel(model);
         }
-        var s2 = sectionBuilder.Build(currentRawSection, nextSection - interval / 2);
-        if (s2.IsValid)
+        catch (Exception e)
         {
-            sections.Add(s2);
+            logger.Warn($"Failed to generate LogModel for RawLog {log.LogNumber}");
+            return new LogModelResult(log, null, new List<string>() { e.Message });
         }
-        else
-        {
-            rejectedSections.Add(s2);
-        }
-
-        var elapsed = sw.ElapsedMilliseconds;
-        logger.Debug($"Log Model Generation took: {elapsed} ms");
-        // var fitErrors = model.Sections.Select(s => s.FitError).ToArray();
-        var model = new LogModel(log.LogNumber, config.SectionInterval, log.TimeScanned, config.MaxFitError,
-            coreConfig.EncoderPulseInterval) { Sections = sections, RejectedSections = rejectedSections, RawLog = log };
-        MeasureModel(model);
-        return model;
+        return new LogModelResult(log, model, new List<string>() );
     }
 
     private void MeasureModel(LogModel model)
