@@ -2,6 +2,7 @@
 using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
+using MathNet.Numerics.LinearAlgebra.Factorization;
 using NLog;
 using UnitsNet;
 using UnitsNet.Units;
@@ -45,7 +46,7 @@ public class PlcConnectorPlugin : ILogModelConsumerPlugin, IHeartBeatSubscriber
         
     }
 
-    public void Consume(LogModel logModel)
+    public void Consume(LogModelResult result)
     {
         // create the solution tag array and send
         if (!IsConnected)
@@ -55,21 +56,54 @@ public class PlcConnectorPlugin : ILogModelConsumerPlugin, IHeartBeatSubscriber
         }
 
         var values = new int[28];
-        values[0] = (int)(Volume.FromCubicMillimeters(logModel.BarkVolume).ToUnit(VolumeUnit.CubicInch).Value * 1000);
-        values[1] = 1; //TODO: implement ButEndFirst
-        values[2] = (int)(logModel.CompoundSweep90 * 1000);
-        values[3] = (int)(logModel.CompoundSweep * 1000);
-        values[4] = (int)(Length.FromMillimeters(logModel.LargeEndDiameter).ToUnit(LengthUnit.Inch).Value * 1000);
-        values[5] = (int)(Length.FromMillimeters(logModel.LargeEndDiameterX).ToUnit(LengthUnit.Inch).Value * 1000);
-        values[6] = (int)(Length.FromMillimeters(logModel.LargeEndDiameterY).ToUnit(LengthUnit.Inch).Value * 1000);
-        values[7] = (int)(Length.FromMillimeters(logModel.Length).ToUnit(LengthUnit.Inch).Value * 1000);
-        values[8] = logModel.LogNumber;
-        // values[9] = (int)(Length.FromMillimeters(logModel.MaxDiameter).ToUnit(LengthUnit.Inch).Value * 1000);
-        // values[10] = (int)(Length.FromMillimeters(logModel.MaxDiameter).ToUnit(LengthUnit.Inch).Value * 1000);
-        // values[11] = (int)(Length.FromMillimeters(logModel.MaxDiameter).ToUnit(LengthUnit.Inch).Value * 1000);
-        values[12] = (int)(Length.FromMillimeters(logModel.SmallEndDiameter).ToUnit(LengthUnit.Inch).Value * 1000);
-        values[13] = (int)(Length.FromMillimeters(logModel.SmallEndDiameterX).ToUnit(LengthUnit.Inch).Value * 1000);
-        values[14] = (int)(Length.FromMillimeters(logModel.SmallEndDiameterY).ToUnit(LengthUnit.Inch).Value * 1000);
+        if (result.IsValidModel)
+        {
+            var logModel = result.LogModel;
+            values[0] =
+                (int)(Volume.FromCubicMillimeters(logModel.BarkVolume).ToUnit(VolumeUnit.CubicInch).Value * 1000);
+            values[1] = logModel.ButtEndFirst ? 1 : 2;
+            values[2] = (int)(logModel.CompoundSweep90 * 1000);
+            values[3] = (int)(logModel.CompoundSweep * 1000);
+            values[4] = (int)(Length.FromMillimeters(logModel.LargeEndDiameter).ToUnit(LengthUnit.Inch).Value * 1000);
+            values[5] = (int)(Length.FromMillimeters(logModel.LargeEndDiameterX).ToUnit(LengthUnit.Inch).Value * 1000);
+            values[6] = (int)(Length.FromMillimeters(logModel.LargeEndDiameterY).ToUnit(LengthUnit.Inch).Value * 1000);
+            values[7] = (int)(Length.FromMillimeters(logModel.Length).ToUnit(LengthUnit.Inch).Value * 1000);
+            values[8] = logModel.LogNumber;
+            values[9] = (int)(Length.FromMillimeters(logModel.MaxDiameter).ToUnit(LengthUnit.Inch).Value * 1000);
+            values[10] = (int)(Length.FromMillimeters(logModel.MaxDiameterZ).ToUnit(LengthUnit.Inch).Value * 1000);
+            values[11] = (int)(Length.FromMillimeters(logModel.MinDiameterZ).ToUnit(LengthUnit.Inch).Value * 1000);
+            values[12] = (int)(Length.FromMillimeters(logModel.SmallEndDiameter).ToUnit(LengthUnit.Inch).Value * 1000);
+            values[13] = (int)(Length.FromMillimeters(logModel.SmallEndDiameterX).ToUnit(LengthUnit.Inch).Value * 1000);
+            values[14] = (int)(Length.FromMillimeters(logModel.SmallEndDiameterY).ToUnit(LengthUnit.Inch).Value * 1000);
+            values[15] = (int)(Length.FromMillimeters(logModel.Sweep).ToUnit(LengthUnit.Inch).Value * 1000);
+            values[16] = (int)(Angle.FromRadians(logModel.SweepAngleRad).ToUnit(AngleUnit.Degree).Value * 1000);
+            values[17] = (int)(100* logModel.Sweep/logModel.SmallEndDiameter) * 1000;// SweepPercent = 100.0 * Sweep / Sed;
+            values[18] = (int)(logModel.Taper * 1000);
+            values[19] = (int)(logModel.TaperX * 1000);
+            values[20] = (int)(Volume.FromCubicMillimeters(logModel.Volume).ToUnit(VolumeUnit.CubicInch).Value * 1000);
+            // rest is 0
+        }
+        else
+        {
+            // log modeling failed, still send the log number
+            values[8] = result.LogNumber;
+        }
+        Logger.Trace("Sending Solution Array");
+        Task.Run(() =>
+        {
+            lock (this)
+            {
+                var res = NativeMethods.js_write_tag_array_32(Config.WatchdogTagName, values,values.Length);
+                if (res == 0)
+                {
+                    Logger.Trace($"Successfully sent tag array for solution.");
+                }
+                else
+                {
+                    Logger.Error($"Failed to send tag array for solution.");
+                }
+            }
+        }).Forget();
 
     }
 
@@ -96,7 +130,7 @@ public class PlcConnectorPlugin : ILogModelConsumerPlugin, IHeartBeatSubscriber
                     }
                     else
                     {
-                        Logger.Trace($"Failed to set tag {Config.WatchdogTagName} to {tagValue}.");
+                        Logger.Error($"Failed to set tag {Config.WatchdogTagName} to {tagValue}.");
                     }
                 }
             }).Forget();
