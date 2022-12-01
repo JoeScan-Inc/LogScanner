@@ -123,12 +123,12 @@ public class LogModelBuilder
         LogSection endSection = model.Sections[0];
         double n = model.Sections.Count;
 
-        var Volume = 0.0;
-        var BarkVolume = 0.0;
-        var MaxDiameter = 0.0;
-        var MinDiameter = Double.MaxValue;
-        var MaxDiameterPos = 0.0;
-        var MinDiameterPos = 0.0;
+        var volume = 0.0;
+        var barkVolume = 0.0;
+        var maxDiameter = 0.0;
+        var minDiameter = Double.MaxValue;
+        var maxDiameterPos = 0.0;
+        var minDiameterPos = 0.0;
 
         double sumX = 0.0;
         double sumY = 0.0;
@@ -148,20 +148,20 @@ public class LogModelBuilder
             {
                 endSection = sm;
             }
-            Volume += sm.WoodArea * model.Length / model.Sections.Count;
-            BarkVolume += sm.BarkArea * model.Length / model.Sections.Count;
+            volume += sm.WoodArea * model.Length / model.Sections.Count;
+            barkVolume += sm.BarkArea * model.Length / model.Sections.Count;
 
             //find the largest diameter in the log and it's Z location
-            if (MaxDiameter < sm.DiameterMax)
+            if (maxDiameter < sm.DiameterMax)
             {
-                MaxDiameter = sm.DiameterMax;
-                MaxDiameterPos = sm.SectionCenter;
+                maxDiameter = sm.DiameterMax;
+                maxDiameterPos = sm.SectionCenter;
             }
             // minimum diameter
-            if (MinDiameter > sm.DiameterMin)
+            if (minDiameter > sm.DiameterMin)
             {
-                MinDiameter = sm.DiameterMin;
-                MinDiameterPos = sm.SectionCenter;
+                minDiameter = sm.DiameterMin;
+                minDiameterPos = sm.SectionCenter;
             }
 
             // Find sums used to calculate best fit center line
@@ -173,8 +173,12 @@ public class LogModelBuilder
             sumYZ += sm.CentroidY * sm.SectionCenter;
         }
 
-        model.Volume = Volume;
-        model.BarkVolume = BarkVolume;
+        model.Volume = volume;
+        model.BarkVolume = barkVolume;
+        model.MaxDiameter = maxDiameter;
+        model.MaxDiameterZ = maxDiameterPos;
+        model.MinDiameter = minDiameter;
+        model.MinDiameterZ = minDiameterPos;
 
         // this computes a best fit line through all centers
         model.CenterLineSlopeX = (n * sumXZ - sumZ * sumX) / (n * sumZ2 - sumZ * sumZ);
@@ -192,6 +196,7 @@ public class LogModelBuilder
             model.LargeEndDiameter = (beginSection.DiameterMin + beginSection.DiameterMax) / 2.0;
             model.LargeEndDiameterX = beginSection.DiameterX;
             model.LargeEndDiameterY = beginSection.DiameterY;
+            model.ButtEndFirst = true;
         }
         else
         {
@@ -202,6 +207,7 @@ public class LogModelBuilder
             model.SmallEndDiameter = (beginSection.DiameterMin + beginSection.DiameterMax) / 2.0;
             model.SmallEndDiameterX = beginSection.DiameterX;
             model.SmallEndDiameterY = beginSection.DiameterY;
+            model.ButtEndFirst = false;
         }
 
         // Based on a straight line between the begin and end centroids 
@@ -241,7 +247,7 @@ public class LogModelBuilder
         }
 
         model.Sweep = Sweep;
-        model.SweepAngle = SweepAngle;
+        model.SweepAngleRad = SweepAngle;
         var CompoundSweep90 = 0.0;
         var CompoundSweepS = 0.0;
 
@@ -260,7 +266,7 @@ public class LogModelBuilder
             double deviationParalell = deviationX * Math.Cos(SweepAngle) + deviationY * Math.Sin(SweepAngle);
             double deviationPerpendicular = deviationX * -Math.Sin(SweepAngle) + deviationY * Math.Cos(SweepAngle);
 
-            // Set sweep values to the largest devation found.
+            // Set sweep values to the largest deviation found.
             CompoundSweepS = Math.Max(CompoundSweepS, -deviationParalell);
             CompoundSweep90 = Math.Max(CompoundSweep90, Math.Abs(deviationPerpendicular));
         }

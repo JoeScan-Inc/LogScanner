@@ -60,7 +60,7 @@ public class LogModel
     private Lazy<double> taper;
     private Lazy<double> taperX;
     private Lazy<double> taperY;
-
+   
     #endregion
 
     #region Lifecycle
@@ -146,7 +146,7 @@ public class LogModel
     public double LargeEndDiameterY { get; internal set; }
     public double Sweep { get; internal set; }
     
-    public double SweepAngle { get; internal set; }
+    public double SweepAngleRad { get; internal set; }
   
     public double CompoundSweep { get; internal set; }
   
@@ -156,5 +156,12 @@ public class LogModel
     public double TaperY => taperY.Value;
     public double Volume { get; internal set; }
     public double BarkVolume { get; internal set; }
+
+    public double MaxDiameter { get; internal set; }
+    public double MaxDiameterZ { get; internal set; }
+    public double MinDiameter { get; internal set; }
+    public double MinDiameterZ { get; internal set; }
+    public bool ButtEndFirst { get; internal set; }
+
     public RawLog RawLog { get; set; }
 }
