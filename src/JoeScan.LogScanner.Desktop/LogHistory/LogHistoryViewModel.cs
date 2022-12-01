@@ -61,6 +61,13 @@ public record LogHistoryEntry
         LED = UnitsNet.Length.FromMillimeters(logModel.LargeEndDiameter).ToUnit(targetUnit).ToString("F2");
         LEDX = UnitsNet.Length.FromMillimeters(logModel.LargeEndDiameterX).ToUnit(targetUnit).ToString("F2");
         LEDY = UnitsNet.Length.FromMillimeters(logModel.LargeEndDiameterY).ToUnit(targetUnit).ToString("F2");
+        MaxDiameter = UnitsNet.Length.FromMillimeters(logModel.MaxDiameter).ToUnit(targetUnit).ToString("F2");
+        MaxDiameterZ = UnitsNet.Length.FromMillimeters(logModel.MaxDiameterZ).ToUnit(targetUnit).ToString("F2");
+        MinDiameter = UnitsNet.Length.FromMillimeters(logModel.MinDiameter).ToUnit(targetUnit).ToString("F2");
+        MinDiameterZ = UnitsNet.Length.FromMillimeters(logModel.MinDiameterZ).ToUnit(targetUnit).ToString("F2");
+        Sweep = UnitsNet.Length.FromMillimeters(logModel.Sweep).ToUnit(targetUnit).ToString("F2");
+        SweepAngle = UnitsNet.Angle.FromRadians(logModel.SweepAngleRad).ToUnit(AngleUnit.Degree).ToString("F1");
+        ButtEndFirst = logModel.ButtEndFirst ? "True" : "False";
         Volume = UnitsNet.Volume.FromCubicMillimeters(logModel.Volume).ToUnit(units==DisplayUnits.Millimeters?VolumeUnit.CubicMeter:VolumeUnit.CubicFoot).ToString("F2");
         BarkVolume = UnitsNet.Volume.FromCubicMillimeters(logModel.BarkVolume).ToUnit(units==DisplayUnits.Millimeters?VolumeUnit.CubicMeter:VolumeUnit.CubicFoot).ToString("F2");
         Taper = logModel.Taper.ToString("F3");
@@ -81,7 +88,19 @@ public record LogHistoryEntry
     public string Volume { get; }
     public string BarkVolume { get; }
     public string Taper { get; }
- 
+    [DisplayName("Max ⌀")]
+    public string MaxDiameter { get; }
+    [DisplayName("Max ⌀ Pos")]
+    public string MaxDiameterZ { get; }
+    [DisplayName("Min ⌀")]
+    public string MinDiameter { get; }
+    [DisplayName("Min ⌀ Pos")]
+    public string MinDiameterZ { get; }
+    public string Sweep { get; }
+    [DisplayName("Sweep Angle")]
+    public string SweepAngle { get; }
+    [DisplayName("Butt End First")]
+    public string ButtEndFirst { get; }
     private string FileName { get; }
 
 
