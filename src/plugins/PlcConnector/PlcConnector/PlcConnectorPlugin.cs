@@ -58,6 +58,19 @@ public class PlcConnectorPlugin : ILogModelConsumerPlugin, IHeartBeatSubscriber
         values[0] = (int)(Volume.FromCubicMillimeters(logModel.BarkVolume).ToUnit(VolumeUnit.CubicInch).Value * 1000);
         values[1] = 1; //TODO: implement ButEndFirst
         values[2] = (int)(logModel.CompoundSweep90 * 1000);
+        values[3] = (int)(logModel.CompoundSweep * 1000);
+        values[4] = (int)(Length.FromMillimeters(logModel.LargeEndDiameter).ToUnit(LengthUnit.Inch).Value * 1000);
+        values[5] = (int)(Length.FromMillimeters(logModel.LargeEndDiameterX).ToUnit(LengthUnit.Inch).Value * 1000);
+        values[6] = (int)(Length.FromMillimeters(logModel.LargeEndDiameterY).ToUnit(LengthUnit.Inch).Value * 1000);
+        values[7] = (int)(Length.FromMillimeters(logModel.Length).ToUnit(LengthUnit.Inch).Value * 1000);
+        values[8] = logModel.LogNumber;
+        // values[9] = (int)(Length.FromMillimeters(logModel.MaxDiameter).ToUnit(LengthUnit.Inch).Value * 1000);
+        // values[10] = (int)(Length.FromMillimeters(logModel.MaxDiameter).ToUnit(LengthUnit.Inch).Value * 1000);
+        // values[11] = (int)(Length.FromMillimeters(logModel.MaxDiameter).ToUnit(LengthUnit.Inch).Value * 1000);
+        values[12] = (int)(Length.FromMillimeters(logModel.SmallEndDiameter).ToUnit(LengthUnit.Inch).Value * 1000);
+        values[13] = (int)(Length.FromMillimeters(logModel.SmallEndDiameterX).ToUnit(LengthUnit.Inch).Value * 1000);
+        values[14] = (int)(Length.FromMillimeters(logModel.SmallEndDiameterY).ToUnit(LengthUnit.Inch).Value * 1000);
+
     }
 
     public void Dispose()
