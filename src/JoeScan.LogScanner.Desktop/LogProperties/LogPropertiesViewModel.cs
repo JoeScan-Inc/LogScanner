@@ -29,13 +29,13 @@ public class LogPropertiesViewModel : Screen
         Config = config;
         Logger = logger;
 
-        model.LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModel>(logModel =>
+        model.LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModelResult>(result =>
         {
             Application.Current.Dispatcher.BeginInvoke(() =>
             {
                 foreach (var logPropertyItemViewModel in Items)
                 {
-                    logPropertyItemViewModel.UpdateWith(logModel);
+                    logPropertyItemViewModel.UpdateWith(result.LogModel);
                 }
             });
         }));

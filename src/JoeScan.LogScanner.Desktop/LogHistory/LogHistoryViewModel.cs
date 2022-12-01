@@ -29,15 +29,18 @@ public class LogHistoryViewModel : Screen
         Config = config;
         Logger = logger;
         Model = model;
-        model.LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModel>(logModel =>
+        model.LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModelResult>(result =>
         {
             Application.Current.Dispatcher.BeginInvoke(() =>
             {
-               Items.Insert(0,new LogHistoryEntry(Config.Units, logModel));
-               if (Items.Count > Config.LogHistoryConfig.MaxLength)
-               {
-                   Items.RemoveAt(Config.LogHistoryConfig.MaxLength);
-               }
+                if (result.IsValidModel)
+                {
+                    Items.Insert(0, new LogHistoryEntry(Config.Units, result.LogModel!));
+                    if (Items.Count > Config.LogHistoryConfig.MaxLength)
+                    {
+                        Items.RemoveAt(Config.LogHistoryConfig.MaxLength);
+                    }
+                }
             });
         }));
     }

@@ -24,7 +24,7 @@ public class SampleConsumer : ILogModelConsumerPlugin, IHeartBeatSubscriber
        // nothing in the sample
     }
 
-    public void Consume(LogModel logModel)
+    public void Consume(LogModelResult result)
     {
         // do whatever with model here. Ideally, this should be quick, as it is executed
         // within the LogScannerEngine, so the recommended approach is a producer-consumer
@@ -44,6 +44,6 @@ public class SampleConsumer : ILogModelConsumerPlugin, IHeartBeatSubscriber
     public TimeSpan RequestedInterval { get; } = TimeSpan.FromSeconds(5);
     public void Callback(bool isRunning)
     {
-        Logger.Trace(isRunning?"Adapter is up and running.":"Adapter not running.");
+        Logger.Trace(isRunning?"Adapter callback executed.":"Adapter not running.");
     }
 }
