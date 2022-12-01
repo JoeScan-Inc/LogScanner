@@ -13,7 +13,7 @@ public interface ILogModelConsumerPlugin : IDisposable
     void Initialize();
     bool IsInitialized { get; }
     void Cleanup();
-    void Consume(LogModel logModel);
+    void Consume(LogModelResult logModel);
 
 
 }

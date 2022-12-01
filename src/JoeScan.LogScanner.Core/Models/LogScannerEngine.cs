@@ -33,8 +33,8 @@ namespace JoeScan.LogScanner.Core.Models
             = new BroadcastBlock<Profile>(profile => profile);
         public BroadcastBlock<RawLog> RawLogsBroadcastBlock { get; } 
             = new BroadcastBlock<RawLog>(r => r);
-        public BroadcastBlock<LogModel> LogModelBroadcastBlock { get; }
-            = new BroadcastBlock<LogModel>(r => r);
+        public BroadcastBlock<LogModelResult> LogModelBroadcastBlock { get; }
+            = new BroadcastBlock<LogModelResult>(r => r);
 
         public bool IsRunning => ActiveAdapter is { IsRunning: true };
         
@@ -171,7 +171,8 @@ namespace JoeScan.LogScanner.Core.Models
                 if (logModelConsumer.IsInitialized)
                 {
                     // TODO: check for version and GUID here
-                    var userBlock = new ActionBlock<LogModel>(logModelConsumer.Consume);
+                    var userBlock = new ActionBlock<LogModelResult>(logModelConsumer.Consume);
+                    // TODO: save disposable for possible unlinking
                     LogModelBroadcastBlock.LinkTo(userBlock);
                 }
                

@@ -16,7 +16,6 @@
             IsReadOnly="True" />
         <Label VerticalContentAlignment="Center" DockPanel.Dock="Right">Build:</Label>
         <ComboBox
-           
             MinWidth="180"
             Margin="5,5,30,5"
             VerticalAlignment="Center"
@@ -36,5 +35,12 @@
             Text="{Binding Model.Units, Mode=OneWay}" />
         <Label VerticalContentAlignment="Center" DockPanel.Dock="Right">Units:</Label>
         <ContentControl x:Name="EncStatus" DockPanel.Dock="Right" />
+        <TextBox
+            MinWidth="160"
+            Margin="3"
+            DockPanel.Dock="Right"
+            IsReadOnly="True"
+            Text="{Binding NextSolutionNumber, Mode=OneWay}" />
+        <Label VerticalContentAlignment="Center" DockPanel.Dock="Right">Next Log Number:</Label>
     </DockPanel>
 </UserControl>

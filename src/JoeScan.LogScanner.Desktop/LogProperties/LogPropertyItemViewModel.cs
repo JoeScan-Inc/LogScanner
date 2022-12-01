@@ -22,9 +22,9 @@ public class LogPropertyItemViewModel : PropertyChangedBase
         UnitString = unit;
     }
 
-    public void UpdateWith(LogModel model)
+    public void UpdateWith(LogModel? model)
     {
-        PropertyValue = displayFunc(model) ;
+        PropertyValue = model != null ? displayFunc(model) : "n/a" ;
         Refresh();
     }
 }
