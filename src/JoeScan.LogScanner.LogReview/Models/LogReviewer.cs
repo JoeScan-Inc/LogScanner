@@ -27,7 +27,7 @@ public class LogReviewer : PropertyChangedBase, ILogModelObservable
             NotifyOfPropertyChange(() => CurrentRawLog);
             if (currentRawLog != null)
             {
-                CurrentLogModel = ModelBuilder.Build(currentRawLog);
+                CurrentLogModel = ModelBuilder.Build(currentRawLog).LogModel;
             }
         }
     }

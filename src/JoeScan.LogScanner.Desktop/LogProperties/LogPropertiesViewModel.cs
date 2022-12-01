@@ -29,13 +29,13 @@ public class LogPropertiesViewModel : Screen
         Config = config;
         Logger = logger;
 
-        model.LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModel>(logModel =>
+        model.LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModelResult>(result =>
         {
             Application.Current.Dispatcher.BeginInvoke(() =>
             {
                 foreach (var logPropertyItemViewModel in Items)
                 {
-                    logPropertyItemViewModel.UpdateWith(logModel);
+                    logPropertyItemViewModel.UpdateWith(result.LogModel);
                 }
             });
         }));
@@ -52,7 +52,13 @@ public class LogPropertiesViewModel : Screen
         Items.Add(new LogPropertyItemViewModel("LED", "", (logModel) => Length.FromMillimeters(logModel.LargeEndDiameter).ToUnit(targetUnit).ToString("F2")));
         Items.Add(new LogPropertyItemViewModel("LED X", "", (logModel) => Length.FromMillimeters(logModel.LargeEndDiameterX).ToUnit(targetUnit).ToString("F2")));
         Items.Add(new LogPropertyItemViewModel("LED Y", "", (logModel) => Length.FromMillimeters(logModel.LargeEndDiameterY).ToUnit(targetUnit).ToString("F2")));
-        Items.Add(new LogPropertyItemViewModel("Butt End First", "", (logModel) => "n/a"));
+        Items.Add(new LogPropertyItemViewModel("Max ⌀", "", (logModel) => Length.FromMillimeters(logModel.MaxDiameter).ToUnit(targetUnit).ToString("F2")));
+        Items.Add(new LogPropertyItemViewModel("Max ⌀ at Pos", "", (logModel) => Length.FromMillimeters(logModel.MaxDiameterZ).ToUnit(targetUnit).ToString("F2")));
+        Items.Add(new LogPropertyItemViewModel("Min ⌀", "", (logModel) => Length.FromMillimeters(logModel.MinDiameter).ToUnit(targetUnit).ToString("F2")));
+        Items.Add(new LogPropertyItemViewModel("Min ⌀ at Pos", "", (logModel) => Length.FromMillimeters(logModel.MinDiameterZ).ToUnit(targetUnit).ToString("F2")));
+        Items.Add(new LogPropertyItemViewModel("Sweep", "", (logModel) => Length.FromMillimeters(logModel.Sweep).ToUnit(targetUnit).ToString("F2")));
+        Items.Add(new LogPropertyItemViewModel("Sweep Angle", "", (logModel) => Angle.FromRadians(logModel.Sweep).ToUnit(AngleUnit.Degree).ToString("F1")));
+        Items.Add(new LogPropertyItemViewModel("Butt End First", "", (logModel) => logModel.ButtEndFirst? "True": "False"));
         Items.Add(new LogPropertyItemViewModel("Volume", "", (logModel)
             => Volume.FromCubicMillimeters(logModel.Volume).ToUnit(du == DisplayUnits.Inches ? VolumeUnit.CubicFoot : VolumeUnit.CubicMeter).ToString("F3")));
         Items.Add(new LogPropertyItemViewModel("Bark Volume", "", (logModel)

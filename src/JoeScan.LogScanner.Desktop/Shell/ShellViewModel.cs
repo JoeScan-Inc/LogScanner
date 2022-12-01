@@ -14,6 +14,7 @@ using JoeScan.LogScanner.Shared.Log3D;
 using NLog;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using System.Windows;
 using System.Windows.Threading;
 using MessageBox = AdonisUI.Controls.MessageBox;
@@ -65,6 +66,16 @@ public class ShellViewModel : Screen
         Engine = engine;
         Logger = logger;
         Config = config;
+        Engine.LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModelResult>((result) =>
+        {
+            Application.Current.Dispatcher.BeginInvoke(() =>
+            {
+                if (!result.IsValidModel)
+                {
+                    Notifier.Error($"Log Model could not be generated for RawLog #{result.LogNumber}.");
+                }
+            });
+        }));
     }
 
     public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken = new CancellationToken())

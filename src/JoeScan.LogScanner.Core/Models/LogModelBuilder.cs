@@ -16,7 +16,7 @@ public class LogModelBuilder
 
     #endregion
 
-    public TransformBlock<RawLog, LogModel> BuilderBlock { get; }
+    public TransformBlock<RawLog, LogModelResult> BuilderBlock { get; }
 
     #region Lifecycle
 
@@ -29,84 +29,93 @@ public class LogModelBuilder
         this.coreConfig = coreConfig;
         this.sectionBuilder = sectionBuilder;
         this.logger = logger;
-        BuilderBlock = new TransformBlock<RawLog, LogModel>(Build,
+        BuilderBlock = new TransformBlock<RawLog, LogModelResult>(Build,
             new ExecutionDataflowBlockOptions() { EnsureOrdered = true, SingleProducerConstrained = true, MaxDegreeOfParallelism = 2 });
     }
 
     #endregion
 
-    public LogModel Build(RawLog log)
+    public LogModelResult Build(RawLog log)
     {
-        var sw = Stopwatch.StartNew();
-        var interval = config.SectionInterval;
-        var encoderPulseInterval = coreConfig.EncoderPulseInterval;
-        logger.Debug($"Building new LogModel from RawLog #{log.LogNumber}");
-        logger.Debug($"Using SectionInterval {interval} mm");
+        LogModel? model = null;
+        try
+        {
+            var sw = Stopwatch.StartNew();
+            var interval = config.SectionInterval;
+            var encoderPulseInterval = coreConfig.EncoderPulseInterval;
+            logger.Debug($"Building new LogModel from RawLog #{log.LogNumber}");
+            logger.Debug($"Using SectionInterval {interval} mm");
         
-        List<LogSection> sections = new List<LogSection>();
-        List<LogSection> rejectedSections = new List<LogSection>();
-        var firstEncVal = log.ProfileData[0].EncoderValues[0];
+            List<LogSection> sections = new List<LogSection>();
+            List<LogSection> rejectedSections = new List<LogSection>();
+            var firstEncVal = log.ProfileData[0].EncoderValues[0];
 
-        // this will contain the z position of each profile - for the JS-25 we will need more work as the encoder may be de-synced
-        // but for the JS-50 series we have always synchronized encoder positions for all heads
-        var zPositions = log.ProfileData.Select(q =>
-            (q.EncoderValues[0] - firstEncVal) * encoderPulseInterval).ToArray();
+            // this will contain the z position of each profile - for the JS-25 we will need more work as the encoder may be de-synced
+            // but for the JS-50 series we have always synchronized encoder positions for all heads
+            var zPositions = log.ProfileData.Select(q =>
+                (q.EncoderValues[0] - firstEncVal) * encoderPulseInterval).ToArray();
 
-        double nextSection = interval;
-        var startOffset = 0;
-        double firstZ = zPositions[startOffset];
-        double maxZ = zPositions[^1];
-        var currentRawSection = new List<Profile>();
-        for (int i = startOffset; i < zPositions.Length; i++)
-        {
-            if ((zPositions[i] - firstZ) > nextSection)
+            double nextSection = interval;
+            var startOffset = 0;
+            double firstZ = zPositions[startOffset];
+            double maxZ = zPositions[^1];
+            var currentRawSection = new List<Profile>();
+            for (int i = startOffset; i < zPositions.Length; i++)
             {
-
-                if (currentRawSection.Count > 0)
+                if ((zPositions[i] - firstZ) > nextSection)
                 {
-                    var s = sectionBuilder.Build(currentRawSection, nextSection - interval / 2.0);
-                    if (s.IsValid)
+
+                    if (currentRawSection.Count > 0)
                     {
-                        sections.Add(s);
+                        var s = sectionBuilder.Build(currentRawSection, nextSection - interval / 2.0);
+                        if (s.IsValid)
+                        {
+                            sections.Add(s);
+                        }
+                        else
+                        {
+                            rejectedSections.Add(s);
+                        }
                     }
-                    else
+                    do
                     {
-                        rejectedSections.Add(s);
+                        nextSection += interval;
+                    } while ((zPositions[i] - firstZ) > nextSection);
+
+                    if ((maxZ > nextSection) && ((maxZ - nextSection) < (interval / 2)))
+                    {
+                        interval += (maxZ - nextSection);
+                        nextSection = maxZ + 1; // make sure last profile makes it into the bin
                     }
-                }
-                do
-                {
-                    nextSection += interval;
-                } while ((zPositions[i] - firstZ) > nextSection);
 
-                if ((maxZ > nextSection) && ((maxZ - nextSection) < (interval / 2)))
-                {
-                    interval += (maxZ - nextSection);
-                    nextSection = maxZ + 1; // make sure last profile makes it into the bin
+                    currentRawSection = new List<Profile>();
                 }
+                currentRawSection.Add(log.ProfileData[i]);
 
-                currentRawSection = new List<Profile>();
             }
-            currentRawSection.Add(log.ProfileData[i]);
+            var s2 = sectionBuilder.Build(currentRawSection, nextSection - interval / 2);
+            if (s2.IsValid)
+            {
+                sections.Add(s2);
+            }
+            else
+            {
+                rejectedSections.Add(s2);
+            }
 
+            var elapsed = sw.ElapsedMilliseconds;
+            logger.Debug($"Log Model Generation took: {elapsed} ms");
+            // var fitErrors = model.Sections.Select(s => s.FitError).ToArray();
+             model = new LogModel(log.LogNumber, config.SectionInterval, log.TimeScanned, config.MaxFitError,
+                coreConfig.EncoderPulseInterval) { Sections = sections, RejectedSections = rejectedSections, RawLog = log };
+            MeasureModel(model);
         }
-        var s2 = sectionBuilder.Build(currentRawSection, nextSection - interval / 2);
-        if (s2.IsValid)
+        catch (Exception e)
         {
-            sections.Add(s2);
+            logger.Warn($"Failed to generate LogModel for RawLog {log.LogNumber}");
+            return new LogModelResult(log, null, new List<string>() { e.Message });
         }
-        else
-        {
-            rejectedSections.Add(s2);
-        }
-
-        var elapsed = sw.ElapsedMilliseconds;
-        logger.Debug($"Log Model Generation took: {elapsed} ms");
-        // var fitErrors = model.Sections.Select(s => s.FitError).ToArray();
-        var model = new LogModel(log.LogNumber, config.SectionInterval, log.TimeScanned, config.MaxFitError,
-            coreConfig.EncoderPulseInterval) { Sections = sections, RejectedSections = rejectedSections, RawLog = log };
-        MeasureModel(model);
-        return model;
+        return new LogModelResult(log, model, new List<string>() );
     }
 
     private void MeasureModel(LogModel model)
@@ -123,12 +132,12 @@ public class LogModelBuilder
         LogSection endSection = model.Sections[0];
         double n = model.Sections.Count;
 
-        var Volume = 0.0;
-        var BarkVolume = 0.0;
-        var MaxDiameter = 0.0;
-        var MinDiameter = Double.MaxValue;
-        var MaxDiameterPos = 0.0;
-        var MinDiameterPos = 0.0;
+        var volume = 0.0;
+        var barkVolume = 0.0;
+        var maxDiameter = 0.0;
+        var minDiameter = Double.MaxValue;
+        var maxDiameterPos = 0.0;
+        var minDiameterPos = 0.0;
 
         double sumX = 0.0;
         double sumY = 0.0;
@@ -148,20 +157,20 @@ public class LogModelBuilder
             {
                 endSection = sm;
             }
-            Volume += sm.WoodArea * model.Length / model.Sections.Count;
-            BarkVolume += sm.BarkArea * model.Length / model.Sections.Count;
+            volume += sm.WoodArea * model.Length / model.Sections.Count;
+            barkVolume += sm.BarkArea * model.Length / model.Sections.Count;
 
             //find the largest diameter in the log and it's Z location
-            if (MaxDiameter < sm.DiameterMax)
+            if (maxDiameter < sm.DiameterMax)
             {
-                MaxDiameter = sm.DiameterMax;
-                MaxDiameterPos = sm.SectionCenter;
+                maxDiameter = sm.DiameterMax;
+                maxDiameterPos = sm.SectionCenter;
             }
             // minimum diameter
-            if (MinDiameter > sm.DiameterMin)
+            if (minDiameter > sm.DiameterMin)
             {
-                MinDiameter = sm.DiameterMin;
-                MinDiameterPos = sm.SectionCenter;
+                minDiameter = sm.DiameterMin;
+                minDiameterPos = sm.SectionCenter;
             }
 
             // Find sums used to calculate best fit center line
@@ -173,8 +182,12 @@ public class LogModelBuilder
             sumYZ += sm.CentroidY * sm.SectionCenter;
         }
 
-        model.Volume = Volume;
-        model.BarkVolume = BarkVolume;
+        model.Volume = volume;
+        model.BarkVolume = barkVolume;
+        model.MaxDiameter = maxDiameter;
+        model.MaxDiameterZ = maxDiameterPos;
+        model.MinDiameter = minDiameter;
+        model.MinDiameterZ = minDiameterPos;
 
         // this computes a best fit line through all centers
         model.CenterLineSlopeX = (n * sumXZ - sumZ * sumX) / (n * sumZ2 - sumZ * sumZ);
@@ -192,6 +205,7 @@ public class LogModelBuilder
             model.LargeEndDiameter = (beginSection.DiameterMin + beginSection.DiameterMax) / 2.0;
             model.LargeEndDiameterX = beginSection.DiameterX;
             model.LargeEndDiameterY = beginSection.DiameterY;
+            model.ButtEndFirst = true;
         }
         else
         {
@@ -202,6 +216,7 @@ public class LogModelBuilder
             model.SmallEndDiameter = (beginSection.DiameterMin + beginSection.DiameterMax) / 2.0;
             model.SmallEndDiameterX = beginSection.DiameterX;
             model.SmallEndDiameterY = beginSection.DiameterY;
+            model.ButtEndFirst = false;
         }
 
         // Based on a straight line between the begin and end centroids 
@@ -241,7 +256,7 @@ public class LogModelBuilder
         }
 
         model.Sweep = Sweep;
-        model.SweepAngle = SweepAngle;
+        model.SweepAngleRad = SweepAngle;
         var CompoundSweep90 = 0.0;
         var CompoundSweepS = 0.0;
 
@@ -260,7 +275,7 @@ public class LogModelBuilder
             double deviationParalell = deviationX * Math.Cos(SweepAngle) + deviationY * Math.Sin(SweepAngle);
             double deviationPerpendicular = deviationX * -Math.Sin(SweepAngle) + deviationY * Math.Cos(SweepAngle);
 
-            // Set sweep values to the largest devation found.
+            // Set sweep values to the largest deviation found.
             CompoundSweepS = Math.Max(CompoundSweepS, -deviationParalell);
             CompoundSweep90 = Math.Max(CompoundSweep90, Math.Abs(deviationPerpendicular));
         }
