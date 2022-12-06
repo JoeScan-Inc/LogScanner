@@ -1,6 +1,9 @@
 ﻿using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Geometry;
 using System.Runtime.ExceptionServices;
+using UnitsNet;
+using UnitsNet.Units;
+#pragma warning disable CS0618
 
 namespace JoeScan.LogScanner.Core.Models;
 
@@ -14,17 +17,21 @@ public class LogModel
     /// <summary>
     /// Log Number
     /// </summary>
+
     public int LogNumber { get;  }
 
     /// <summary>
     /// The interval between sections in millimeters.
     /// </summary>
+  
     public double Interval { get;  }
 
     /// <summary>
     /// Date and Time when this log was scanned
     /// </summary>
+
     public DateTime TimeScanned { get;  }
+
 
     /// <summary>
     /// Data and measurements at each section
@@ -35,7 +42,8 @@ public class LogModel
     /// Data and measurements at each section
     /// </summary>
     public  List<LogSection> RejectedSections { get; init; } = new List<LogSection>();
-
+    
+  
     public double EncoderPulseInterval => encoderPulseInterval;
 
     #endregion
@@ -52,7 +60,7 @@ public class LogModel
     private Lazy<double> taper;
     private Lazy<double> taperX;
     private Lazy<double> taperY;
-
+   
     #endregion
 
     #region Lifecycle
@@ -110,24 +118,38 @@ public class LogModel
     /// <summary>
     /// Log length 
     /// </summary>
+  
     public double Length => length.Value;
     public Profile LastGoodProfile => lastGoodProfile.Value;
     public Profile FirstGoodProfile => firstGoodProfile.Value;
+
     public double CenterLineSlopeX { get; internal set; }
+  
     public double CenterLineInterceptXZ { get; internal set; }
+
     public double CenterLineSlopeY { get; internal set; }
+  
     public double CenterLineInterceptYZ { get; internal set; }
     public Point3D CenterLineStart => centerLineStart.Value;
     public Point3D CenterLineEnd => centerLineEnd.Value;
+   
     public double SmallEndDiameter { get; internal set; }
+   
     public double SmallEndDiameterX { get; internal set; }
+   
     public double SmallEndDiameterY { get; internal set; }
+  
     public double LargeEndDiameter { get; internal set; }
+  
     public double LargeEndDiameterX { get; internal set; }
+  
     public double LargeEndDiameterY { get; internal set; }
     public double Sweep { get; internal set; }
-    public double SweepAngle { get; internal set; }
+    
+    public double SweepAngleRad { get; internal set; }
+  
     public double CompoundSweep { get; internal set; }
+  
     public double CompoundSweep90 { get; internal set; }
     public double Taper => taper.Value;
     public double TaperX => taperX.Value;
@@ -135,4 +157,11 @@ public class LogModel
     public double Volume { get; internal set; }
     public double BarkVolume { get; internal set; }
 
+    public double MaxDiameter { get; internal set; }
+    public double MaxDiameterZ { get; internal set; }
+    public double MinDiameter { get; internal set; }
+    public double MinDiameterZ { get; internal set; }
+    public bool ButtEndFirst { get; internal set; }
+
+    public RawLog RawLog { get; set; }
 }

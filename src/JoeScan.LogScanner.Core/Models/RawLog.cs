@@ -16,6 +16,8 @@ public class RawLog
     public DateTime TimeScanned { get; set; }
 
     public Guid Id { get; init; }
+    public string? ArchiveFileName { get; set; }
+
     public RawLog(int logNumber, IEnumerable<Profile> profiles)
     {
         LogNumber = logNumber;
@@ -29,12 +31,13 @@ public class RawLog
 
 public static class RawLogReaderWriter
 {
-    private const int currentVersion = 0x01;
+    private const int currentVersion = 0x02;
     public static string DefaultExtension => "loga";
 
     public static void Write(this RawLog r, BinaryWriter bw)        
     {
         bw.Write(currentVersion); // 32 bit int
+        bw.Write((byte) UnitSystem.Millimeters); // 1 byte 
         bw.Write(r.LogNumber); // 32 bit int
         bw.Write(r.Id.ToByteArray()); // 16 byte array
         bw.Write(r.TimeScanned.ToBinary()); // 64 bits encoding datetime and ticks
@@ -50,10 +53,16 @@ public static class RawLogReaderWriter
     public static RawLog Read(BinaryReader br)
     {
         var version = br.ReadInt32();
-        if (version != currentVersion)
+        UnitSystem units;
+        if (version >= 0x2)
         {
-            throw new Exception($"Version mismatch: File is version {version}.");
+             units = (UnitSystem)br.ReadByte();
         }
+        else
+        {
+            units = UnitSystem.Millimeters;
+        }
+
         var number = br.ReadInt32();
         var guid = new Guid(br.ReadBytes(16));
         var datetime = DateTime.FromBinary(br.ReadInt64());
@@ -79,23 +88,8 @@ public static class RawLogReaderWriter
         using var fs = new FileStream(fileName, FileMode.Open);
         using var gzip = new GZipStream(fs, CompressionMode.Decompress);
         using var reader = new BinaryReader(gzip);
-        return Read(reader);
+        var rawLog = Read(reader);
+        rawLog.ArchiveFileName = fileName;
+        return rawLog;
     }
-    // TODO: benchmark and potentially use InsertionSort 
-
-    // private void InsertionSort(int[] arr)
-    // {
-    //     int j, temp;
-    //     for (int i = 1; i <= arr.Length - 1; i++)
-    //     {
-    //         temp = arr[i];
-    //         j = i - 1;
-    //         while (j >= 0 && arr[j] > temp)
-    //         {
-    //             arr[j + 1] = arr[j];
-    //             j--;
-    //         }
-    //         arr[j + 1] = temp;
-    //     }
-    // }
 }

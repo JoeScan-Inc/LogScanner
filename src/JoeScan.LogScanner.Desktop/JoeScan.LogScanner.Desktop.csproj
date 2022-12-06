@@ -2,9 +2,11 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+	  <OutputType>Exe</OutputType>
+	  <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +22,10 @@
     <None Remove="Fonts\Inter-Regular.ttf" />
     <None Remove="Fonts\Inter-SemiBold.ttf" />
     <None Remove="Fonts\Inter-Thin.ttf" />
+    <None Remove="Fonts\materialdesignicons-webfont.ttf" />
     <None Remove="Interfaces\**" />
+    <None Remove="Main\**" />
+    <None Remove="NLogViewer\**" />
     <None Remove="Themes\**" />
   </ItemGroup>
 
@@ -30,34 +35,29 @@
     <PackageReference Include="Autofac" Version="6.3.0" />
     <PackageReference Include="Autofac.Extras.NLog" Version="4.0.0" />
     <PackageReference Include="Caliburn.Micro" Version="4.0.173" />
-    <PackageReference Include="GitVersion.MsBuild" Version="5.10.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Config.Net" Version="4.19.0" />
+    <PackageReference Include="Config.Net.Json" Version="4.19.0" />
     <PackageReference Include="gong-wpf-dragdrop" Version="3.1.1" />
     <PackageReference Include="HelixToolkit.Core.Wpf" Version="2.20.2" />
-    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
+    <PackageReference Include="JoeScan.Pinchot" Version="13.1.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog.Schema" Version="5.0.1" />
     <PackageReference Include="OxyPlot.Core" Version="2.1.0" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.1.0" />
     <PackageReference Include="ToastNotifications.Messages.Net5" Version="3.0.1" />
     <PackageReference Include="ToastNotifications.Net5" Version="3.0.0" />
-    <PackageReference Include="UnitsNet" Version="4.130.0" />
+    <PackageReference Include="UnitsNet" Version="4.149.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\JoeScan.LogScanner.Core\JoeScan.LogScanner.Core.csproj" />
-    <ProjectReference Include="..\JoeScan.LogScanner.Js25\JoeScan.LogScanner.Js25.csproj" />
-    <ProjectReference Include="..\JoeScan.LogScanner.Js50\JoeScan.LogScanner.Js50.csproj" />
-    <ProjectReference Include="..\JoeScan.LogScanner.Replay\JoeScan.LogScanner.Replay.csproj" />
     <ProjectReference Include="..\JoeScan.LogScanner.Shared\JoeScan.LogScanner.Shared.csproj" />
-    <ProjectReference Include="..\JoeScan.LogScanner.SyntheticDataAdapter\JoeScan.LogScanner.SyntheticDataAdapter.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Config\" />
     <Folder Include="Engine\" />
+    <Folder Include="Enums\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -72,6 +72,7 @@
     <Resource Include="Fonts\Inter-Regular.ttf" />
     <Resource Include="Fonts\Inter-SemiBold.ttf" />
     <Resource Include="Fonts\Inter-Thin.ttf" />
+    <Resource Include="Fonts\materialdesignicons-webfont.ttf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -82,16 +83,22 @@
 
   <ItemGroup>
     <Compile Remove="Interfaces\**" />
+    <Compile Remove="Main\**" />
+    <Compile Remove="NLogViewer\**" />
     <Compile Remove="Themes\**" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Remove="Interfaces\**" />
+    <EmbeddedResource Remove="Main\**" />
+    <EmbeddedResource Remove="NLogViewer\**" />
     <EmbeddedResource Remove="Themes\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Page Remove="Interfaces\**" />
+    <Page Remove="Main\**" />
+    <Page Remove="NLogViewer\**" />
     <Page Remove="Themes\**" />
   </ItemGroup>
 

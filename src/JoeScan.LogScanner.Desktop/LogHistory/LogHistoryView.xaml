@@ -5,32 +5,23 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:logHistory="clr-namespace:JoeScan.LogScanner.Desktop.LogHistory"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <GroupBox Padding="0">
-        <GroupBox.Header>
-            <DockPanel MinHeight="30" LastChildFill="False">
-                <Border
-                    MinHeight="24"
-                    VerticalAlignment="Center"
-                    BorderBrush="{x:Null}"
-                    DockPanel.Dock="Left">
-                    <TextBlock Margin="30,0">Log History</TextBlock>
-                </Border>
-            </DockPanel>
-        </GroupBox.Header>
-        <Grid>
-            <ListView Name="lvUsers">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Name" />
-                        <GridViewColumn DisplayMemberBinding="{Binding Age}" Header="Age" />
-                        <GridViewColumn DisplayMemberBinding="{Binding Mail}" Header="Mail" />
-                    </GridView>
-                </ListView.View>
-            </ListView>
+    <Grid>
+        <DataGrid
+            CellStyle="{StaticResource Body_Content_DataGrid_Centering}"
+            x:Name="Items"
+            AutoGenerateColumns="True"
+            IsReadOnly="True"  >
+            <b:Interaction.Behaviors>
+                <logHistory:ColumnHeaderBehaviour/>
+            </b:Interaction.Behaviors>
+          
+        </DataGrid>
 
-        </Grid>
-    </GroupBox>
+    </Grid>
+
 </UserControl>

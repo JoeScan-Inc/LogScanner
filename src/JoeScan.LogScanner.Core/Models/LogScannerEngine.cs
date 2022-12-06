@@ -1,9 +1,12 @@
 ﻿using Autofac.Features.AttributeFilters;
+using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.Core.Events;
 using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Geometry;
+using JoeScan.LogScanner.Core.Helpers;
 using JoeScan.LogScanner.Core.Interfaces;
 using NLog;
+using NLog.LayoutRenderers.Wrappers;
 using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
 
@@ -12,9 +15,11 @@ namespace JoeScan.LogScanner.Core.Models
     public class LogScannerEngine : IDisposable
     {
         private readonly ILogArchiver archiver;
-        private RawProfileDumper dumper;
+        private readonly RawProfileDumper dumper;
+        private readonly List<IHeartBeatSubscriber> heartBeatSubscribers;
+        private readonly CancellationTokenSource statusCheckerSource = new CancellationTokenSource();
         public IFlightsAndWindowFilter Filter { get; }
-        public ICoreConfig Config { get; }
+        public CoreConfig Config { get; }
         private readonly IEnumerable<IScannerAdapter> availableAdapters;
         private IDisposable? unlinker;
         public IReadOnlyList<IScannerAdapter> AvailableAdapters => new List<IScannerAdapter>(availableAdapters);
@@ -22,16 +27,15 @@ namespace JoeScan.LogScanner.Core.Models
         private ILogger Logger { get; }
         public ILogAssembler LogAssembler { get; }
         public LogModelBuilder ModelBuilder { get; }
-        public IEnumerable<ILogModelConsumer> Consumers { get; }
+        public IEnumerable<ILogModelConsumerPlugin> Consumers { get; }
 
         public BroadcastBlock<Profile> RawProfilesBroadcastBlock { get; private set; } 
             = new BroadcastBlock<Profile>(profile => profile);
         public BroadcastBlock<RawLog> RawLogsBroadcastBlock { get; } 
             = new BroadcastBlock<RawLog>(r => r);
-        public BroadcastBlock<LogModel> LogModelBroadcastBlock { get; }
-            = new BroadcastBlock<LogModel>(r => r);
+        public BroadcastBlock<LogModelResult> LogModelBroadcastBlock { get; }
+            = new BroadcastBlock<LogModelResult>(r => r);
 
-        public UnitSystem Units { get; }
         public bool IsRunning => ActiveAdapter is { IsRunning: true };
         
 
@@ -76,16 +80,24 @@ namespace JoeScan.LogScanner.Core.Models
 
         #region Lifecycle
 
-        public LogScannerEngine(ICoreConfig config,
+        public LogScannerEngine(
             IEnumerable<IScannerAdapter> availableAdapters,
             IFlightsAndWindowFilter filter,
             ILogger logger,
             ILogAssembler logAssembler,
             ILogArchiver archiver,
             LogModelBuilder modelBuilder,
-            IEnumerable<ILogModelConsumer> consumers)
+            RawProfileDumper dumper,
+            IEnumerable<ILogModelConsumerPlugin> consumers,
+            CoreConfig config
+           )
         {
             this.archiver = archiver;
+            this.dumper = dumper;
+            // this is a bit hacky, I would rather have a separate list of registered IHeartBeatSubscribers,
+            // but I couldn't figure out how to resolve them. This works.
+            heartBeatSubscribers = consumers!.ToList().OfType<IHeartBeatSubscriber>().ToList();
+
             Filter = filter;
             Config = config;
             this.availableAdapters = availableAdapters;
@@ -94,15 +106,21 @@ namespace JoeScan.LogScanner.Core.Models
             LogAssembler = logAssembler;
             ModelBuilder = modelBuilder;
             Consumers = consumers;
-            Units = Config.Units;
+            
             foreach (var a in AvailableAdapters)
             {
                  logger.Debug($"Available Adapter: {a.Name} ");
             }
 
             SetupPipeline();
+            // set up the background task that every 5 seconds checks the adapter
+            if (heartBeatSubscribers.Any())
+            {
+                RecurringTaskHelper.RecurringTask(CheckScanningStatus, 
+                    heartBeatSubscribers.Min(q=>q!.RequestedInterval), statusCheckerSource.Token);
+            }
         }
-
+        
         private void SetupPipeline()
         {
             var blockOptions = new ExecutionDataflowBlockOptions()
@@ -115,10 +133,8 @@ namespace JoeScan.LogScanner.Core.Models
                 PropagateCompletion = true
             };
 
-            dumper = new RawProfileDumper(Logger);
-            dumper.OutputDir = Config.RawDumperConfig.RawDumpLocation;
             
-            var unitConverterBlock = new TransformBlock<Profile, Profile>((p) => UnitConverter.Convert(ActiveAdapter.Units, Units, p));
+            var unitConverterBlock = new TransformBlock<Profile, Profile>((p) => UnitConverter.Convert(ActiveAdapter.Units, UnitSystem.Millimeters, p));
             // dumper.DumpBlock is a pass-through from the source block where the profiles originate, scannerAdapter.AvailableProfiles
             dumper.DumpBlock.LinkTo(unitConverterBlock, linkOptions);
             var boundingBoxBlock = new TransformBlock<Profile, Profile>(BoundingBox.UpdateBoundingBox, blockOptions);
@@ -151,11 +167,16 @@ namespace JoeScan.LogScanner.Core.Models
            // LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModel>((l) => { Debugger.Break(); }));
             foreach (var logModelConsumer in Consumers)
             {
-                var userBlock = new ActionBlock<LogModel>(logModelConsumer.Consume);
-                LogModelBroadcastBlock.LinkTo(userBlock);
+                logModelConsumer.Initialize();
+                if (logModelConsumer.IsInitialized)
+                {
+                    // TODO: check for version and GUID here
+                    var userBlock = new ActionBlock<LogModelResult>(logModelConsumer.Consume);
+                    // TODO: save disposable for possible unlinking
+                    LogModelBroadcastBlock.LinkTo(userBlock);
+                }
+               
             }
-           
-
         }
 
         #endregion
@@ -291,7 +312,13 @@ namespace JoeScan.LogScanner.Core.Models
                 throw new ApplicationException(msg);
             }
         }
-
+        private void CheckScanningStatus()
+        {
+            foreach (var heartBeatSubscriber in heartBeatSubscribers)
+            {
+                heartBeatSubscriber.Callback(ActiveAdapter is { IsRunning: true });
+            }
+        }
         #endregion
 
         #region IDisposable Implementation
@@ -299,6 +326,7 @@ namespace JoeScan.LogScanner.Core.Models
         public void Dispose()
         {
             unlinker?.Dispose();
+            statusCheckerSource.Cancel();
            
         }
 

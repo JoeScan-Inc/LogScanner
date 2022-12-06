@@ -3,14 +3,17 @@
     "Kind": "BoxFilter",
     "ScanHeadId": 0,
     "IsEnabled": true,
-    "Left": -350,
-    "Right": 350,
+    "Units" : "Millimeter",
+    "Left": -300,
+    "Right": 300,
+
     "Bottom": 150,
     "Top": 500
   },
   {
     "Kind": "PolygonFilter",
     "ScanHeadId": 2,
+    "Units": "Millimeter",
     "IsEnabled": true,
     "Vertices": [
       {
@@ -43,6 +46,7 @@
     "Kind": "PolygonFilter",
     "ScanHeadId": 1,
     "IsEnabled": true,
+    "Units": "Millimeter",
     "Vertices": [
       {
         "X": 120,

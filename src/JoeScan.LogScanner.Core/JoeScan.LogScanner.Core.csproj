@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -11,25 +11,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\config\coreconfig.json" Link="coreconfig.json" />
-    <Content Include="..\..\config\coreconfig_user.json" Link="coreconfig_user.json" />
     <Content Include="..\..\config\rawfilters.json" Link="rawfilters.json" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.3.0" />
-    <PackageReference Include="Config.Net" Version="4.19.0" />
-    <PackageReference Include="Config.Net.Json" Version="4.19.0" />
-    <PackageReference Include="GitVersion.MsBuild" Version="5.10.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Autofac.Extras.NLog" Version="4.0.0" />
     <PackageReference Include="JsonSubTypes" Version="1.9.0" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="McMaster.NETCore.Plugins" Version="1.4.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog" Version="5.0.0" />
+    <PackageReference Include="RawScape.Nini" Version="1.0.0" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="6.0.0" />
-    <PackageReference Include="UnitsNet" Version="4.130.0" />
+    <PackageReference Include="UnitsNet" Version="4.149.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,6 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="core.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="coreconfig.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>

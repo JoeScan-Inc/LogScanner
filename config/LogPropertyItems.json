@@ -1,0 +1,9 @@
+{
+	"Length" :{
+		"Index": 0,
+		"DisplayName": "Length",
+		"DisplayUnit": "m",
+		"Digits": 3,
+		"ToolTip" : "Length between first and last good profile" 
+	}
+}

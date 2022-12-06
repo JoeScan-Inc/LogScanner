@@ -35,10 +35,22 @@ namespace JoeScan.LogScanner.Desktop.Live3D
         public Live3DViewModel(EngineViewModel engineVm)
         {
 
-            engineVm.Engine.LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModel>(logModel =>
+            engineVm.Engine.LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModelResult>(result =>
             {
                 // need to execute on UI thread
-                Application.Current.Dispatcher.BeginInvoke(() => CurrentLogModel = logModel);
+                Application.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    if (result.IsValidModel)
+                    {
+                        CurrentLogModel = result.LogModel;
+                    }
+                    else
+                    {
+                        // TODO: implement clearing of 3D model
+                        CurrentLogModel = null;
+                    }
+                }
+                    );
             }));
         }
 

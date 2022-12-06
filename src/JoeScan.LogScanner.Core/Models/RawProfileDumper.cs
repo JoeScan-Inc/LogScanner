@@ -1,23 +1,24 @@
-﻿using NLog;
+﻿using JoeScan.LogScanner.Core.Config;
+using NLog;
 using System.Collections.Concurrent;
 using System.IO.Compression;
 using System.Threading.Tasks.Dataflow;
-using Castle.Core;
 
 namespace JoeScan.LogScanner.Core.Models;
 
 public class RawProfileDumper
 {
+    public RawDumperConfig Config { get; }
     private readonly ILogger logger;
     public TransformBlock<Profile,Profile> DumpBlock { get;  }
-    public string OutputDir { get; set; } = String.Empty;
     public string BaseName { get; set; } = String.Empty;
 
     private BlockingCollection<Profile>? dumpQueue  = null;
 
     public bool IsEnabled { get; set; } = true;
-    public RawProfileDumper(ILogger logger)
+    public RawProfileDumper(RawDumperConfig config, ILogger logger)
     {
+        Config = config;
         this.logger = logger;
         DumpBlock = new TransformBlock<Profile, Profile>(ProcessProfile,
             new ExecutionDataflowBlockOptions() { BoundedCapacity = -1, EnsureOrdered = true, MaxDegreeOfParallelism = 1 });
@@ -31,22 +32,22 @@ public class RawProfileDumper
             return;
         }
         // check for file being open and such here
-        if (OutputDir == String.Empty)
+        if (Config.Location == String.Empty)
         {
             var msg = "Output directory must not be empty. Dumping disabled.";
             logger.Warn(msg);
             return;
         }
 
-        if (!Directory.Exists(OutputDir))
+        if (!Directory.Exists(Config.Location))
         {
             try
             {
-                Directory.CreateDirectory(OutputDir);
+                Directory.CreateDirectory(Config.Location);
             }
             catch (Exception ex)
             {
-                logger.Error($"Failed to create directory: {OutputDir}: {ex.Message}. Dumping disabled.");
+                logger.Error($"Failed to create directory: {Config.Location}: {ex.Message}. Dumping disabled.");
                 return;
             }
         }
@@ -104,7 +105,7 @@ public class RawProfileDumper
     {
         var t = DateTime.Now;
         // TODO: do a File.Exists to catch cases where the seconds are not enough to distinct
-        return Path.Combine(OutputDir, $"{BaseName}{t.Year}_{t.Month}_{t.Day}_{t.Hour}_{t.Minute}_{t.Second}.raw");
+        return Path.Combine(Config.Location, $"{BaseName}{t.Year}_{t.Month}_{t.Day}_{t.Hour}_{t.Minute}_{t.Second}.raw");
     }
 
     public void StopDumping()

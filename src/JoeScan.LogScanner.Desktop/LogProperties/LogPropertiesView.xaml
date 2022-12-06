@@ -9,46 +9,35 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
     <Grid>
-        <GroupBox Padding="0">
-            <GroupBox.Header>
-                <DockPanel MinHeight="30" LastChildFill="False">
-                    <Border
-                        VerticalAlignment="Center"
-                        BorderBrush="{x:Null}"
-                        DockPanel.Dock="Left">
-                        <TextBlock Margin="30,0">Log Properties</TextBlock>
-                    </Border>
-                </DockPanel>
-            </GroupBox.Header>
-            <ListBox
-                x:Name="Items"
-                dd:DragDrop.IsDragSource="True"
-                dd:DragDrop.IsDropTarget="True">
-                <ListBox.Style>
-                    <Style BasedOn="{StaticResource {x:Type ListBox}}" TargetType="ListBox">
-                        <Setter Property="ItemsPanel">
-                            <Setter.Value>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel />
-                                </ItemsPanelTemplate>
-                            </Setter.Value>
-                        </Setter>
-                        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
-                    </Style>
-                </ListBox.Style>
-                <ListBox.ItemContainerStyle>
-                    <Style BasedOn="{StaticResource {x:Type ListBoxItem}}" TargetType="{x:Type ListBoxItem}">
-                        <Setter Property="Focusable" Value="False" />
-                        <Setter Property="Padding" Value="0" />
-                        <Style.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="transparent" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
+        <ListBox
+            x:Name="Items"
+            dd:DragDrop.IsDragSource="True"
+            dd:DragDrop.IsDropTarget="True">
+            <ListBox.Style>
+                <Style BasedOn="{StaticResource {x:Type ListBox}}" TargetType="ListBox">
+                    <Setter Property="ItemsPanel">
+                        <Setter.Value>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+                </Style>
+            </ListBox.Style>
+            <ListBox.ItemContainerStyle>
+                <Style BasedOn="{StaticResource {x:Type ListBoxItem}}" TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="Focusable" Value="False" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="2" />
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="transparent" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
 
-        </GroupBox>
     </Grid>
 </UserControl>
