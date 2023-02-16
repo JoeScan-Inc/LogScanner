@@ -32,6 +32,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner.Js50", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoeScan.LogScanner.Replay", "adapters\JoeScan.LogScanner.Replay\JoeScan.LogScanner.Replay.csproj", "{665D20B0-BAA4-494D-920F-2A95B0D2DB47}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{7FFC73BF-87AB-4580-BFB6-244A6B135CC8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProblemLogArchiver", "plugins\ProblemLogArchiver\ProblemLogArchiver.csproj", "{F9501B7D-9436-42CB-B59F-C8E93F76AB28}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,6 +86,10 @@ Global
 		{665D20B0-BAA4-494D-920F-2A95B0D2DB47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{665D20B0-BAA4-494D-920F-2A95B0D2DB47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{665D20B0-BAA4-494D-920F-2A95B0D2DB47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9501B7D-9436-42CB-B59F-C8E93F76AB28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9501B7D-9436-42CB-B59F-C8E93F76AB28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9501B7D-9436-42CB-B59F-C8E93F76AB28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9501B7D-9436-42CB-B59F-C8E93F76AB28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,6 +99,7 @@ Global
 		{FBB71CEC-67ED-4239-9996-2528ED97F696} = {AAE979EA-E80F-4784-9503-2176681A6F36}
 		{C77D099A-28BF-4719-8F4E-48638DBBEED0} = {AAE979EA-E80F-4784-9503-2176681A6F36}
 		{665D20B0-BAA4-494D-920F-2A95B0D2DB47} = {AAE979EA-E80F-4784-9503-2176681A6F36}
+		{F9501B7D-9436-42CB-B59F-C8E93F76AB28} = {7FFC73BF-87AB-4580-BFB6-244A6B135CC8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4D4EBC3D-D5FA-4C40-81D2-52BC16A6F200}
