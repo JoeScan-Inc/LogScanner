@@ -1,12 +1,12 @@
 ﻿using Autofac;
 using JoeScan.LogScanner.Core.Interfaces;
 
-namespace LogScanner.VendorSample;
+namespace PlcConnector;
 
 public class PluginConfiguration : IPluginFactory
 {
     public void Configure(ContainerBuilder builder)
     {
-        builder.RegisterModule<VendorModule>();
+        builder.RegisterModule<PlcConnectorModule>();
     }
 }

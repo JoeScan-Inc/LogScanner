@@ -16,11 +16,11 @@
         Margin="0"
         adonisExtensions:LayerExtension.IncreaseLayer="True"
         LastChildFill="False">
-        <!-- <Image -->
-        <!--     Height="45" -->
-        <!--     Margin="20,5" -->
-        <!--     HorizontalAlignment="Right" -->
-        <!--     Source="../Assets/Logo.png" /> -->
+        <Image
+            Height="45"
+            Margin="20,5"
+            HorizontalAlignment="Right"
+            Source="../Assets/Logo.png" />
         <TextBlock
             Margin="5,5,120,5"
             HorizontalAlignment="Right"

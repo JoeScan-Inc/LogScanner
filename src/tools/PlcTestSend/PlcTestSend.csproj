@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net7.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+		<!-- Wpf workaround: GitVersion and .NET SDK < v5.0.200 -->
+		<GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+		<GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+		<GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="Assets\logo.png" />
+		<None Remove="Fonts\materialdesignicons-webfont.ttf" />
+		<None Remove="Fonts\Roboto-Regular.ttf" />
+		<None Remove="Fonts\Roboto-Thin.ttf" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AdonisUI" Version="1.17.1" />
+		<PackageReference Include="AdonisUI.ClassicTheme" Version="1.17.1" />
+		<PackageReference Include="Autofac" Version="6.3.0" />
+		<PackageReference Include="Autofac.Extras.NLog" Version="4.0.0" />
+		<PackageReference Include="Caliburn.Micro" Version="4.0.173" />
+		<PackageReference Include="GitVersion.MsBuild" Version="5.11.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="NLog" Version="5.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\JoeScan.LogScanner.Shared\JoeScan.LogScanner.Shared.csproj" />
+		<ProjectReference Include="..\..\plugins\PlcConnector\CellWinNet\CellWinNet.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Assets\logo.png" />
+		<Resource Include="Fonts\materialdesignicons-webfont.ttf" />
+		<Resource Include="Fonts\Roboto-Regular.ttf" />
+		<Resource Include="Fonts\Roboto-Thin.ttf" />
+	</ItemGroup>
+
+</Project>
