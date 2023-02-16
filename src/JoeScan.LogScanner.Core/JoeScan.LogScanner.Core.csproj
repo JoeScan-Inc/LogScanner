@@ -11,9 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\config\rawfilters.json" Link="rawfilters.json" />
+    <None Include="..\..\config\rawfilters.json" Link="rawfilters.json" />
   </ItemGroup>
-
+	<ItemGroup>
+		<None Include="..\..\config\core.ini" Link="core.ini" />
+	</ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.3.0" />
     <PackageReference Include="Autofac.Extras.NLog" Version="4.0.0" />
@@ -31,16 +33,10 @@
     <Folder Include="Enums\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="core.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="coreconfig.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="rawfilters.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+  
+
+  
+
+  
 
 </Project>

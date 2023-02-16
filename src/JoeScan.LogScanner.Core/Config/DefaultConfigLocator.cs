@@ -21,7 +21,7 @@ public class DefaultConfigLocator : IConfigLocator
         //Logger.Debug($"Path for code base is: {path}");
         // deployedPath exists on a customer machine, where the config subdirectory
         // is in the same directory as the executables
-        string deployedPath = Path.Combine(Path.GetDirectoryName(path), "config");
+        string deployedPath = Path.Combine(Path.GetDirectoryName(path), "..","config");
        // Logger.Debug($"Search path for deployed version is: {deployedPath}");
         if (Directory.Exists(deployedPath))
         {
