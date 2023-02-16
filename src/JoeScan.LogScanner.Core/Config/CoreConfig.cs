@@ -136,7 +136,7 @@ public class RawLogArchiverConfig : ConfigBase
             if (config != null)
             {
                 Location = config.GetString("Location", "");
-                IsEnabled = config.GetBoolean("IsEnabled", false);
+                IsEnabled = config.GetBoolean("Enabled", false);
                 if (String.IsNullOrEmpty(Location))
                 {
                     IsEnabled = false;

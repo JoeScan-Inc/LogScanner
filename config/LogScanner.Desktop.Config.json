@@ -1,7 +1,7 @@
 {
   "ActiveAdapter": "Synthetic Data",
-  "Units": "Inches",
+  "Units": "Millimeters",
   "LiveProfileConfig": {
-    "ShowFilters" :  false
+    "ShowFilters" :  true
   }
 }

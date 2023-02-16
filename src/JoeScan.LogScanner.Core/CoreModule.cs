@@ -21,7 +21,8 @@ public class CoreModule : Module
         builder.RegisterType<LogScannerEngine>().AsSelf().SingleInstance();
         builder.RegisterType<SingleZoneLogAssembler>().As<ILogAssembler>().SingleInstance();
         builder.RegisterType<RawProfileValidator>().As<IRawProfileValidator>();
-        builder.RegisterType<PieceNumberProvider>().As<IPieceNumberProvider>().SingleInstance().OnRelease(instance => instance.Dispose());
+        builder.RegisterType<PieceNumberProvider>().As<IPieceNumberProvider>().SingleInstance()
+            .OnRelease(instance => instance.Dispose());
         builder.RegisterType<RawLogArchiver>().As<ILogArchiver>().SingleInstance();
 
         builder.RegisterType<FlightsAndWindowFilter>().As<IFlightsAndWindowFilter>().SingleInstance();
@@ -32,44 +33,77 @@ public class CoreModule : Module
 
 
         builder.RegisterType<DefaultConfigLocator>().As<IConfigLocator>();
-       
-        builder.Register(c =>
-            new CoreConfig(new IniConfigSource("core.ini").Configs["Core"])).AsSelf();
-        builder.Register(c =>
-            new SingleZoneLogAssemblerConfig(new IniConfigSource("core.ini").Configs["SingleZoneLogAssembler"]));
-        builder.Register(c =>
-            new LogModelBuilderConfig(new IniConfigSource("core.ini").Configs["LogModelBuilder"]));
-        builder.Register(c =>
-                    new RawLogArchiverConfig(new IniConfigSource("core.ini").Configs["RawLogArchiver"]));
-        builder.Register(c =>
-                            new RawDumperConfig(new IniConfigSource("core.ini").Configs["RawDumper"]));
-builder.Register(c =>
-                            new SectionBuilderConfig(new IniConfigSource("core.ini").Configs["SectionBuilder"]));
 
-        RegisterPlugins(builder, GetPluginLoaders("adapters"));
-        RegisterPlugins(builder, GetPluginLoaders("extensions"));
+        // we store all configs in a single location, 
+        // independent of the binaries location.
+        // the following code resolves the location at runtime by 
+        // first resolving an instance of the DefaultConfigLocator 
+        // and then asking it for the location of configfiles (DefaultConfigLocation)
+        // the IniConfigSource is used multiple times, as all core components 
+        // use the same file, only different sections.
 
-    }
-    private static void RegisterPlugins(ContainerBuilder builder, List<PluginLoader> loaders)
-    {
-        // Create an instance of plugin types
-        foreach (var loader in loaders)
+        // This allows us to be flexible with where the files live.
+        builder.Register(c =>
         {
-            var assembly = loader.LoadDefaultAssembly();
-            var types = assembly.GetTypes();
-            foreach (var t in types)
+            var configLocator = c.Resolve<IConfigLocator>();
+            var configLocation = configLocator.GetDefaultConfigLocation();
+            return new CoreConfig(new IniConfigSource(Path.Combine(configLocation, "core.ini")).Configs["Core"]);
+        }).AsSelf();
+
+        builder.Register(c =>
+        {
+            var configLocator = c.Resolve<IConfigLocator>();
+            var configLocation = configLocator.GetDefaultConfigLocation();
+            return new SingleZoneLogAssemblerConfig(
+                new IniConfigSource(Path.Combine(configLocation, "core.ini")).Configs["SingleZoneLogAssembler"]);
+        });
+        ;
+        builder.Register(c =>
             {
-                if (typeof(IPluginFactory).IsAssignableFrom(t) && !t.IsAbstract)
-                {
-                    var plugin = Activator.CreateInstance(t) as IPluginFactory;
-                    plugin?.Configure(builder);
-                }
+                var configLocator = c.Resolve<IConfigLocator>();
+                var configLocation = configLocator.GetDefaultConfigLocation();
+                return new LogModelBuilderConfig(
+                    new IniConfigSource(Path.Combine(configLocation, "core.ini")).Configs["LogModelBuilder"]);
             }
-        }
+        );
+
+        builder.Register(c =>
+            {
+                var configLocator = c.Resolve<IConfigLocator>();
+                var configLocation = configLocator.GetDefaultConfigLocation();
+                return new RawLogArchiverConfig(
+                    new IniConfigSource(Path.Combine(configLocation, "core.ini")).Configs["RawLogArchiver"]);
+            }
+        );
+        builder.Register(c =>
+            {
+                var configLocator = c.Resolve<IConfigLocator>();
+                var configLocation = configLocator.GetDefaultConfigLocation();
+                return new RawDumperConfig(
+                    new IniConfigSource(Path.Combine(configLocation, "core.ini")).Configs["RawDumper"]);
+            }
+        );
+        builder.Register(c =>
+            {
+                var configLocator = c.Resolve<IConfigLocator>();
+                var configLocation = configLocator.GetDefaultConfigLocation();
+                return new SectionBuilderConfig(
+                    new IniConfigSource(Path.Combine(configLocation, "core.ini")).Configs["SectionBuilder"]);
+            }
+        );
+
+        // the sensor adapter plugins (JS-50Adapter, Replay, Synthetic etc.) all live in 
+        // a separate folder. 
+        RegisterPlugins(builder, GetPluginLoaders("adapters"));
+        // extension plugins (things that implement ILogModelConsumerPlugin) live here.
+        RegisterPlugins(builder, GetPluginLoaders("extensions"));
     }
+
 
     private static List<PluginLoader> GetPluginLoaders(string subFolder)
     {
+        // plugin loaders are a concept from the .NET Core Plugins library
+        // https://github.com/natemcmaster/DotNetCorePlugins
         var loaders = new List<PluginLoader>();
         // create plugin loaders
         var pluginsDir = GetPluginsPath(subFolder);
@@ -88,8 +122,28 @@ builder.Register(c =>
                 }
             }
         }
+
         return loaders;
     }
+
+    private static void RegisterPlugins(ContainerBuilder builder, List<PluginLoader> loaders)
+    {
+        // Create an instance of plugin types
+        foreach (var loader in loaders)
+        {
+            var assembly = loader.LoadDefaultAssembly();
+            var types = assembly.GetTypes();
+            foreach (var t in types)
+            {
+                if (typeof(IPluginFactory).IsAssignableFrom(t) && !t.IsAbstract)
+                {
+                    var plugin = Activator.CreateInstance(t) as IPluginFactory;
+                    plugin?.Configure(builder);
+                }
+            }
+        }
+    }
+
 
     private static string? GetPluginsPath(string subFolder)
     {
@@ -114,6 +168,7 @@ builder.Register(c =>
                 adapterpath = p;
             }
         }
+
         return adapterpath;
     }
 }
