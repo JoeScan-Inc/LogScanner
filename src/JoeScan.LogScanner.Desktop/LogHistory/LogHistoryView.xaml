@@ -2,26 +2,23 @@
     x:Class="JoeScan.LogScanner.Desktop.LogHistory.LogHistoryView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:cm="http://caliburnmicro.com"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:logHistory="clr-namespace:JoeScan.LogScanner.Desktop.LogHistory"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
     <Grid>
         <DataGrid
-            CellStyle="{StaticResource Body_Content_DataGrid_Centering}"
             x:Name="Items"
+            cm:Message.Attach="[Event MouseDoubleClick] = [Action RowDoubleClicked($eventArgs)]"
             AutoGenerateColumns="True"
-            IsReadOnly="True"  >
+            IsReadOnly="True">
             <b:Interaction.Behaviors>
-                <logHistory:ColumnHeaderBehaviour/>
+                <logHistory:ColumnHeaderBehaviour />
             </b:Interaction.Behaviors>
-          
         </DataGrid>
-
     </Grid>
-
 </UserControl>

@@ -16,4 +16,6 @@ public class LogModelResult
     public bool IsValidModel => LogModel != null;
     public int LogNumber => RawLog.LogNumber;
 
+    public DateTime TimeScanned => RawLog.TimeScanned;
+
 }
