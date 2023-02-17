@@ -166,11 +166,14 @@ namespace JoeScan.LogScanner.Desktop.Live3D
 
         private void CreateVisuals()
         {
-            rawPointCloud = CreateRawCloudByColor();
-            modelPoints = CreateModelPoints();
-            model = CreateModel();
-            sectionCenters = CreateSectionCenters();
-            debugStuff = CreateDebugVisuals();
+            if (CurrentLogModel != null)
+            {
+                rawPointCloud = CreateRawCloudByColor();
+                modelPoints = CreateModelPoints();
+                model = CreateModel();
+                sectionCenters = CreateSectionCenters();
+                debugStuff = CreateDebugVisuals();
+            }
 
         }
 
