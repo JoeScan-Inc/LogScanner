@@ -270,7 +270,7 @@ namespace JoeScan.LogScanner.Desktop.Live3D
                     // mb.AddTriangle(p0, p3, p2);
                     // mb.AddTriangle(p2, p1, p0);
 
-                    mb.AddQuad(p0, p1, p2, p3);
+                    mb.AddQuad(p3, p2, p1, p0);
                 }
 
             }
@@ -318,6 +318,8 @@ namespace JoeScan.LogScanner.Desktop.Live3D
         private void RefreshDisplay()
         {
             Viewport.Children.Clear();
+            Viewport.Children.Add(new SunLight());
+
             if (CurrentLogModel == null)
             {
 
