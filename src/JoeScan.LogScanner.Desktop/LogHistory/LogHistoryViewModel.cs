@@ -63,7 +63,7 @@ public record LogHistoryEntry
     {
         LogNumber = res.LogNumber.ToString();
         TimeScanned = res.TimeScanned;
-        RawLog = res.RawLog;
+        
 
         if (res.IsValidModel)
         {

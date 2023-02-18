@@ -137,6 +137,7 @@ public class RawLogArchiverConfig : ConfigBase
             {
                 Location = config.GetString("Location", "");
                 IsEnabled = config.GetBoolean("Enabled", false);
+                MaxCount = config.GetInt("MaxCount", 100);
                 if (String.IsNullOrEmpty(Location))
                 {
                     IsEnabled = false;
@@ -156,6 +157,8 @@ public class RawLogArchiverConfig : ConfigBase
 
     public string Location { get; init; }
     public bool IsEnabled { get; init; }
+
+    public int MaxCount { get; init; }
 }
 
 public class RawDumperConfig : ConfigBase

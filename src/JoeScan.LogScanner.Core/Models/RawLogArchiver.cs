@@ -1,4 +1,5 @@
 ﻿using JoeScan.LogScanner.Core.Config;
+using JoeScan.LogScanner.Core.Helpers;
 using JoeScan.LogScanner.Core.Interfaces;
 using NLog;
 using System.IO.Compression;
@@ -50,6 +51,10 @@ public class RawLogArchiver : ILogArchiver
         {
             rawLog.Write(writer);
             rawLog.ArchiveFileName = fileName;
+            if (config.MaxCount > 0)
+            {
+                ArchiveCleaner.CleanupDirectory(config.Location,config.MaxCount );
+            }
 
         }
         catch (Exception e)
@@ -62,4 +67,6 @@ public class RawLogArchiver : ILogArchiver
     {
         return null;
     }
+
+    
 }
