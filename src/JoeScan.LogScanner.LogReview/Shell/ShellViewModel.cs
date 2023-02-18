@@ -4,7 +4,9 @@ using JoeScan.LogScanner.LogReview.Log3D;
 using JoeScan.LogScanner.LogReview.Models;
 using JoeScan.LogScanner.LogReview.Navigator;
 using JoeScan.LogScanner.LogReview.SectionTable;
+using JoeScan.LogScanner.LogReview.Settings;
 using JoeScan.LogScanner.LogReview.ToolBar;
+using JoeScan.LogScanner.Shared.LogProperties;
 using NLog;
 using NLog.Fluent;
 using System.Windows.Interop;
@@ -21,14 +23,17 @@ public class ShellViewModel : Screen
     public NavigatorViewModel Navigator { get; }
     public Log3DWrapperViewModel Log3D { get; }
     public SectionTableViewModel SectionTable { get; }
+    public LogPropertiesViewModel LogProperties { get; }
     public LogReviewer Reviewer { get; }
 
     public ShellViewModel(ILogger logger,
+        ILogReviewSettings config,
         ToolBarViewModel toolBar,
         CrossSectionViewModel crossSection,
         NavigatorViewModel navigator,
         Log3DWrapperViewModel log3D,
         SectionTableViewModel sectionTable,
+        LogPropertiesViewModel logProperties,
         LogReviewer reviewer)
     {
         Logger = logger;
@@ -37,8 +42,11 @@ public class ShellViewModel : Screen
         Navigator = navigator;
         Log3D = log3D;
         SectionTable = sectionTable;
+        LogProperties = logProperties;
+        LogProperties.SetDisplayUnits(config.Units);
         Reviewer = reviewer;
         Logger.Debug("Started LogReview tool.");
+        Reviewer.PropertyChanged += (_, _) => LogProperties.UpdateWith(Reviewer.CurrentLogModel);
     }
 
     // handle command line args

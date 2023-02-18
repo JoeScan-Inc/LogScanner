@@ -3,7 +3,7 @@ using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.Desktop.Config;
 using JoeScan.LogScanner.Desktop.Engine;
-using JoeScan.LogScanner.Desktop.Enums;
+using JoeScan.LogScanner.Shared.Enums;
 using JoeScan.LogScanner.Shared.Helpers;
 using OxyPlot;
 using OxyPlot.Annotations;

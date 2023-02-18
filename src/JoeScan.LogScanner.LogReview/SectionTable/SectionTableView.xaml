@@ -8,29 +8,18 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <GroupBox Padding="0">
-        <GroupBox.Header>
-            <DockPanel MinHeight="30" LastChildFill="False">
-                <Border
-                    VerticalAlignment="Center"
-                    BorderBrush="{x:Null}"
-                    DockPanel.Dock="Left">
-                    <TextBlock Margin="10,0,0,0">Section Values</TextBlock>
-                </Border>
-            </DockPanel>
-        </GroupBox.Header>
-        <ListView ItemsSource="{Binding Model.Sections}" SelectedItem="{Binding Model.CurrentSection}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=SectionCenter, StringFormat={}{0:F0} mm}" Header="Pos" />
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=AcceptedPoints.Count}" Header="#Pts" />
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=RawDiameterX, StringFormat={}{0:F1} mm}" Header="Dia. X" />
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=RawDiameterY, StringFormat={}{0:F1} mm}" Header="Dia. Y" />
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=FitError, StringFormat={}{0:F3} mm}" Header="Fit Error" />
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=Ovality, StringFormat={}{0:F3}}" Header="Ovality" />
-                </GridView>
-            </ListView.View>
-        </ListView>
-        <!-- <DataGrid AutoGenerateColumns="True" ItemsSource="{Binding Sections}" /> -->
-    </GroupBox>
+
+    <ListView ItemsSource="{Binding Model.Sections}" SelectedItem="{Binding Model.CurrentSection}">
+        <ListView.View>
+            <GridView>
+                <GridViewColumn DisplayMemberBinding="{Binding Path=SectionCenter, StringFormat={}{0:F0} mm}" Header="Pos" />
+                <GridViewColumn DisplayMemberBinding="{Binding Path=AcceptedPoints.Count}" Header="#Pts" />
+                <GridViewColumn DisplayMemberBinding="{Binding Path=RawDiameterX, StringFormat={}{0:F1} mm}" Header="Dia. X" />
+                <GridViewColumn DisplayMemberBinding="{Binding Path=RawDiameterY, StringFormat={}{0:F1} mm}" Header="Dia. Y" />
+                <GridViewColumn DisplayMemberBinding="{Binding Path=FitError, StringFormat={}{0:F3} mm}" Header="Fit Error" />
+                <GridViewColumn DisplayMemberBinding="{Binding Path=Ovality, StringFormat={}{0:F3}}" Header="Ovality" />
+            </GridView>
+        </ListView.View>
+    </ListView>
+    <!-- <DataGrid AutoGenerateColumns="True" ItemsSource="{Binding Sections}" /> -->
 </UserControl>

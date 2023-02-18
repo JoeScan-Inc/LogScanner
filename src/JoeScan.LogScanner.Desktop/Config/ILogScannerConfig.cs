@@ -1,5 +1,5 @@
 ﻿using Config.Net;
-using JoeScan.LogScanner.Desktop.Enums;
+using JoeScan.LogScanner.Shared.Enums;
 using OxyPlot.Axes;
 
 namespace JoeScan.LogScanner.Desktop.Config;
