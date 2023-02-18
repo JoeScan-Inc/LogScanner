@@ -12,7 +12,7 @@ using JoeScan.LogScanner.LogReview.Interfaces;
 using JoeScan.LogScanner.LogReview.Models;
 using JoeScan.LogScanner.LogReview.SectionTable;
 using JoeScan.LogScanner.LogReview.Settings;
-using JoeScan.LogScanner.Shared.Log3D;
+using JoeScan.LogScanner.Shared.Live3D;
 using MvvmDialogs;
 
 namespace JoeScan.LogScanner.LogReview;
@@ -37,6 +37,9 @@ public class AppBootstrapper : AutofacBootstrapper
         // use the reviewer object as an observable that holds the loaded log data
         builder.RegisterType<LogReviewer>().AsSelf().As<ILogModelObservable>().SingleInstance();
         builder.RegisterType<DialogService>().As<IDialogService>();
+        // re-register the Live View so it uses the constructor that does not require a whole log 
+        // engine, so we don't pull all the other crap in that is not needed here
+        builder.RegisterType<Live3DViewModel>().UsingConstructor();
     }
 }
 

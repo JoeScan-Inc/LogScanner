@@ -1,20 +1,13 @@
 ﻿using Caliburn.Micro;
 using HelixToolkit.Wpf;
 using JoeScan.LogScanner.Core.Models;
-using JoeScan.LogScanner.Desktop.Engine;
 using JoeScan.LogScanner.Shared.Helpers;
-using JoeScan.LogScanner.Shared.Log3D;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
-namespace JoeScan.LogScanner.Desktop.Live3D
+namespace JoeScan.LogScanner.Shared.Live3D
 {
     public class Live3DViewModel : Screen
     {
@@ -32,10 +25,10 @@ namespace JoeScan.LogScanner.Desktop.Live3D
         private ModelVisual3D? debugStuff;
 
 
-        public Live3DViewModel(EngineViewModel engineVm)
+        public Live3DViewModel(LogScannerEngine engine)
         {
 
-            engineVm.Engine.LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModelResult>(result =>
+            engine.LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModelResult>(result =>
             {
                 // need to execute on UI thread
                 Application.Current.Dispatcher.BeginInvoke(() =>
@@ -54,7 +47,10 @@ namespace JoeScan.LogScanner.Desktop.Live3D
             }));
         }
 
-       
+        public Live3DViewModel()
+        {
+
+        }
 
         private HelixViewport3D Viewport { get; set; }
 

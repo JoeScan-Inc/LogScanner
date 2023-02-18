@@ -32,14 +32,8 @@ public class AppBootstrapper : AutofacBootstrapper
     protected override void ConfigureContainer(ContainerBuilder builder)
     {
         builder.Register(c => new ConfigurationBuilder<ILogScannerConfig>()
-            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(),"LogScannerConfig.json"))
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "LogScannerConfig.json"))
             .Build()).SingleInstance();
-
-        // -- Adapter Modules are now registered from assembly, see bottom --
-        // builder.RegisterModule<ReplayModule>();
-        // builder.RegisterModule<Js25Module>();
-        // builder.RegisterModule<Js50Module>();
-        // builder.RegisterModule<SyntheticDataModule>();
 
         builder.RegisterType<EngineViewModel>().AsSelf().SingleInstance();
 
@@ -56,30 +50,8 @@ public class AppBootstrapper : AutofacBootstrapper
         builder.RegisterType<ToolbarViewModel>().AsSelf().SingleInstance();
         builder.RegisterType<TopAndSideViewModel>().AsSelf().SingleInstance();
         builder.Register(c => new ConfigurationBuilder<ILogScannerConfig>()
-            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "LogScanner.Desktop.Config.json"))
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(),
+                "LogScanner.Desktop.Config.json"))
             .Build()).SingleInstance();
-        // add vendor specific assemblies from a folder 
-
-
-        Assembly executingAssembly = Assembly.GetExecutingAssembly();
-
-        // TODO: move this to module so headless can use it too
-        // string applicationDirectory = Path.GetDirectoryName(executingAssembly.Location);
-        // foreach (var file in Directory.GetFiles(Path.Combine(applicationDirectory!, "vendor"), "*.dll"))
-        // {
-        //     try
-        //     {
-        //         var vendorAssembly = Assembly.LoadFile(file);
-        //         builder.RegisterAssemblyModules(new Assembly[]{vendorAssembly});
-        //     }
-        //     catch
-        //     {
-        //
-        //     }
-        // }
-
-       
     }
-
-   
 }

@@ -20,10 +20,4 @@
     <ProjectReference Include="..\JoeScan.LogScanner.Core\JoeScan.LogScanner.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Page Update="Log3D\Log3DView.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
-  </ItemGroup>
-
 </Project>
