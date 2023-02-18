@@ -1,4 +1,5 @@
-﻿using JoeScan.LogScanner.Core.Interfaces;
+﻿using JoeScan.LogScanner.Core.Helpers;
+using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using Nini.Config;
 using NLog;
@@ -72,7 +73,10 @@ public class ProblemLogArchiver : ILogModelConsumerPlugin, IDisposable
         {
             logModel.RawLog.Write(writer);
             logModel.RawLog.ArchiveFileName = fileName;
-
+            if (Config.MaxCount > 0)
+            {
+                ArchiveCleaner.CleanupDirectory(Config.ArchiveLocation, Config.MaxCount);
+            }
         }
         catch (Exception e)
         {
