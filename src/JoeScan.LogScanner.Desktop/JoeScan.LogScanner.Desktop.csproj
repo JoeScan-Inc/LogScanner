@@ -44,8 +44,6 @@
     <PackageReference Include="NLog.Schema" Version="5.0.1" />
     <PackageReference Include="OxyPlot.Core" Version="2.1.0" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.1.0" />
-    <PackageReference Include="ToastNotifications.Messages.Net5" Version="3.0.1" />
-    <PackageReference Include="ToastNotifications.Net5" Version="3.0.0" />
     <PackageReference Include="UnitsNet" Version="4.149.0" />
   </ItemGroup>
 

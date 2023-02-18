@@ -16,7 +16,7 @@
                 <!-- <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/light.xaml" /> -->
                 <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml" />
                 <!-- <ResourceDictionary Source="pack://application:,,,/ToastNotifications.Messages;component/Themes/Default.xaml" /> -->
-
+                <ResourceDictionary Source="pack://application:,,,/JoeScan.LogScanner.Shared;component/Externals.xaml" />
                 <ResourceDictionary>
                     <Color x:Key="{x:Static adonisUi:Colors.AccentColor}">#FFD600</Color>
                     <CornerRadius x:Key="{x:Static adonisUi:Dimensions.CornerRadius}">3</CornerRadius>

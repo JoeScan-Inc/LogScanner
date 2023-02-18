@@ -14,6 +14,7 @@ using JoeScan.LogScanner.LogReview.SectionTable;
 using JoeScan.LogScanner.LogReview.Settings;
 using JoeScan.LogScanner.Shared.Live3D;
 using MvvmDialogs;
+using JoeScan.LogScanner.Shared.Notifier;
 
 namespace JoeScan.LogScanner.LogReview;
 
@@ -34,6 +35,8 @@ public class AppBootstrapper : AutofacBootstrapper
         builder.RegisterModule<CoreModule>();
         // logging
         builder.RegisterModule<NLogModule>();
+        // notifier
+        builder.RegisterModule<NotifierModule>();
         // use the reviewer object as an observable that holds the loaded log data
         builder.RegisterType<LogReviewer>().AsSelf().As<ILogModelObservable>().SingleInstance();
         builder.RegisterType<DialogService>().As<IDialogService>();

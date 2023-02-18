@@ -22,8 +22,7 @@
                 <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/dark.xaml" />
                 <!-- <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/light.xaml" /> -->
                 <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/ToastNotifications.Messages;component/Themes/Default.xaml" />
-
+                <ResourceDictionary Source="pack://application:,,,/JoeScan.LogScanner.Shared;component/Externals.xaml" />
                 <ResourceDictionary>
                     <Color x:Key="{x:Static adonisUi:Colors.AccentColor}">#A9AD38</Color>
                     <CornerRadius x:Key="{x:Static adonisUi:Dimensions.CornerRadius}">3</CornerRadius>
@@ -38,7 +37,10 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type DataGridCell}">
                                     <Grid Background="{TemplateBinding Background}">
-                                        <ContentPresenter Margin="3,3" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        <ContentPresenter
+                                            Margin="3,3"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center" />
 
                                     </Grid>
                                 </ControlTemplate>
