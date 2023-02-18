@@ -1,15 +1,16 @@
 ﻿using Caliburn.Micro;
 using JoeScan.LogScanner.LogReview.Interfaces;
-using JoeScan.LogScanner.Shared.Log3D;
+using JoeScan.LogScanner.Shared.Live3D;
 
 namespace JoeScan.LogScanner.LogReview.Log3D;
 
 public class Log3DWrapperViewModel : Screen
 {
-    public Log3DViewModel WrappedViewModel { get; }
+    public Live3DViewModel WrappedViewModel { get; }
     public ILogModelObservable Model { get; }
 
-    public Log3DWrapperViewModel(Log3DViewModel wrappedViewModel, ILogModelObservable model)
+    //TODO: review, this seems unnecessary, why not use model directly?
+    public Log3DWrapperViewModel(Live3DViewModel wrappedViewModel, ILogModelObservable model)
     {
         WrappedViewModel = wrappedViewModel;
         Model = model;

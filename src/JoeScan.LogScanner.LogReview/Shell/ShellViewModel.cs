@@ -5,7 +5,6 @@ using JoeScan.LogScanner.LogReview.Models;
 using JoeScan.LogScanner.LogReview.Navigator;
 using JoeScan.LogScanner.LogReview.SectionTable;
 using JoeScan.LogScanner.LogReview.ToolBar;
-using JoeScan.LogScanner.Shared.Log3D;
 using NLog;
 using NLog.Fluent;
 using System.Windows.Interop;
