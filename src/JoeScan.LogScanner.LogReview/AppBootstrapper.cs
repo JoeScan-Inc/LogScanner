@@ -35,7 +35,7 @@ public class AppBootstrapper : AutofacBootstrapper
         // logging
         builder.RegisterModule<NLogModule>();
         // use the reviewer object as an observable that holds the loaded log data
-        builder.RegisterType<LogReviewer>().As<ILogModelObservable>().SingleInstance();
+        builder.RegisterType<LogReviewer>().AsSelf().As<ILogModelObservable>().SingleInstance();
         builder.RegisterType<DialogService>().As<IDialogService>();
     }
 }

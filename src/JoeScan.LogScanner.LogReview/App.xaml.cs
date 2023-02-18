@@ -37,7 +37,7 @@ namespace JoeScan.LogScanner.LogReview
                 var thread = new Thread(
                     () =>
                     {
-                        while (this.eventWaitHandle.WaitOne())
+                        while (eventWaitHandle.WaitOne())
                         {
                             Current.Dispatcher.BeginInvoke(
                                 (Action)(() =>
@@ -57,6 +57,15 @@ namespace JoeScan.LogScanner.LogReview
 
             // Notify other instance so it could bring itself to foreground.
             this.eventWaitHandle.Set();
+
+            // if we have command line args, send them to the instance 
+            // that is running. We can only do so by finding the HWND of 
+            // the other process. This is tricky, as Windows only will do 
+            // exact matches in FindWindow. 
+
+            //TODO: use PInvoke to get all top window handles and
+            // send command line data via WM_Copy message
+
 
             // Terminate this instance.
             this.Shutdown();
