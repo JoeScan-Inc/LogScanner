@@ -1,12 +1,8 @@
-﻿using Autofac.Features.AttributeFilters;
-using JoeScan.LogScanner.Core.Events;
+﻿using JoeScan.LogScanner.Core.Events;
 using JoeScan.LogScanner.Core.Extensions;
-using JoeScan.LogScanner.Core.Geometry;
-using JoeScan.LogScanner.Core.Helpers;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using NLog;
-using System.Diagnostics;
 using System.IO.Compression;
 using System.Threading.Tasks.Dataflow;
 
@@ -118,6 +114,7 @@ public class ReplayAdapter : IScannerAdapter
     public event EventHandler? ScanningStopped;
     public event EventHandler? ScanErrorEncountered;
     public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
+    public event EventHandler<AdapterMessageEventArgs>? AdapterMessage;
 
     #endregion
 
@@ -210,4 +207,9 @@ public class ReplayAdapter : IScannerAdapter
     }
 
     #endregion
+
+    protected virtual void OnAdapterMessage(AdapterMessageEventArgs e)
+    {
+        AdapterMessage?.Invoke(this, e);
+    }
 }

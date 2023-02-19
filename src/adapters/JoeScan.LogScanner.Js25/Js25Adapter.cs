@@ -233,6 +233,7 @@ public class Js25Adapter : IScannerAdapter
     public event EventHandler ScanningStopped;
     public event EventHandler ScanErrorEncountered;
     public event EventHandler<EncoderUpdateArgs> EncoderUpdated;
+    public event EventHandler<AdapterMessageEventArgs>? AdapterMessage;
 
     #endregion
 
@@ -257,6 +258,11 @@ public class Js25Adapter : IScannerAdapter
     private void OnEncoderUpdated(EncoderUpdateArgs e)
     {
         EncoderUpdated?.Invoke(this, e);
+    }
+
+    protected virtual void OnAdapterMessage(AdapterMessageEventArgs e)
+    {
+        AdapterMessage?.Invoke(this, e);
     }
 
     #endregion
@@ -486,4 +492,6 @@ public class Js25Adapter : IScannerAdapter
         }
     }
     #endregion
+
+    
 }
