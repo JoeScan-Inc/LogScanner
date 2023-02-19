@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Models;
+using JoeScan.LogScanner.LogReview.Config;
 using JoeScan.LogScanner.LogReview.Interfaces;
 using JoeScan.LogScanner.LogReview.Models;
-using JoeScan.LogScanner.LogReview.Settings;
 using MvvmDialogs;
 using MvvmDialogs.FrameworkDialogs.OpenFile;
 
@@ -21,7 +21,7 @@ public class ToolBarViewModel : Screen
 
     #region Private fields
 
-    private ILogReviewSettings settings;
+    private ILogReviewConfig config;
     private IDialogService dialogService;
 
     #endregion
@@ -31,10 +31,10 @@ public class ToolBarViewModel : Screen
     #region Lifecycle
 
     public ToolBarViewModel(ILogModelObservable model,
-        ILogReviewSettings settings,
+        ILogReviewConfig config,
         IDialogService dialogService)
     {
-        this.settings = settings;
+        this.config = config;
         this.dialogService = dialogService;
         Model = model;
         Model.PropertyChanged += (_, _) => Refresh();
@@ -47,9 +47,9 @@ public class ToolBarViewModel : Screen
     public void Load()
     {
 
-        var initialDirectory = String.IsNullOrEmpty(this.settings.FileBrowserLastFolder)
+        var initialDirectory = String.IsNullOrEmpty(this.config.FileBrowserLastFolder)
             ? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-            : this.settings.FileBrowserLastFolder;
+            : this.config.FileBrowserLastFolder;
         var openFileDialogSettings = new OpenFileDialogSettings()
         {
             Title = "Open raw log archive file",
@@ -63,7 +63,7 @@ public class ToolBarViewModel : Screen
         if (success == true)
         {
             Model.Load(openFileDialogSettings.FileName);
-            settings.FileBrowserLastFolder = Path.GetDirectoryName(openFileDialogSettings.FileName);
+            config.FileBrowserLastFolder = Path.GetDirectoryName(openFileDialogSettings.FileName);
         }
     }
 

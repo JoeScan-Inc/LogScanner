@@ -13,18 +13,18 @@
 
         <Grid>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+               <RowDefinition Height="*" />
+               <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <oxy:PlotView
-                Grid.Column="0"
+                Grid.Row="0"
                 Margin="0"
                 Padding="0"
                 Model="{Binding CrossSectionPlotModel}" />
-            <DockPanel Grid.Column="1" LastChildFill="False">
-                <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-                    <TextBlock Margin="5">View Mode:</TextBlock>
+            <DockPanel Grid.Row="1" LastChildFill="False">
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                    <TextBlock Margin="5" VerticalAlignment="Center">View Mode:</TextBlock>
                     <ComboBox
                         Margin="5"
                         DisplayMemberPath="Value"
@@ -35,12 +35,12 @@
                 </StackPanel>
                 <StackPanel
                     Margin="5"
-                    DockPanel.Dock="Top"
-                    Orientation="Vertical">
-                    <CheckBox x:Name="ShowAcceptedPoints">Accepted Points</CheckBox>
-                    <CheckBox x:Name="ShowRejectedPoints">Rejected Points</CheckBox>
-                    <CheckBox x:Name="ShowModel">Model</CheckBox>
-                    <CheckBox x:Name="ShowModelPoints">Model Points</CheckBox>
+                    DockPanel.Dock="Left"
+                    Orientation="Horizontal">
+                    <CheckBox MinWidth="120" x:Name="ShowAcceptedPoints">Accepted Points</CheckBox>
+                    <CheckBox MinWidth="120" x:Name="ShowRejectedPoints">Rejected Points</CheckBox>
+                    <CheckBox MinWidth="120" x:Name="ShowModel">Model</CheckBox>
+                    <CheckBox MinWidth="120" x:Name="ShowModelPoints">Model Points</CheckBox>
                 </StackPanel>
             </DockPanel>
 

@@ -7,11 +7,11 @@ using JoeScan.LogScanner.Shared;
 using System.Windows;
 using Config.Net;
 using JoeScan.LogScanner.Core.Config;
+using JoeScan.LogScanner.LogReview.Config;
 using JoeScan.LogScanner.LogReview.CrossSection;
 using JoeScan.LogScanner.LogReview.Interfaces;
 using JoeScan.LogScanner.LogReview.Models;
 using JoeScan.LogScanner.LogReview.SectionTable;
-using JoeScan.LogScanner.LogReview.Settings;
 using JoeScan.LogScanner.Shared.Live3D;
 using JoeScan.LogScanner.Shared.LogProperties;
 using MvvmDialogs;
@@ -28,8 +28,8 @@ public class AppBootstrapper : AutofacBootstrapper
 
     protected override void ConfigureContainer(ContainerBuilder builder)
     {
-        builder.Register(c => new ConfigurationBuilder<ILogReviewSettings>()
-            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "LogReviewConfig.json"))
+        builder.Register(c => new ConfigurationBuilder<ILogReviewConfig>()
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "LogScanner.LogReview.Config.json"))
             .Build()).SingleInstance();
 
         // the actual log scanner engine is in CoreModule
