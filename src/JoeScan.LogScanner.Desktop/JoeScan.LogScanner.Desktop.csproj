@@ -20,8 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AdonisUI" Version="1.17.1" />
-    <PackageReference Include="AdonisUI.ClassicTheme" Version="1.17.1" />
     <PackageReference Include="Autofac" Version="6.3.0" />
     <PackageReference Include="Autofac.Extras.NLog" Version="4.0.0" />
     <PackageReference Include="Caliburn.Micro" Version="4.0.173" />
