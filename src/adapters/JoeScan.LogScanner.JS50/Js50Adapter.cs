@@ -61,18 +61,35 @@ public class Js50Adapter : IScannerAdapter
     public BufferBlock<Profile> AvailableProfiles { get; } =
         new BufferBlock<Profile>(new DataflowBlockOptions() { BoundedCapacity = -1 });
 
-    public void Configure()
+    public Task<bool> ConfigureAsync()
     {
-        try
+        return Task.Run(() =>
         {
-            encoderUpdater.Start();
-            IsConfigured = true;
-            logger!.Debug("Started ScanSyncReceiverThread.");
-        }
-        catch (Exception e)
+            try
+            {
+                encoderUpdater.Start();
+                IsConfigured = true;
+                logger!.Debug("Started ScanSyncReceiverThread.");
+            }
+            catch (Exception e)
+            {
+                IsConfigured = false;
+                logger!.Error($"Could not start ScanSyncReceiverThread: {e.Message}");
+            }
+
+            return IsConfigured;
+        });
+
+    }
+
+    // TODO: temporary fix, make Start properly Async
+    public Task<bool> StartAsync()
+    {
+        return Task.Run((() =>
         {
-            logger!.Error($"Could not start ScanSyncReceiverThread: {e.Message}");
-        }
+            Start();
+            return IsRunning;
+        }));
     }
 
     public void Start()

@@ -20,9 +20,9 @@ public interface IScannerAdapter
     /// can be started. 
     /// </summary>
     /// <returns></returns>
-    void Configure();
+    Task<bool> ConfigureAsync();
     bool IsConfigured { get; }
-    void Start();
+    Task<bool> StartAsync();
     void Stop();
 
     string Name { get; }

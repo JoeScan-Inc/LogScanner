@@ -85,9 +85,9 @@ public class EngineViewModel : PropertyChangedBase
         Engine.ScanErrorEncountered += (_, _) => Refresh();
     }
     
-    public void Start()
+    public async void Start()
     {
-        Engine.Start();
+        await Engine.Start();
         NotifyOfPropertyChange(() => IsRunning);
     }
 

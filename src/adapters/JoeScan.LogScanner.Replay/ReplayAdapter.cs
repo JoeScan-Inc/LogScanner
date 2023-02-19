@@ -57,9 +57,9 @@ public class ReplayAdapter : IScannerAdapter
 
     #region IScannerAdapter implementation
 
-    public void Configure()
+    public Task<bool> ConfigureAsync()
     {
-        // nothing to do here
+        return Task.FromResult(true);
     }
 
     public bool IsConfigured => true;
@@ -82,6 +82,14 @@ public class ReplayAdapter : IScannerAdapter
 
     public UnitSystem Units => UnitSystem.Inches;
 
+    public Task<bool> StartAsync()
+    {
+        return Task.Run((() =>
+        {
+            Start();
+            return IsRunning;
+        }));
+    }
     public void Start()
     {
         if (!IsRunning)
