@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:extensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
     xmlns:local="clr-namespace:JoeScan.LogScanner.LogReview.Shell"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="JoeScan LogReview"
@@ -40,7 +41,30 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ContentControl x:Name="ToolBar" Grid.Row="0" />
+        <ContentControl x:Name="ToolBar" Grid.Row="1" />
+        <DockPanel
+            Grid.Row="0"
+            Margin="0"
+            extensions:LayerExtension.IncreaseLayer="True"
+            LastChildFill="False">
+            <Image
+                Height="45"
+                Margin="20,5"
+                HorizontalAlignment="Right"
+                Source="../Assets/Logo.png" />
+            <TextBlock
+                Margin="5,5,120,5"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                FontFamily="{StaticResource InterThin}"
+                FontSize="33"
+                TextAlignment="Right">
+                Log Review
+            </TextBlock>
+
+
+
+        </DockPanel>
 
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>

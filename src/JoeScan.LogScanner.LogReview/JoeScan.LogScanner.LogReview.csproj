@@ -5,10 +5,17 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\icon.png" />
+    <None Remove="Assets\logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="..\..\config\LogReviewConfig.json" Link="LogReviewConfig.json" />
+    <Content Include="Assets\icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +41,11 @@
   <ItemGroup>
     <Folder Include="Helpers\" />
     <Folder Include="Settings\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\icon.png" />
+    <Resource Include="Assets\logo.png" />
   </ItemGroup>
 
   <ItemGroup>

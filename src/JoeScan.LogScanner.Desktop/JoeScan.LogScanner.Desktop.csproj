@@ -7,9 +7,11 @@
     <UseWPF>true</UseWPF>
 	  <OutputType>Exe</OutputType>
 	  <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
+	  <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\icon.ico" />
     <None Remove="Assets\icon.png" />
     <None Remove="Assets\logo.png" />
     <None Remove="C:\Users\fabian\.nuget\packages\nlog.config\4.7.13\contentFiles\any\any\NLog.config" />
@@ -78,6 +80,7 @@
 
   <ItemGroup>
     <Content Include="..\..\config\LogScanner.Desktop.Config.json" Link="LogScanner.Desktop.Config.json" />
+    <Content Include="Assets\icon.ico" />
   </ItemGroup>
 
 </Project>
