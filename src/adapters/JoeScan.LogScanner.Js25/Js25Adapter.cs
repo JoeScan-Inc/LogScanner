@@ -94,32 +94,32 @@ public class Js25Adapter : IScannerAdapter
 
     public Task<bool> ConfigureAsync()
     {
-        Logger.Debug($"Configuring adapter {Name}");
+        SendInfo($"Configuring adapter {Name}");
         return Task.Run(() => {
             try
             {
                 // InternalProfileQueueLength
                 var internalProfileQueueLength = Config.InternalProfileQueueLength;
-                Logger.Info($"InternalProfileQueueLength: {internalProfileQueueLength}");
+                SendInfo($"InternalProfileQueueLength: {internalProfileQueueLength}");
 
                 //EncoderUpdateIncrement
                 encoderUpdateIncrement = Config.EncoderUpdateIncrement;
-                Logger.Info($"EncoderUpdateIncrement: {encoderUpdateIncrement}");
+                SendInfo($"EncoderUpdateIncrement: {encoderUpdateIncrement}");
                 //MaxRequestedProfileCount
                 maxRequestedProfileCount = Config.MaxRequestedProfileCount;
-                Logger.Info($"MaxRequestedProfileCount: {maxRequestedProfileCount}");
+                SendInfo($"MaxRequestedProfileCount: {maxRequestedProfileCount}");
                 // BaseAddress
                 string baseAddressString = String.Empty;
                 try
                 {
                     baseAddressString = Config.BaseAddress;
                     baseAddress = IPAddress.Parse(baseAddressString);
-                    Logger.Info($"BaseAddress: {baseAddress}");
+                    SendInfo($"BaseAddress: {baseAddress}");
                 }
                 catch (Exception e) when (e is FormatException || e is ArgumentNullException)
                 {
                     var msg = $"Could not parse BaseAddress: \"{baseAddressString}\".";
-                    Logger.Error(e, msg);
+                    SendError(e, msg);
                     throw new ApplicationException(msg);
                 }
 
@@ -129,12 +129,12 @@ public class Js25Adapter : IScannerAdapter
                 try
                 {
                     cableIdList = idStrings.Select(Int16.Parse).ToList();
-                    Logger.Info($"CableIDList: {String.Join(",", cableIdList)}");
+                    SendInfo($"CableIDList: {String.Join(",", cableIdList)}");
                 }
                 catch (Exception e)
                 {
                     var msg = $"Could not parse CableIdList: \"{idsString}\".";
-                    Logger.Error(e, msg);
+                    SendError(e, msg);
                     throw new ApplicationException(msg);
                 }
 
@@ -143,7 +143,7 @@ public class Js25Adapter : IScannerAdapter
                 if (String.IsNullOrEmpty(paramFile))
                 {
                     var msg = $"Could not parse ParamFile: \"{paramFile}\".";
-                    Logger.Error(msg);
+                    SendError(msg);
                     throw new ApplicationException(msg);
                 }
 
@@ -152,23 +152,23 @@ public class Js25Adapter : IScannerAdapter
                 if (File.Exists(tmpPath))
                 {
                     paramFile = tmpPath;
-                    Logger.Info($"ParamFile: {paramFile}");
+                    SendInfo($"ParamFile: {paramFile}");
                 }
                 else
                 {
                     var msg = $"Could not find ParamFile: \"{paramFile}\".";
-                    Logger.Error(msg);
+                    SendError(msg);
                     throw new ApplicationException(msg);
                 }
 
                 syncMode = Config.SyncMode;
-                Logger.Info($"SyncMode: {syncMode}");
+                SendInfo($"SyncMode: {syncMode}");
 
 
                 if (syncMode == SyncMode.PulseSyncMode)
                 {
                     pulseMasterId = Config.PulseMasterId;
-                    Logger.Info($"PulseMasterId: {pulseMasterId}");
+                    SendInfo($"PulseMasterId: {pulseMasterId}");
                 }
 
                 IsConfigured = true;
@@ -176,7 +176,7 @@ public class Js25Adapter : IScannerAdapter
             }
             catch (Exception e)
             {
-                Logger.Error($"Configuraton of adapter failed with error {e.Message}");
+                SendError($"Configuraton of adapter failed with error {e.Message}");
                 IsConfigured = false;
                 return false;
             }
@@ -196,17 +196,18 @@ public class Js25Adapter : IScannerAdapter
     // proper StartAsync in place
     public void Start()
     {
-        Logger.Debug("Attempting to start.");
+        SendInfo("Attempting to start.");
+        OnAdapterMessage(LogLevel.Info, "Starting");
         if (IsRunning)
         {
-            Logger.Debug("Failed because IsRunning is already true.");
+            SendInfo("Failed because IsRunning is already true.");
             //TODO: feedback?
             return;
         }
         if (!IsConfigured)
         {
             var msg = $"Adapter {Name} needs to be configured first.";
-            Logger.Error(msg);
+            SendError(msg);
             throw new ApplicationException(msg);
         }
         StartScanThread();
@@ -214,7 +215,7 @@ public class Js25Adapter : IScannerAdapter
 
     public void Stop()
     {
-        Logger.Debug("Stop()");
+        SendInfo("Stop()");
         if (workerThread != null && IsRunning && cancellationTokenSource != null)
         {
             cancellationTokenSource.Cancel(true);
@@ -227,6 +228,28 @@ public class Js25Adapter : IScannerAdapter
     }
 
     #endregion
+
+    #region Adapter Feedback Messages
+
+    private void SendInfo(string message)
+    {
+        OnAdapterMessage(LogLevel.Info, message);
+        Logger.Debug(message);
+    }
+
+    private void SendError(string message)
+    {
+        OnAdapterMessage(LogLevel.Error, message);
+        Logger.Error(message);
+    }
+    private void SendError(Exception e,string msg)
+    {
+        OnAdapterMessage(LogLevel.Error, $"{msg} ({e.Message})");
+        Logger.Error(e,msg);
+    }
+
+    #endregion
+
     #region Events
 
     public event EventHandler ScanningStarted;
@@ -260,11 +283,15 @@ public class Js25Adapter : IScannerAdapter
         EncoderUpdated?.Invoke(this, e);
     }
 
-    protected virtual void OnAdapterMessage(AdapterMessageEventArgs e)
+    protected  void OnAdapterMessage(AdapterMessageEventArgs e)
     {
         AdapterMessage?.Invoke(this, e);
     }
 
+    protected void OnAdapterMessage(NLog.LogLevel lvl, string msg)
+    {
+        OnAdapterMessage(new AdapterMessageEventArgs(lvl,msg));
+    }
     #endregion
 
     #region Scan Thread
@@ -284,7 +311,7 @@ public class Js25Adapter : IScannerAdapter
                 // not all heads connected, bail
                 var unconnectedIds = cableIdList.Except(scanners.Select(q => q.CableID));
                 var msg = $"Failed to connect to cable ids {String.Join(',', unconnectedIds)}";
-                Logger.Error(msg);
+                SendError(msg);
                 throw new ApplicationException(msg);
             }
             switch (syncMode)
@@ -328,7 +355,7 @@ public class Js25Adapter : IScannerAdapter
                     //         lastTimeInHead[profile.ScanHeadId] - profile.TimeStampNs > 5E9);
                     // if (removed > 0)
                     // {
-                    //     Logger.Debug("Removed {0} possibly corrupted profiles from queue.", removed);
+                    //     SendInfo("Removed {0} possibly corrupted profiles from queue.", removed);
                     // }
 
                     foreach (var profile in receivedProfiles)
@@ -359,13 +386,13 @@ public class Js25Adapter : IScannerAdapter
         {
             foreach (var innerException in e.Flatten().InnerExceptions)
             {
-                Logger.Error(innerException, "Scanner Communication Problem:");
+                SendError(innerException, "Scanner Communication Problem:");
             }
             OnScanErrorEncountered(EventArgs.Empty);
         }
         catch (Exception e)
         {
-            Logger.Error(e, "Scanner Communication Problem:");
+            SendError(e, "Scanner Communication Problem:");
             OnScanErrorEncountered(EventArgs.Empty);
         }
         finally
@@ -384,7 +411,8 @@ public class Js25Adapter : IScannerAdapter
     private void StartScanThread()
     {
         // TODO: make async
-        Logger.Debug("StartScanThread()");
+        SendInfo("StartScanThread()");
+        
         if (workerThread == null)
         {
             // we can't keep a token source around, because once it's been "canceled",

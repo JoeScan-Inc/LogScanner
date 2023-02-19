@@ -4,6 +4,7 @@ using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.Desktop.Config;
 using JoeScan.LogScanner.Desktop.LiveProfiles;
 using JoeScan.LogScanner.Desktop.LogHistory;
+using JoeScan.LogScanner.Desktop.Messages;
 using JoeScan.LogScanner.Desktop.StatusBar;
 using JoeScan.LogScanner.Desktop.Toolbar;
 using JoeScan.LogScanner.Desktop.TopAndSide;
@@ -33,6 +34,7 @@ public class ShellViewModel : Screen
     public LogHistoryViewModel LogHistory { get; }
     public Live3DViewModel Live3D { get; }
     public LogPropertiesViewModel LogProperties { get; }
+    public MessageListViewModel Messages { get; }
     public LogScannerEngine Engine { get; }
     public ILogger Logger { get; }
     public ILogScannerConfig Config { get; }
@@ -49,6 +51,7 @@ public class ShellViewModel : Screen
         LogHistoryViewModel logHistory,
         Live3DViewModel live3D,
         LogPropertiesViewModel logProperties,
+        MessageListViewModel messages,
         LogScannerEngine engine
       )
     {
@@ -60,6 +63,7 @@ public class ShellViewModel : Screen
         LogHistory = logHistory;
         Live3D = live3D;
         LogProperties = logProperties;
+        Messages = messages;
         LogProperties.SetDisplayUnits(config.Units);
         Engine = engine;
         Logger = logger;

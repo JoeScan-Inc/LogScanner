@@ -81,7 +81,7 @@ namespace JoeScan.LogScanner.Core.Models
 
         private void ActiveAdapterOnMessageReceived(object?  sender, AdapterMessageEventArgs e)
         {
-            AdapterMessageReceived?.Raise(this, e);
+            AdapterMessageReceived?.Raise(sender, e);
         }
 
         #endregion
