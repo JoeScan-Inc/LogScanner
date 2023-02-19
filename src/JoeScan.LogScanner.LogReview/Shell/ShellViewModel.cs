@@ -1,10 +1,10 @@
 ﻿using Caliburn.Micro;
+using JoeScan.LogScanner.LogReview.Config;
 using JoeScan.LogScanner.LogReview.CrossSection;
 using JoeScan.LogScanner.LogReview.Log3D;
 using JoeScan.LogScanner.LogReview.Models;
 using JoeScan.LogScanner.LogReview.Navigator;
 using JoeScan.LogScanner.LogReview.SectionTable;
-using JoeScan.LogScanner.LogReview.Settings;
 using JoeScan.LogScanner.LogReview.ToolBar;
 using JoeScan.LogScanner.Shared.LogProperties;
 using NLog;
@@ -27,7 +27,7 @@ public class ShellViewModel : Screen
     public LogReviewer Reviewer { get; }
 
     public ShellViewModel(ILogger logger,
-        ILogReviewSettings config,
+        ILogReviewConfig config,
         ToolBarViewModel toolBar,
         CrossSectionViewModel crossSection,
         NavigatorViewModel navigator,

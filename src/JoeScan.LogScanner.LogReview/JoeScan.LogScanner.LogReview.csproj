@@ -40,7 +40,7 @@
 
   <ItemGroup>
     <Folder Include="Helpers\" />
-    <Folder Include="Settings\" />
+    <Folder Include="Converters\" />
   </ItemGroup>
 
   <ItemGroup>

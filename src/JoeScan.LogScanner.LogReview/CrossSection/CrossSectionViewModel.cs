@@ -2,10 +2,12 @@
 using Caliburn.Micro;
 using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Models;
+using JoeScan.LogScanner.LogReview.Config;
 using JoeScan.LogScanner.LogReview.Extensions;
 using JoeScan.LogScanner.LogReview.Interfaces;
 using JoeScan.LogScanner.LogReview.Models;
 using JoeScan.LogScanner.LogReview.Navigator;
+using JoeScan.LogScanner.Shared.Enums;
 using JoeScan.LogScanner.Shared.Helpers;
 using NLog;
 using NLog.Filters;
@@ -14,6 +16,7 @@ using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using OxyPlot.Legends;
 using OxyPlot.Series;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Documents;
@@ -27,13 +30,14 @@ public class CrossSectionViewModel : Screen
     #region Backing Properties
 
     private Mode viewMode;
-
+    private Func<double, string> LabelFormatter;
     #endregion
 
     #region Injected Properties
 
     public ILogModelObservable Model { get; }
     public ILogger Logger { get; }
+    public ILogReviewConfig Config { get; }
 
     #endregion
 
@@ -66,11 +70,14 @@ public class CrossSectionViewModel : Screen
 
     public bool ShowAcceptedPoints
     {
-        get => showAcceptedPoints;
+        get => Config.ShowAcceptedPoints;
         set
         {
-            if (value == showAcceptedPoints) return;
-            showAcceptedPoints = value;
+            if (value == Config.ShowAcceptedPoints)
+            {
+                return;
+            }
+            Config.ShowAcceptedPoints = value;
             NotifyOfPropertyChange(() => ShowAcceptedPoints);
             RefreshDisplay();
         }
@@ -78,11 +85,14 @@ public class CrossSectionViewModel : Screen
 
     public bool ShowRejectedPoints
     {
-        get => showRejectedPoints;
+        get => Config.ShowRejectedPoints;
         set
         {
-            if (value == showRejectedPoints) return;
-            showRejectedPoints = value;
+            if (value == Config.ShowRejectedPoints)
+            {
+                return;
+            }
+            Config.ShowRejectedPoints = value;
             NotifyOfPropertyChange(() => ShowRejectedPoints);
             RefreshDisplay();
         }
@@ -90,11 +100,11 @@ public class CrossSectionViewModel : Screen
 
     public bool ShowModelPoints
     {
-        get => showModelPoints;
+        get => Config.ShowModelPoints;
         set
         {
-            if (value == showModelPoints) return;
-            showModelPoints = value;
+            if (value == Config.ShowModelPoints) return;
+            Config.ShowModelPoints = value;
             NotifyOfPropertyChange(() => ShowModelPoints);
             RefreshDisplay();
         }
@@ -102,11 +112,14 @@ public class CrossSectionViewModel : Screen
 
     public bool ShowModel
     {
-        get => showModel;
+        get => Config.ShowModel;
         set
         {
-            if (value == showModel) return;
-            showModel = value;
+            if (value == Config.ShowModel)
+            {
+                return;
+            }
+            Config.ShowModel = value;
             NotifyOfPropertyChange(() => ShowModel);
             RefreshDisplay();
         }
@@ -114,14 +127,14 @@ public class CrossSectionViewModel : Screen
 
     public bool ShowSectionCenters
     {
-        get => showSectionCenters;
+        get => Config.ShowSectionCenters;
         set
         {
-            if (value == showSectionCenters)
+            if (value == Config.ShowSectionCenters)
             {
                 return;
             }
-            showSectionCenters = value;
+            Config.ShowSectionCenters = value;
             NotifyOfPropertyChange(() => ShowSectionCenters);
         }
     }
@@ -129,11 +142,7 @@ public class CrossSectionViewModel : Screen
     private readonly OxyColor acceptedPointsColor = OxyColors.Red;
     private readonly OxyColor rejectedPointsColor = OxyColors.Blue;
     private readonly OxyColor modelPointsColor = OxyColors.Yellow;
-    private bool showAcceptedPoints = true;
-    private bool showRejectedPoints = true;
-    private bool showModelPoints = true;
-    private bool showModel = true;
-    private bool showSectionCenters = true;
+ 
 
     #region UI Bound
 
@@ -145,13 +154,17 @@ public class CrossSectionViewModel : Screen
 
     #region Lifecycle
 
-    public CrossSectionViewModel(ILogModelObservable model, ILogger logger)
+    public CrossSectionViewModel(ILogModelObservable model, ILogger logger,
+        ILogReviewConfig config)
     {
         Model = model;
         Model.PropertyChanged += (_, _) => RefreshDisplay();
         Logger = logger;
-        SetupPlot();
+        Config = config;
+       
         viewMode = Mode.ModeSection;
+        LabelFormatter = Config.Units == DisplayUnits.Inches ? (d => $"{d / 25.4:F0}\"") : (d => $"{d:F0}mm");
+        SetupPlot();
     }
 
     #endregion
@@ -181,7 +194,7 @@ public class CrossSectionViewModel : Screen
             return;
         }
 
-        if (showSectionCenters)
+        if (ShowSectionCenters)
         {
             CrossSectionPlotModel.Annotations.Add(new PolylineAnnotation()
             {
@@ -296,8 +309,8 @@ public class CrossSectionViewModel : Screen
 
         var columnAxis = new LinearAxis
         {
-            Minimum = -100,
-            Maximum = 500,
+            Minimum = Config.Units == DisplayUnits.Inches ? -4 * 25.4 : -100,
+            Maximum = Config.Units == DisplayUnits.Inches ? 20 * 25.4 : 500,
             PositionAtZeroCrossing = true,
             AxislineStyle = LineStyle.Solid,
             AxislineColor = OxyColorsForStyle.MajorGridLineColor,
@@ -310,14 +323,14 @@ public class CrossSectionViewModel : Screen
             MinorGridlineColor = OxyColorsForStyle.MinorGridLineColor,
             IsZoomEnabled = true,
             TextColor = OxyColorsForStyle.AxisTextColor,
-            // LabelFormatter = x => null
+             LabelFormatter = this.LabelFormatter
         };
         CrossSectionPlotModel.Axes.Add(columnAxis);
 
         var rowAxis = new LinearAxis
         {
-            Minimum = -300,
-            Maximum = 300,
+            Minimum = Config.Units == DisplayUnits.Inches ? -12 * 25.4 : -300,
+            Maximum = Config.Units == DisplayUnits.Inches ? 12 * 25.4 : 300,
             Position = AxisPosition.Bottom,
             PositionAtZeroCrossing = true,
             AxislineStyle = LineStyle.Solid,
@@ -331,10 +344,12 @@ public class CrossSectionViewModel : Screen
             MinorGridlineColor = OxyColorsForStyle.MinorGridLineColor,
             IsZoomEnabled = true,
             TextColor = OxyColorsForStyle.AxisTextColor,
-            // LabelFormatter = x => null
+            LabelFormatter = this.LabelFormatter
         };
         CrossSectionPlotModel.Axes.Add(rowAxis);
     }
+
+    
 
     #endregion
 }
