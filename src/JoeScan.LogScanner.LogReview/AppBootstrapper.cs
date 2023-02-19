@@ -29,7 +29,7 @@ public class AppBootstrapper : AutofacBootstrapper
     protected override void ConfigureContainer(ContainerBuilder builder)
     {
         builder.Register(c => new ConfigurationBuilder<ILogReviewConfig>()
-            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "LogReviewConfig.json"))
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "LogScanner.LogReview.Config.json"))
             .Build()).SingleInstance();
 
         // the actual log scanner engine is in CoreModule
