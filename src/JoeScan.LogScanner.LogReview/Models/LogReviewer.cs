@@ -41,6 +41,10 @@ public class LogReviewer : PropertyChangedBase, ILogModelObservable
                     CurrentLogModel = null;
                 }
             }
+            else
+            {
+                CurrentLogModel = null;
+            }
         }
     }
 
@@ -116,6 +120,9 @@ public class LogReviewer : PropertyChangedBase, ILogModelObservable
         catch (Exception e)
         {
             var msg = $"Failed to read raw log from file \"{fileName}\". Error was: {e.Message}";
+            CurrentRawLog = null;
+            CurrentFile = "";
+            Notifier.Error(msg);
             Logger.Error(msg);
         }
     }
