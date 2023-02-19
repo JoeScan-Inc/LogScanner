@@ -92,94 +92,108 @@ public class Js25Adapter : IScannerAdapter
 
     public string Name => "JS-20/JS-25 Single Zone";
 
-    public void Configure()
+    public Task<bool> ConfigureAsync()
     {
         Logger.Debug($"Configuring adapter {Name}");
-        
-        try
-        {
-            // InternalProfileQueueLength
-            var internalProfileQueueLength = Config.InternalProfileQueueLength;
-            Logger.Info($"InternalProfileQueueLength: {internalProfileQueueLength}");
-           
-            //EncoderUpdateIncrement
-            encoderUpdateIncrement = Config.EncoderUpdateIncrement;
-            Logger.Info($"EncoderUpdateIncrement: {encoderUpdateIncrement}");
-            //MaxRequestedProfileCount
-            maxRequestedProfileCount = Config.MaxRequestedProfileCount;
-            Logger.Info($"MaxRequestedProfileCount: {maxRequestedProfileCount}");
-            // BaseAddress
-            string baseAddressString = String.Empty;
+        return Task.Run(() => {
             try
             {
-                baseAddressString = Config.BaseAddress;
-                baseAddress = IPAddress.Parse(baseAddressString);
-                Logger.Info($"BaseAddress: {baseAddress}");
-            }
-            catch (Exception e) when (e is FormatException || e is ArgumentNullException)
-            {
-                var msg = $"Could not parse BaseAddress: \"{baseAddressString}\".";
-                Logger.Error(e, msg);
-                throw new ApplicationException(msg);
-            }
+                // InternalProfileQueueLength
+                var internalProfileQueueLength = Config.InternalProfileQueueLength;
+                Logger.Info($"InternalProfileQueueLength: {internalProfileQueueLength}");
 
-            // CableIdList
-            string idsString = Config.CableIdList;
-            string[] idStrings = idsString.Split(new[] { ',' });
-            try
-            {
-                cableIdList = idStrings.Select(Int16.Parse).ToList();
-                Logger.Info($"CableIDList: {String.Join(",", cableIdList)}");
+                //EncoderUpdateIncrement
+                encoderUpdateIncrement = Config.EncoderUpdateIncrement;
+                Logger.Info($"EncoderUpdateIncrement: {encoderUpdateIncrement}");
+                //MaxRequestedProfileCount
+                maxRequestedProfileCount = Config.MaxRequestedProfileCount;
+                Logger.Info($"MaxRequestedProfileCount: {maxRequestedProfileCount}");
+                // BaseAddress
+                string baseAddressString = String.Empty;
+                try
+                {
+                    baseAddressString = Config.BaseAddress;
+                    baseAddress = IPAddress.Parse(baseAddressString);
+                    Logger.Info($"BaseAddress: {baseAddress}");
+                }
+                catch (Exception e) when (e is FormatException || e is ArgumentNullException)
+                {
+                    var msg = $"Could not parse BaseAddress: \"{baseAddressString}\".";
+                    Logger.Error(e, msg);
+                    throw new ApplicationException(msg);
+                }
+
+                // CableIdList
+                string idsString = Config.CableIdList;
+                string[] idStrings = idsString.Split(new[] { ',' });
+                try
+                {
+                    cableIdList = idStrings.Select(Int16.Parse).ToList();
+                    Logger.Info($"CableIDList: {String.Join(",", cableIdList)}");
+                }
+                catch (Exception e)
+                {
+                    var msg = $"Could not parse CableIdList: \"{idsString}\".";
+                    Logger.Error(e, msg);
+                    throw new ApplicationException(msg);
+                }
+
+                // ParamFile
+                paramFile = Config.ParamFile;
+                if (String.IsNullOrEmpty(paramFile))
+                {
+                    var msg = $"Could not parse ParamFile: \"{paramFile}\".";
+                    Logger.Error(msg);
+                    throw new ApplicationException(msg);
+                }
+
+                // combine handles absolute paths in the second argument by returning just that
+                string tmpPath = Path.Combine(pluginBaseDir, paramFile);
+                if (File.Exists(tmpPath))
+                {
+                    paramFile = tmpPath;
+                    Logger.Info($"ParamFile: {paramFile}");
+                }
+                else
+                {
+                    var msg = $"Could not find ParamFile: \"{paramFile}\".";
+                    Logger.Error(msg);
+                    throw new ApplicationException(msg);
+                }
+
+                syncMode = Config.SyncMode;
+                Logger.Info($"SyncMode: {syncMode}");
+
+
+                if (syncMode == SyncMode.PulseSyncMode)
+                {
+                    pulseMasterId = Config.PulseMasterId;
+                    Logger.Info($"PulseMasterId: {pulseMasterId}");
+                }
+
+                IsConfigured = true;
+                return true;
             }
             catch (Exception e)
             {
-                var msg = $"Could not parse CableIdList: \"{idsString}\".";
-                Logger.Error(e, msg);
-                throw new ApplicationException(msg);
+                Logger.Error($"Configuraton of adapter failed with error {e.Message}");
+                IsConfigured = false;
+                return false;
             }
-
-            // ParamFile
-            paramFile = Config.ParamFile;
-            if (String.IsNullOrEmpty(paramFile))
-            {
-                var msg = $"Could not parse ParamFile: \"{paramFile}\".";
-                Logger.Error(msg);
-                throw new ApplicationException(msg);
-            }
-
-            // combine handles absolute paths in the second argument by returning just that
-            string tmpPath = Path.Combine(pluginBaseDir, paramFile);
-            if (File.Exists(tmpPath))
-            {
-                paramFile = tmpPath;
-                Logger.Info($"ParamFile: {paramFile}");
-            }
-            else
-            {
-                var msg = $"Could not find ParamFile: \"{paramFile}\".";
-                Logger.Error(msg);
-                throw new ApplicationException(msg);
-            }
-
-            syncMode = Config.SyncMode;
-            Logger.Info($"SyncMode: {syncMode}");
-
-
-            if (syncMode == SyncMode.PulseSyncMode)
-            {
-                pulseMasterId = Config.PulseMasterId;
-                Logger.Info($"PulseMasterId: {pulseMasterId}");
-            }
-
-            IsConfigured = true;
-        }
-        catch(Exception e)
-        {
-            Logger.Error($"Configuraton of adapter failed with error {e.Message}");
-            IsConfigured = false;
-        }
+        });
+        
     }
 
+    public Task<bool> StartAsync()
+    {
+        return Task.Run((() =>
+        {
+            Start();
+            return IsRunning;
+        }));
+    }
+    //TODO: this is just a place holder until we can get 
+    // proper StartAsync in place
     public void Start()
     {
         Logger.Debug("Attempting to start.");

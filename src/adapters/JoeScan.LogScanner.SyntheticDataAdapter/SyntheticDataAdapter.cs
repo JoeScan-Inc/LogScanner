@@ -52,13 +52,22 @@ public class SyntheticDataAdapter : IScannerAdapter
     });
 
     public bool IsRunning { get; private set; }
-    public void Configure()
+    public Task<bool> ConfigureAsync()
     {
-        IsConfigured = true;
+        return Task.FromResult(true);
     }
 
     public bool IsReplay => true;
     public bool IsConfigured { get; private set; }
+
+    public Task<bool> StartAsync()
+    {
+        return Task.Run((() =>
+        {
+            Start();
+            return IsRunning;
+        }));
+    }
     public void Start()
     {
         if (!IsRunning)
