@@ -13,16 +13,6 @@
     <None Remove="Assets\icon.png" />
     <None Remove="Assets\logo.png" />
     <None Remove="C:\Users\fabian\.nuget\packages\nlog.config\4.7.13\contentFiles\any\any\NLog.config" />
-    <None Remove="Fonts\Inter-Black.ttf" />
-    <None Remove="Fonts\Inter-Bold.ttf" />
-    <None Remove="Fonts\Inter-ExtraBold.ttf" />
-    <None Remove="Fonts\Inter-ExtraLight.ttf" />
-    <None Remove="Fonts\Inter-Light.ttf" />
-    <None Remove="Fonts\Inter-Medium.ttf" />
-    <None Remove="Fonts\Inter-Regular.ttf" />
-    <None Remove="Fonts\Inter-SemiBold.ttf" />
-    <None Remove="Fonts\Inter-Thin.ttf" />
-    <None Remove="Fonts\materialdesignicons-webfont.ttf" />
     <None Remove="Interfaces\**" />
     <None Remove="Main\**" />
     <None Remove="NLogViewer\**" />
@@ -37,15 +27,12 @@
     <PackageReference Include="Caliburn.Micro" Version="4.0.173" />
     <PackageReference Include="Config.Net" Version="4.19.0" />
     <PackageReference Include="Config.Net.Json" Version="4.19.0" />
-    <PackageReference Include="gong-wpf-dragdrop" Version="3.1.1" />
     <PackageReference Include="HelixToolkit.Core.Wpf" Version="2.20.2" />
     <PackageReference Include="JoeScan.Pinchot" Version="13.1.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog.Schema" Version="5.0.1" />
     <PackageReference Include="OxyPlot.Core" Version="2.1.0" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.1.0" />
-    <PackageReference Include="ToastNotifications.Messages.Net5" Version="3.0.1" />
-    <PackageReference Include="ToastNotifications.Net5" Version="3.0.0" />
     <PackageReference Include="UnitsNet" Version="4.149.0" />
   </ItemGroup>
 
@@ -57,22 +44,11 @@
   <ItemGroup>
     <Folder Include="Config\" />
     <Folder Include="Engine\" />
-    <Folder Include="Enums\" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Assets\icon.png" />
     <Resource Include="Assets\logo.png" />
-    <Resource Include="Fonts\Inter-Black.ttf" />
-    <Resource Include="Fonts\Inter-Bold.ttf" />
-    <Resource Include="Fonts\Inter-ExtraBold.ttf" />
-    <Resource Include="Fonts\Inter-ExtraLight.ttf" />
-    <Resource Include="Fonts\Inter-Light.ttf" />
-    <Resource Include="Fonts\Inter-Medium.ttf" />
-    <Resource Include="Fonts\Inter-Regular.ttf" />
-    <Resource Include="Fonts\Inter-SemiBold.ttf" />
-    <Resource Include="Fonts\Inter-Thin.ttf" />
-    <Resource Include="Fonts\materialdesignicons-webfont.ttf" />
   </ItemGroup>
 
   <ItemGroup>

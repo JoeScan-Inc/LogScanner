@@ -1,19 +1,19 @@
 ﻿using Autofac;
-using JoeScan.LogScanner.Desktop.Notifications;
 using System;
 using System.Windows;
 using ToastNotifications;
 using ToastNotifications.Lifetime;
 using ToastNotifications.Position;
 
-namespace JoeScan.LogScanner.Desktop;
+namespace JoeScan.LogScanner.Shared.Notifier;
 
 public class NotifierModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
         // wrap the Notifier in a service 
-        builder.Register(c => new NotifierService(new Notifier(cfg => {
+        builder.Register(c => new NotifierService(new ToastNotifications.Notifier(cfg =>
+        {
             cfg.PositionProvider = new WindowPositionProvider(
                 parentWindow: Application.Current.MainWindow,
                 corner: Corner.BottomLeft,
@@ -28,7 +28,6 @@ public class NotifierModule : Module
 
             cfg.DisplayOptions.TopMost = true;
             cfg.DisplayOptions.Width = 250;
-            // this will override the registration of MuteNotifier in the engine
         }))).As<IUserNotifier>().SingleInstance();
     }
 }

@@ -10,51 +10,41 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
     <Grid>
-        <GroupBox Padding="0">
-            <GroupBox.Header>
-                <DockPanel MinHeight="30" LastChildFill="False">
-                    <Border
-                        VerticalAlignment="Center"
-                        BorderBrush="{x:Null}"
-                        DockPanel.Dock="Left">
-                        <TextBlock Margin="10,0,0,0">Cross Section</TextBlock>
-                    </Border>
-                </DockPanel>
-            </GroupBox.Header>
-            <Grid>
-                
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <oxy:PlotView
-                    Grid.Column="0"
-                    Margin="0"
-                    Padding="0"
-                    Model="{Binding CrossSectionPlotModel}" />
-                <DockPanel Grid.Column="1" LastChildFill="False">
-                    <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-                        <TextBlock Margin="5">View Mode:</TextBlock>
-                        <ComboBox Margin="5"
-                            DisplayMemberPath="Value"
-                            Focusable="False"
-                            ItemsSource="{Binding ModeStringPairs}"
-                            SelectedValue="{Binding ViewMode}"
-                            SelectedValuePath="Key" />
-                    </StackPanel>
-                    <StackPanel
-                        Margin="5"
-                        DockPanel.Dock="Top"
-                        Orientation="Vertical">
-                        <CheckBox x:Name="ShowAcceptedPoints">Accepted Points</CheckBox>
-                        <CheckBox x:Name="ShowRejectedPoints">Rejected Points</CheckBox>
-                        <CheckBox x:Name="ShowModel">Model</CheckBox>
-                        <CheckBox x:Name="ShowModelPoints">Model Points</CheckBox>
-                    </StackPanel>
-                </DockPanel>
 
-            </Grid>
-        </GroupBox>
+        <Grid>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <oxy:PlotView
+                Grid.Column="0"
+                Margin="0"
+                Padding="0"
+                Model="{Binding CrossSectionPlotModel}" />
+            <DockPanel Grid.Column="1" LastChildFill="False">
+                <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+                    <TextBlock Margin="5">View Mode:</TextBlock>
+                    <ComboBox
+                        Margin="5"
+                        DisplayMemberPath="Value"
+                        Focusable="False"
+                        ItemsSource="{Binding ModeStringPairs}"
+                        SelectedValue="{Binding ViewMode}"
+                        SelectedValuePath="Key" />
+                </StackPanel>
+                <StackPanel
+                    Margin="5"
+                    DockPanel.Dock="Top"
+                    Orientation="Vertical">
+                    <CheckBox x:Name="ShowAcceptedPoints">Accepted Points</CheckBox>
+                    <CheckBox x:Name="ShowRejectedPoints">Rejected Points</CheckBox>
+                    <CheckBox x:Name="ShowModel">Model</CheckBox>
+                    <CheckBox x:Name="ShowModelPoints">Model Points</CheckBox>
+                </StackPanel>
+            </DockPanel>
+
+        </Grid>
 
     </Grid>
 </UserControl>

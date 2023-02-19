@@ -2,7 +2,7 @@
 using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.Desktop.Config;
 using JoeScan.LogScanner.Desktop.Engine;
-using JoeScan.LogScanner.Desktop.Enums;
+using JoeScan.LogScanner.Shared.Enums;
 using NLog;
 using System;
 using System.ComponentModel;

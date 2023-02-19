@@ -1,23 +1,21 @@
 ﻿using AdonisUI.Controls;
 using Caliburn.Micro;
-using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.Desktop.Config;
 using JoeScan.LogScanner.Desktop.LiveProfiles;
 using JoeScan.LogScanner.Desktop.LogHistory;
-using JoeScan.LogScanner.Desktop.LogProperties;
 using JoeScan.LogScanner.Desktop.StatusBar;
 using JoeScan.LogScanner.Desktop.Toolbar;
 using JoeScan.LogScanner.Desktop.TopAndSide;
 using JoeScan.LogScanner.Shared.Live3D;
+using JoeScan.LogScanner.Shared.LogProperties;
+using JoeScan.LogScanner.Shared.Notifier;
 using NLog;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Windows;
-using System.Windows.Threading;
 using MessageBox = AdonisUI.Controls.MessageBox;
-using MessageBoxButton = AdonisUI.Controls.MessageBoxButton;
 using MessageBoxImage = AdonisUI.Controls.MessageBoxImage;
 using MessageBoxResult = AdonisUI.Controls.MessageBoxResult;
 // ReSharper disable MemberCanBePrivate.Global
@@ -62,6 +60,7 @@ public class ShellViewModel : Screen
         LogHistory = logHistory;
         Live3D = live3D;
         LogProperties = logProperties;
+        LogProperties.SetDisplayUnits(config.Units);
         Engine = engine;
         Logger = logger;
         Config = config;

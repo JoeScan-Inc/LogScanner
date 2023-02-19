@@ -10,6 +10,7 @@ using JoeScan.LogScanner.Desktop.StatusBar;
 using JoeScan.LogScanner.Desktop.Toolbar;
 using JoeScan.LogScanner.Desktop.TopAndSide;
 using JoeScan.LogScanner.Shared;
+using JoeScan.LogScanner.Shared.Notifier;
 using System;
 using System.IO;
 using System.Reflection;

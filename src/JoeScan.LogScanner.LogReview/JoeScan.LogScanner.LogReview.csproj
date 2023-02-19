@@ -1,11 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\config\LogReviewConfig.json" Link="LogReviewConfig.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AdonisUI" Version="1.17.1" />

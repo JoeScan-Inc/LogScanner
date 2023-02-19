@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace JoeScan.LogScanner.Desktop;
+﻿namespace JoeScan.LogScanner.Shared.Notifier;
 
 public interface IUserNotifier
 {

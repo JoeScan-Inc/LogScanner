@@ -33,51 +33,128 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="3*" />
             <RowDefinition Height="Auto" />
 
-            <RowDefinition Height="*" />
+            <RowDefinition Height="2*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+
         <ContentControl x:Name="ToolBar" Grid.Row="0" />
 
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" MinWidth="300" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
-            <ContentControl
-                x:Name="Navigator"
-                Grid.Column="0"
-                Margin="3,3,0,0" />
-            <GridSplitter
-                Grid.Column="1"
-                MinWidth="5"
-                VerticalAlignment="Stretch" />
-            <ContentControl
-                x:Name="CrossSection"
+
+            <GroupBox
                 Grid.Column="2"
-                Margin="0,3,0,0" />
+                Margin="0,3,3,0"
+                Padding="0">
+                <GroupBox.Header>
+                    <DockPanel MinHeight="30" LastChildFill="False">
+                        <Border
+                            VerticalAlignment="Center"
+                            BorderBrush="{x:Null}"
+                            DockPanel.Dock="Left">
+                            <TextBlock Margin="10,0,0,0">Cross Section</TextBlock>
+                        </Border>
+                    </DockPanel>
+                </GroupBox.Header>
+                <ContentControl x:Name="CrossSection" />
+            </GroupBox>
+
             <GridSplitter
                 Grid.Column="3"
                 MinWidth="5"
                 VerticalAlignment="Stretch" />
-            <ContentControl
-                x:Name="SectionTable"
-                Grid.Column="4"
-                Margin="0,3,3,0" />
+            <DockPanel Grid.Column="4">
+                <GroupBox
+                    Margin="0,3,3,0"
+                    Padding="0"
+                    DockPanel.Dock="Top">
+                    <GroupBox.Header>
+                        <DockPanel MinHeight="30" LastChildFill="False">
+                            <Border
+                                VerticalAlignment="Center"
+                                BorderBrush="{x:Null}"
+                                DockPanel.Dock="Left">
+                                <TextBlock Margin="10,0,0,0">Navigation</TextBlock>
+                            </Border>
+                        </DockPanel>
+                    </GroupBox.Header>
+                    <ContentControl x:Name="Navigator" />
+                </GroupBox>
+                <GroupBox
+                    Margin="0,3,3,0"
+                    Padding="0"
+                    DockPanel.Dock="Top">
+                    <GroupBox.Header>
+                        <DockPanel MinHeight="30" LastChildFill="False">
+                            <Border
+                                VerticalAlignment="Center"
+                                BorderBrush="{x:Null}"
+                                DockPanel.Dock="Left">
+                                <TextBlock Margin="10,0,0,0">Section Values</TextBlock>
+                            </Border>
+                        </DockPanel>
+                    </GroupBox.Header>
+
+                    <ContentControl x:Name="SectionTable" />
+
+
+                </GroupBox>
+
+            </DockPanel>
+            <GridSplitter
+                Grid.Column="5"
+                MinWidth="5"
+                VerticalAlignment="Stretch" />
+            <GroupBox
+                Grid.Column="6"
+                Margin="0,3,3,0"
+                Padding="0">
+                <GroupBox.Header>
+                    <DockPanel MinHeight="30" LastChildFill="False">
+                        <Border
+                            VerticalAlignment="Center"
+                            BorderBrush="{x:Null}"
+                            DockPanel.Dock="Left">
+                            <TextBlock Margin="10,0,0,0">Log Values</TextBlock>
+                        </Border>
+                    </DockPanel>
+                </GroupBox.Header>
+                <ContentControl x:Name="LogProperties" />
+            </GroupBox>
+
         </Grid>
         <GridSplitter
             Grid.Row="3"
             MinHeight="5"
             HorizontalAlignment="Stretch" />
-        <ContentControl
-            x:Name="Log3D"
+        <GroupBox
             Grid.Row="4"
-            Margin="3,0,3,3" />
+            Margin="0,3,3,0"
+            Padding="0">
+            <GroupBox.Header>
+                <DockPanel MinHeight="30" LastChildFill="False">
+                    <Border
+                        VerticalAlignment="Center"
+                        BorderBrush="{x:Null}"
+                        DockPanel.Dock="Left">
+                        <TextBlock Margin="10,0,0,0">3-D View</TextBlock>
+                    </Border>
+                </DockPanel>
+            </GroupBox.Header>
+            <ContentControl x:Name="Log3D" />
+        </GroupBox>
+
 
     </Grid>
 </controls:AdonisWindow>

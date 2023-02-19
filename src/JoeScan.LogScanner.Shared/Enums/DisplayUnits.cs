@@ -1,4 +1,4 @@
-﻿namespace JoeScan.LogScanner.Desktop.Enums;
+﻿namespace JoeScan.LogScanner.Shared.Enums;
 
 public enum DisplayUnits
 {
