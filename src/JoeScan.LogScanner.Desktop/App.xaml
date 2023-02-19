@@ -11,43 +11,9 @@
                 <ResourceDictionary>
                     <desktop:AppBootstrapper x:Key="Bootstrapper" />
                 </ResourceDictionary>
-                <ResourceDictionary>
-                    <FontFamily x:Key="InterUI">pack://application:,,,/JoeScan.LogScanner.Shared;component/Fonts/#Inter Medium</FontFamily>
-                    <FontFamily x:Key="InterThin">pack://application:,,,/JoeScan.LogScanner.Shared;component/Fonts/#Inter Thin</FontFamily>
-                    <FontFamily x:Key="InterLight">pack://application:,,,/JoeScan.LogScanner.Shared;component/Fonts/#Inter Light</FontFamily>
-                    <FontFamily x:Key="InterUIBlack">pack://application:,,,/JoeScan.LogScanner.Shared;component/Fonts/#Inter Black</FontFamily>
-                    <FontFamily x:Key="InterUIBold">pack://application:,,,/JoeScan.LogScanner.Shared;component/Fonts/#Inter Bold</FontFamily>
-                    <FontFamily x:Key="MaterialDesignIcons">pack://application:,,,/JoeScan.LogScanner.Shared;component/Fonts/#Material Design Icons</FontFamily>
-                </ResourceDictionary>
-                <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/dark.xaml" />
-                <!-- <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/light.xaml" /> -->
-                <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/JoeScan.LogScanner.Shared;component/Externals.xaml" />
-                <ResourceDictionary>
-                    <Color x:Key="{x:Static adonisUi:Colors.AccentColor}">#A9AD38</Color>
-                    <CornerRadius x:Key="{x:Static adonisUi:Dimensions.CornerRadius}">3</CornerRadius>
-                    <Thickness x:Key="{x:Static adonisUi:Dimensions.BorderThickness}">1</Thickness>
-                </ResourceDictionary>
-                <ResourceDictionary>
-                    <Style
-                        x:Key="Body_Content_DataGrid_Centering"
-                        BasedOn="{StaticResource {x:Type DataGridCell}}"
-                        TargetType="{x:Type DataGridCell}">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                    <Grid Background="{TemplateBinding Background}">
-                                        <ContentPresenter
-                                            Margin="3,3"
-                                            HorizontalAlignment="Right"
-                                            VerticalAlignment="Center" />
 
-                                    </Grid>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ResourceDictionary>
+                <ResourceDictionary Source="pack://application:,,,/JoeScan.LogScanner.Shared;component/Externals.xaml" />
+
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
