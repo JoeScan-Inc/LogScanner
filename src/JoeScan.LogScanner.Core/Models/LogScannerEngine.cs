@@ -7,27 +7,39 @@ using JoeScan.LogScanner.Core.Helpers;
 using JoeScan.LogScanner.Core.Interfaces;
 using NLog;
 using NLog.LayoutRenderers.Wrappers;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Net.Mime;
 using System.Threading.Tasks.Dataflow;
 
 namespace JoeScan.LogScanner.Core.Models
 {
     public class LogScannerEngine : IDisposable
     {
+        #region Private Fields
+
+        private const int maxUserMessages = 500;
         private readonly ILogArchiver archiver;
         private readonly RawProfileDumper dumper;
         private readonly List<IHeartBeatSubscriber> heartBeatSubscribers;
         private readonly CancellationTokenSource statusCheckerSource = new CancellationTokenSource();
-        public IFlightsAndWindowFilter Filter { get; }
-        public CoreConfig Config { get; }
+
         private readonly IEnumerable<IScannerAdapter> availableAdapters;
         private IDisposable? unlinker;
+        private ObservableCollection<UserMessage> pluginMessages = new();
+
+        #endregion
+
+        public IFlightsAndWindowFilter Filter { get; }
+        public CoreConfig Config { get; }
         public IReadOnlyList<IScannerAdapter> AvailableAdapters => new List<IScannerAdapter>(availableAdapters);
         public IScannerAdapter? ActiveAdapter { get; private set; }
         private ILogger Logger { get; }
         public ILogAssembler LogAssembler { get; }
         public LogModelBuilder ModelBuilder { get; }
         public IEnumerable<ILogModelConsumerPlugin> Consumers { get; }
+
+        public ObservableCollection<UserMessage> PluginMessages => pluginMessages;
 
         public BroadcastBlock<Profile> RawProfilesBroadcastBlock { get; private set; }
             = new BroadcastBlock<Profile>(profile => profile);
@@ -81,7 +93,14 @@ namespace JoeScan.LogScanner.Core.Models
 
         private void ActiveAdapterOnMessageReceived(object? sender, PluginMessageEventArgs e)
         {
+            // re-broadcast
             PluginMessageReceived?.Raise(sender, e);
+            
+            PluginMessages.Insert(0,new UserMessage(sender,e));
+            if (PluginMessages.Count > maxUserMessages)
+            {
+                PluginMessages.RemoveAt(maxUserMessages);
+            }
         }
 
         #endregion

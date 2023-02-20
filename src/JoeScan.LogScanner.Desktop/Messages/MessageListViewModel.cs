@@ -17,8 +17,9 @@ public class MessageListViewModel : Screen
 {
     private ICollectionView collectionView;
     private LogLevel selectedLevel;
-    private int maxNumMessages = 300;
-    public NLog.LogLevel SelectedLevel
+    private object locker = new object();
+
+    public LogLevel SelectedLevel
     {
         get => selectedLevel;
         set
@@ -31,7 +32,6 @@ public class MessageListViewModel : Screen
             selectedLevel = value;
             NotifyOfPropertyChange(() => SelectedLevel);
             collectionView.Refresh();
-
         }
     }
 
@@ -46,16 +46,17 @@ public class MessageListViewModel : Screen
         new KeyValuePair<LogLevel, string>(LogLevel.Fatal, "Fatal")
     };
 
-    public ObservableCollection<MessageItem> MessageItems { get; set; } = new BindableCollection<MessageItem>();
+    public ObservableCollection<UserMessage> MessageItems { get; init; }
 
     public MessageListViewModel(LogScannerEngine engine,
         ILogScannerConfig config)
     {
-        engine.PluginMessageReceived += OnMessageReceived;
+        BindingOperations.EnableCollectionSynchronization(engine.PluginMessages, locker);
+        MessageItems = engine.PluginMessages;
         collectionView = CollectionViewSource.GetDefaultView(MessageItems);
         collectionView.Filter += o =>
         {
-            if (o is MessageItem item)
+            if (o is UserMessage item)
             {
                 if (item.Level >= SelectedLevel)
                 {
@@ -66,40 +67,5 @@ public class MessageListViewModel : Screen
             return false;
         };
         SelectedLevel = LogLevel.Info;
-        maxNumMessages = config.MessageListConfig.MaxLength;
-    }
-
-    private void OnMessageReceived(object? sender, PluginMessageEventArgs e)
-    {
-        if (sender is IPlugin plugin)
-        {
-            MessageItems.Insert(0, new MessageItem(plugin.Name, e.Level, e.Message));
-        }
-        else
-        {
-            MessageItems.Insert(0, new MessageItem("Internal", e.Level, e.Message));
-        }
-
-        if (MessageItems.Count > maxNumMessages)
-        {
-            MessageItems.RemoveAt(maxNumMessages);
-        }
-    }
-}
-
-public class MessageItem
-{
-    public string Sender { get; init; }
-    public NLog.LogLevel Level { get; init; }
-
-    public string Message { get; init; }
-    public DateTime DateTime { get; init; }
-
-    public MessageItem(string sender, LogLevel level, string message)
-    {
-        Sender = sender;
-        Level = level;
-        Message = message;
-        DateTime = DateTime.Now;
     }
 }

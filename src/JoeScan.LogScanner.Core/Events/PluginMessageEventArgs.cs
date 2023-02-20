@@ -6,10 +6,15 @@ public class PluginMessageEventArgs : EventArgs
 {
     public string Message { get; }
     public NLog.LogLevel Level { get; }
+    public DateTime DateTime { get; init; }
 
-    public PluginMessageEventArgs(LogLevel level, string message)
+    public string Sender { get; set; }
+
+
+    public PluginMessageEventArgs( LogLevel level, string message)
     {
         Message = message;
         Level = level;
+        DateTime = DateTime.Now;
     }
 }

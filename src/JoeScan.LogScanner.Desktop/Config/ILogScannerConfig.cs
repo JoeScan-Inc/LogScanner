@@ -14,7 +14,7 @@ public interface ILogScannerConfig
     ILiveProfileViewConfig LiveProfileConfig { get; set; }
     ILogHistoryViewConfig LogHistoryConfig { get; set; }
 
-    IMessageListConfig MessageListConfig { get; set; }
+ 
 
 }
 
@@ -30,8 +30,4 @@ public interface ILogHistoryViewConfig
     int MaxLength { get; set; }
 }
 
-public interface IMessageListConfig
-{
-    [Option(DefaultValue = 300)]
-    int MaxLength { get; set; }
-}
+
