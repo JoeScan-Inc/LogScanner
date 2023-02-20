@@ -24,11 +24,11 @@
             <!--  toolbar (0)  -->
             <RowDefinition Height="Auto" />
             <!--  top and left view (1)  -->
-            <RowDefinition Height="3*" />
+            <RowDefinition Height="*" />
             <!--  splitter (2)  -->
             <RowDefinition Height="Auto" />
             <!--  3-D view (3)  -->
-            <RowDefinition Height="2*" />
+            <RowDefinition Height="*" />
             <!--  splitter (4)  -->
             <RowDefinition Height="Auto" />
             <!--  log list (5)  -->

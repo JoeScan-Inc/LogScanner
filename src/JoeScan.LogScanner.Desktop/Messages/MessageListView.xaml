@@ -4,15 +4,51 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:JoeScan.LogScanner.Desktop.Messages"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             xmlns:converters="clr-namespace:JoeScan.LogScanner.Shared.Converters;assembly=JoeScan.LogScanner.Shared"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <DataGrid ItemsSource="{Binding MessageItems}" IsReadOnly="True"
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="3"
+                    Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}">
+            <TextBlock Margin="3" VerticalAlignment="Center">Show Only:</TextBlock>
+            <ComboBox ItemsSource="{Binding SelectableLevels}"
+                      DisplayMemberPath="Value"
+                      SelectedValue="{Binding SelectedLevel}"
+                      SelectedValuePath="Key"
+                      MinWidth="120" Focusable="False" Margin="3"
+            ></ComboBox>
+        </StackPanel>
+        <DataGrid DockPanel.Dock="Top" ItemsSource="{Binding MessageItems}" IsReadOnly="True"
                   AutoGenerateColumns="False"
-                  GridLinesVisibility="Vertical"
+                  GridLinesVisibility="None"
                   HeadersVisibility="Column">
+            <DataGrid.Resources>
+                <converters:LogLevelToColorConverter x:Key="LevelToColorConverter" />
+            </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Time" Binding="{Binding DateTime}" />
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock>Date/Time</TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DateTime}" Margin="3,1"
+                                       Tag="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}">
+
+                                <TextBlock.Foreground>
+                                    <PriorityBinding>
+                                        <Binding Path="Level" Converter="{StaticResource LevelToColorConverter}" />
+                                        <Binding Path="Tag" RelativeSource="{RelativeSource Mode=Self}" />
+                                    </PriorityBinding>
+
+                                </TextBlock.Foreground>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTemplateColumn >
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
@@ -21,17 +57,67 @@
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Level}"></TextBlock>
+                            <TextBlock Text="{Binding Level}" Margin="3,1"
+                                       Tag="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}">
+                            
+                                <TextBlock.Foreground>
+                                    <PriorityBinding>
+                                        <Binding Path="Level" Converter="{StaticResource LevelToColorConverter}" />
+                                        <Binding Path="Tag" RelativeSource="{RelativeSource Mode=Self}" />
+                                    </PriorityBinding>
+
+                                </TextBlock.Foreground>
+                            </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="Sender" Binding="{Binding Sender}" />
-                <DataGridTextColumn Header="Message" Binding="{Binding Message}" />
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock>Component</TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Sender}" Margin="3,1"
+                                       Tag="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}">
 
+                                <TextBlock.Foreground>
+                                    <PriorityBinding>
+                                        <Binding Path="Level" Converter="{StaticResource LevelToColorConverter}" />
+                                        <Binding Path="Tag" RelativeSource="{RelativeSource Mode=Self}" />
+                                    </PriorityBinding>
 
+                                </TextBlock.Foreground>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock>Message</TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Message}" Margin="3,1"
+                                       Tag="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}">
+
+                                <TextBlock.Foreground>
+                                    <PriorityBinding>
+                                        <Binding Path="Level" Converter="{StaticResource LevelToColorConverter}" />
+                                        <Binding Path="Tag" RelativeSource="{RelativeSource Mode=Self}" />
+                                    </PriorityBinding>
+
+                                </TextBlock.Foreground>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
 
         </DataGrid>
-    </Grid>
+    </DockPanel>
 </UserControl>

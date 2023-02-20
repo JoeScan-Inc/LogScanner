@@ -100,14 +100,14 @@ public class Js25Adapter : IScannerAdapter
             {
                 // InternalProfileQueueLength
                 var internalProfileQueueLength = Config.InternalProfileQueueLength;
-                SendInfo($"InternalProfileQueueLength: {internalProfileQueueLength}");
+                SendDebug($"InternalProfileQueueLength: {internalProfileQueueLength}");
 
                 //EncoderUpdateIncrement
                 encoderUpdateIncrement = Config.EncoderUpdateIncrement;
-                SendInfo($"EncoderUpdateIncrement: {encoderUpdateIncrement}");
+                SendDebug($"EncoderUpdateIncrement: {encoderUpdateIncrement}");
                 //MaxRequestedProfileCount
                 maxRequestedProfileCount = Config.MaxRequestedProfileCount;
-                SendInfo($"MaxRequestedProfileCount: {maxRequestedProfileCount}");
+                SendDebug($"MaxRequestedProfileCount: {maxRequestedProfileCount}");
                 // BaseAddress
                 string baseAddressString = String.Empty;
                 try
@@ -162,13 +162,13 @@ public class Js25Adapter : IScannerAdapter
                 }
 
                 syncMode = Config.SyncMode;
-                SendInfo($"SyncMode: {syncMode}");
+                SendDebug($"SyncMode: {syncMode}");
 
 
                 if (syncMode == SyncMode.PulseSyncMode)
                 {
                     pulseMasterId = Config.PulseMasterId;
-                    SendInfo($"PulseMasterId: {pulseMasterId}");
+                    SendDebug($"PulseMasterId: {pulseMasterId}");
                 }
 
                 IsConfigured = true;
@@ -176,7 +176,7 @@ public class Js25Adapter : IScannerAdapter
             }
             catch (Exception e)
             {
-                SendError($"Configuraton of adapter failed with error {e.Message}");
+                SendError($"Configuration of adapter failed with error {e.Message}");
                 IsConfigured = false;
                 return false;
             }
@@ -197,11 +197,9 @@ public class Js25Adapter : IScannerAdapter
     public void Start()
     {
         SendInfo("Attempting to start.");
-        OnAdapterMessage(LogLevel.Info, "Starting");
         if (IsRunning)
         {
-            SendInfo("Failed because IsRunning is already true.");
-            //TODO: feedback?
+            SendWarning("Failed because IsRunning is already true.");
             return;
         }
         if (!IsConfigured)
@@ -234,7 +232,20 @@ public class Js25Adapter : IScannerAdapter
     private void SendInfo(string message)
     {
         OnAdapterMessage(LogLevel.Info, message);
+        Logger.Info(message);
+    }
+
+    private void SendDebug(string message)
+    {
+        OnAdapterMessage(LogLevel.Debug, message);
         Logger.Debug(message);
+    }
+
+
+    private void SendWarning(string message)
+    {
+        OnAdapterMessage(LogLevel.Warn, message);
+        Logger.Warn(message);
     }
 
     private void SendError(string message)
@@ -410,7 +421,6 @@ public class Js25Adapter : IScannerAdapter
 
     private void StartScanThread()
     {
-        // TODO: make async
         SendInfo("StartScanThread()");
         
         if (workerThread == null)
