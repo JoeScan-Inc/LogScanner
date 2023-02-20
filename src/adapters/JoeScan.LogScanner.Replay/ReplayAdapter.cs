@@ -114,7 +114,7 @@ public class ReplayAdapter : IScannerAdapter
     public event EventHandler? ScanningStopped;
     public event EventHandler? ScanErrorEncountered;
     public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
-    public event EventHandler<AdapterMessageEventArgs>? AdapterMessage;
+    public event EventHandler<PluginMessageEventArgs>? PluginMessage;
 
     #endregion
 
@@ -208,8 +208,8 @@ public class ReplayAdapter : IScannerAdapter
 
     #endregion
 
-    protected virtual void OnAdapterMessage(AdapterMessageEventArgs e)
+    protected virtual void OnAdapterMessage(PluginMessageEventArgs e)
     {
-        AdapterMessage?.Invoke(this, e);
+        PluginMessage?.Invoke(this, e);
     }
 }

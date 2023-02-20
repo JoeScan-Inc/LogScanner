@@ -51,7 +51,7 @@ public class MessageListViewModel : Screen
     public MessageListViewModel(LogScannerEngine engine,
         ILogScannerConfig config)
     {
-        engine.AdapterMessageReceived += OnMessageReceived;
+        engine.PluginMessageReceived += OnMessageReceived;
         collectionView = CollectionViewSource.GetDefaultView(MessageItems);
         collectionView.Filter += o =>
         {
@@ -69,11 +69,11 @@ public class MessageListViewModel : Screen
         maxNumMessages = config.MessageListConfig.MaxLength;
     }
 
-    private void OnMessageReceived(object? sender, AdapterMessageEventArgs e)
+    private void OnMessageReceived(object? sender, PluginMessageEventArgs e)
     {
-        if (sender is IScannerAdapter adapter)
+        if (sender is IPlugin plugin)
         {
-            MessageItems.Insert(0, new MessageItem(adapter.Name, e.Level, e.Message));
+            MessageItems.Insert(0, new MessageItem(plugin.Name, e.Level, e.Message));
         }
         else
         {
