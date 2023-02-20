@@ -47,6 +47,7 @@ namespace JoeScan.LogScanner.Core.Models
         public event EventHandler ScanningStopped;
         public event EventHandler ScanErrorEncountered;
         public event EventHandler<EncoderUpdateArgs> EncoderUpdated;
+        public event EventHandler<PluginMessageEventArgs> PluginMessageReceived;
         public event EventHandler AdapterChanged;
 
         #endregion
@@ -76,6 +77,11 @@ namespace JoeScan.LogScanner.Core.Models
         private void ActiveAdapterOnEncoderUpdated(object? sender, EncoderUpdateArgs e)
         {
             EncoderUpdated?.Raise(this, e);
+        }
+
+        private void ActiveAdapterOnMessageReceived(object? sender, PluginMessageEventArgs e)
+        {
+            PluginMessageReceived?.Raise(sender, e);
         }
 
         #endregion
@@ -163,6 +169,7 @@ namespace JoeScan.LogScanner.Core.Models
             // LogModelBroadcastBlock.LinkTo(new ActionBlock<LogModel>((l) => { Debugger.Break(); }));
             foreach (var logModelConsumer in Consumers)
             {
+                logModelConsumer.PluginMessage += ActiveAdapterOnMessageReceived;
                 logModelConsumer.Initialize();
                 if (logModelConsumer.IsInitialized)
                 {
@@ -213,6 +220,7 @@ namespace JoeScan.LogScanner.Core.Models
                 ActiveAdapter.ScanningStopped -= ActiveAdapterOnScanningStopped;
                 ActiveAdapter.ScanErrorEncountered -= ActiveAdapterOnScanErrorEncountered;
                 ActiveAdapter.EncoderUpdated -= ActiveAdapterOnEncoderUpdated;
+                ActiveAdapter.PluginMessage -= ActiveAdapterOnMessageReceived;
                 // unlinker is a Disposable that represents the link from the ActiveAdapter - deleting it 
                 // unlinks the current adapter from the pipeline start
                 unlinker!.Dispose();
@@ -227,6 +235,7 @@ namespace JoeScan.LogScanner.Core.Models
                 ActiveAdapter.ScanningStopped += ActiveAdapterOnScanningStopped;
                 ActiveAdapter.ScanErrorEncountered += ActiveAdapterOnScanErrorEncountered;
                 ActiveAdapter.EncoderUpdated += ActiveAdapterOnEncoderUpdated;
+                ActiveAdapter.PluginMessage += ActiveAdapterOnMessageReceived;
                 // entry point, the AvailableProfiles is the source of all profiles. 
                 unlinker = ActiveAdapter.AvailableProfiles.LinkTo(dumper.DumpBlock,
                     new DataflowLinkOptions { PropagateCompletion = true });

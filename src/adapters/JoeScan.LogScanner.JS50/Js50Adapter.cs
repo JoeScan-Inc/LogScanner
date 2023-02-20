@@ -185,6 +185,8 @@ public class Js50Adapter : IScannerAdapter
     public event EventHandler? ScanningStopped;
     public event EventHandler? ScanErrorEncountered;
     public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
+    public event EventHandler<PluginMessageEventArgs>? PluginMessage;
+
     public bool IsReplay => false;
     public uint VersionMajor => 1;
     public uint VersionMinor => 0;
@@ -344,12 +346,15 @@ public class Js50Adapter : IScannerAdapter
     {
         ScanErrorEncountered?.Invoke(this, EventArgs.Empty);
     }
-
-
-
+    
     private void EncoderUpdaterOnScanSyncUpdate(object? sender, EncoderUpdateArgs e)
     {
         // we just pass on the event
         EncoderUpdated.Raise(this, e);
+    }
+
+    protected virtual void OnAdapterMessage(PluginMessageEventArgs e)
+    {
+        PluginMessage?.Invoke(this, e);
     }
 }

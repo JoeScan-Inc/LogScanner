@@ -92,6 +92,7 @@ public class SyntheticDataAdapter : IScannerAdapter
     public event EventHandler? ScanningStarted;
     public event EventHandler? ScanningStopped;
     public event EventHandler? ScanErrorEncountered;
+    public event EventHandler<PluginMessageEventArgs>? PluginMessage;
 
     #endregion
 
@@ -115,6 +116,11 @@ public class SyntheticDataAdapter : IScannerAdapter
     protected virtual void OnEncoderUpdated(EncoderUpdateArgs e)
     {
         EncoderUpdated?.Raise(this, e);
+    }
+
+    protected virtual void OnAdapterMessage(PluginMessageEventArgs e)
+    {
+        PluginMessage?.Invoke(this, e);
     }
 
     private void ThreadMain(CancellationToken ct)
