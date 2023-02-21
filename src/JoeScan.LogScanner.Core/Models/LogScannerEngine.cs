@@ -119,6 +119,7 @@ namespace JoeScan.LogScanner.Core.Models
             CoreConfig config
         )
         {
+            
             this.archiver = archiver;
             this.dumper = dumper;
             // this is a bit hacky, I would rather have a separate list of registered IHeartBeatSubscribers,
@@ -130,6 +131,7 @@ namespace JoeScan.LogScanner.Core.Models
             this.availableAdapters = availableAdapters;
             ActiveAdapter = null;
             Logger = logger;
+            Logger.Debug($"LogScannerEngine {GitVersionInformation.FullSemVer}");
             LogAssembler = logAssembler;
             ModelBuilder = modelBuilder;
             Consumers = consumers;

@@ -7,7 +7,9 @@
 	  <UseWPF>true</UseWPF>
 
   </PropertyGroup>
-
+	<PropertyGroup>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
   <ItemGroup>
     <None Remove="Fonts\Inter-Black.ttf" />
     <None Remove="Fonts\Inter-Bold.ttf" />
@@ -20,12 +22,19 @@
     <None Remove="Fonts\Inter-Thin.ttf" />
     <None Remove="Fonts\materialdesignicons-webfont.ttf" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Shared.AssemblyInfo.cs" Link="Shared.AssemblyInfo.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AdonisUI" Version="1.17.1" />
     <PackageReference Include="AdonisUI.ClassicTheme" Version="1.17.1" />
     <PackageReference Include="Autofac" Version="6.3.0" />
     <PackageReference Include="Caliburn.Micro" Version="4.0.173" />
+    <PackageReference Include="GitVersion.MsBuild" Version="5.11.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="gong-wpf-dragdrop" Version="3.2.1" />
     <PackageReference Include="HelixToolkit.Core.Wpf" Version="2.20.2" />
     <PackageReference Include="OxyPlot.Core" Version="2.1.0" />

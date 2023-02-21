@@ -8,7 +8,10 @@ public class StatusBarViewModel : Screen
 {
     public EngineViewModel Model { get; }
     public EncoderStatusViewModel EncStatus { get; }
-    public string BuildInfo => $"TODO-FIXME ";
+    public string BuildInfo => $"{GitVersionInformation.Major}" +
+                               $".{GitVersionInformation.Minor}" +
+                               $".{GitVersionInformation.Patch}" +
+                               $" - {GitVersionInformation.ShortSha}";
     public  string NextSolutionNumber { get; set; }
     public IObservableCollection<IScannerAdapter> Adapters => Model.Adapters;
     public IScannerAdapter? SelectedAdapter

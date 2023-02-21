@@ -5,10 +5,19 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+	<PropertyGroup>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Include="..\..\Shared.AssemblyInfo.cs" Link="Shared.AssemblyInfo.cs" />
+	</ItemGroup>
   <ItemGroup>
     <PackageReference Include="Config.Net" Version="4.19.0" />
     <PackageReference Include="Config.Net.Json" Version="4.19.0" />
+    <PackageReference Include="GitVersion.MsBuild" Version="5.11.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

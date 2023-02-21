@@ -6,7 +6,12 @@
     <Nullable>enable</Nullable>
     <AssemblyName>synthetic</AssemblyName>
   </PropertyGroup>
-
+	<PropertyGroup>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Include="..\..\Shared.AssemblyInfo.cs" Link="Shared.AssemblyInfo.cs" />
+	</ItemGroup>
   
 	<ItemGroup>
 		<PackageReference Include="Autofac" Version="6.3.0" />

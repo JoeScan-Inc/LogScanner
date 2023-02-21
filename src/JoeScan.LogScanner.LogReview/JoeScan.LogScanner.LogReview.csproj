@@ -7,11 +7,16 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
   </PropertyGroup>
-
+	<PropertyGroup>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
   <ItemGroup>
     <None Remove="Assets\icon.png" />
     <None Remove="Assets\logo.png" />
     <None Remove="C:\Users\Fabian\.nuget\packages\nlog.schema\5.0.1\contentFiles\any\any\NLog.xsd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Shared.AssemblyInfo.cs" Link="Shared.AssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,6 +30,10 @@
     <PackageReference Include="Caliburn.Micro" Version="4.0.173" />
     <PackageReference Include="Config.Net" Version="4.19.0" />
     <PackageReference Include="Config.Net.Json" Version="4.19.0" />
+    <PackageReference Include="GitVersion.MsBuild" Version="5.11.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="HelixToolkit.Core.Wpf" Version="2.20.2" />
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
     <PackageReference Include="MvvmDialogs" Version="8.0.0" />
