@@ -4,23 +4,26 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:h="http://helix-toolkit.org/wpf"
+    xmlns:local="clr-namespace:JoeScan.LogScanner.Shared.Live3D"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
         <h:HelixViewport3D
             x:Name="Viewport"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Margin="0,0,0,10"
             CameraMode="Inspect"
             CameraRotationMode="Trackball"
             ModelUpDirection="0,1,0"
-            Orthographic="{Binding IsChecked, ElementName=UseOrthographicCamera}"
+            Orthographic="False"
             ShowCameraInfo="False"
             ShowCoordinateSystem="True"
             ZoomAroundMouseDownPoint="True"
@@ -32,23 +35,85 @@
                 <PerspectiveCamera
                     LookDirection="-4000,0,3000"
                     Position="4000,100,3000"
-                    UpDirection="0,1,0" />
+                    UpDirection="0,1000,0" />
             </h:HelixViewport3D.DefaultCamera>
         </h:HelixViewport3D>
         <DockPanel
-            Grid.Column="0"
+            Grid.Row="1"
             Margin="3"
             LastChildFill="False">
+            <DockPanel.Resources>
+                <Style BasedOn="{StaticResource {x:Type CheckBox}}" TargetType="CheckBox">
+                    <!-- <Setter Property="MinWidth" Value="100" /> -->
+                    <Setter Property="Margin" Value="2" />
+                </Style>
+            </DockPanel.Resources>
+            <Button
+                x:Name="ResetView"
+                MinWidth="40"
+                MaxHeight="18"
+                Margin="10,2,2,2"
+                Padding="5,2"
+                DockPanel.Dock="Left"
+                Focusable="False"
+                FontSize="9">
+                Reset
+            </Button>
 
-            <CheckBox x:Name="ShowRawPoints" DockPanel.Dock="Top">Raw Points</CheckBox>
+            <Button
+                x:Name="FitView"
+                Width="{Binding ElementName=ResetView, Path=ActualWidth}"
+                MaxHeight="18"
+                Margin="2,2,2,2"
+                Padding="5,2"
+                DockPanel.Dock="Left"
+                Focusable="False"
+                FontSize="9">
+                Fit
+            </Button>
+            <ToggleButton
+                x:Name="UseOrthographicCamera"
+                Width="{Binding ElementName=ResetView, Path=ActualWidth}"
+                MaxHeight="18"
+                Margin="2,2,20,2"
+                Padding="5,2"
+                DockPanel.Dock="Left"
+                Focusable="False"
+                FontSize="9">
+                Ortho
+            </ToggleButton>
+            <CheckBox x:Name="ShowRawPoints" DockPanel.Dock="Left">Raw Points By:</CheckBox>
+            
 
-            <CheckBox x:Name="ShowModelPoints" DockPanel.Dock="Top">Model Points</CheckBox>
+            <RadioButton
+                MaxHeight="18"
+                Margin="2,2,2,2"
+                Padding="5,2"
+                DockPanel.Dock="Left"
+                Focusable="False"
+                FontSize="9"
+                IsChecked="{Binding ColorMode, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static local:ColorMode.ByIntensity}}"
+                IsEnabled="{Binding ElementName=ShowRawPoints, Path=IsChecked}"
+                Style="{StaticResource {x:Type ToggleButton}}">
+                Intens.
+            </RadioButton>
+            <RadioButton
+                MaxHeight="18"
+                Margin="2,2,20,2"
+                Padding="5,2"
+                DockPanel.Dock="Left"
+                Focusable="False"
+                FontSize="9"
+                IsChecked="{Binding ColorMode, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static local:ColorMode.ByCableId}}"
+                IsEnabled="{Binding ElementName=ShowRawPoints, Path=IsChecked}"
+                Style="{StaticResource {x:Type ToggleButton}}">
+                CableId
+            </RadioButton>
 
-            <CheckBox x:Name="ShowModel" DockPanel.Dock="Top">Model</CheckBox>
+            <CheckBox x:Name="ShowModelPoints" Margin="10,2" DockPanel.Dock="Left">Model Points</CheckBox>
+            <CheckBox x:Name="ShowModel" Margin="10,2" DockPanel.Dock="Left">Model</CheckBox>
+            <CheckBox x:Name="ShowSectionCenters" Margin="10,2" DockPanel.Dock="Left">Section Centers</CheckBox>
 
-            <CheckBox x:Name="ShowSectionCenters" DockPanel.Dock="Top">Section Centers</CheckBox>
-            <CheckBox x:Name="ShowDebugStuff" DockPanel.Dock="Top">Debug Stuff</CheckBox>
-            <CheckBox x:Name="UseOrthographicCamera" DockPanel.Dock="Bottom">Orthographic</CheckBox>
 
         </DockPanel>
     </Grid>

@@ -1,7 +1,8 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI">
+    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+    xmlns:converters="clr-namespace:JoeScan.LogScanner.Shared.Converters">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/ToastNotifications.Messages;component/Themes/Default.xaml" />
         <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/dark.xaml" />
@@ -20,6 +21,9 @@
             <FontFamily x:Key="InterUIBlack">pack://application:,,,/JoeScan.LogScanner.Shared;component/Fonts/#Inter Black</FontFamily>
             <FontFamily x:Key="InterUIBold">pack://application:,,,/JoeScan.LogScanner.Shared;component/Fonts/#Inter Bold</FontFamily>
             <FontFamily x:Key="MaterialDesignIcons">pack://application:,,,/JoeScan.LogScanner.Shared;component/Fonts/#Material Design Icons</FontFamily>
+        </ResourceDictionary>
+        <ResourceDictionary>
+            <converters:ComparisonConverter x:Key="ComparisonConverter" />
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
