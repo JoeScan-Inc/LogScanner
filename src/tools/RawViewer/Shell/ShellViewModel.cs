@@ -22,6 +22,7 @@ using NLog.Filters;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using OxyPlot.Legends;
+using System.Drawing;
 using AxisPosition = OxyPlot.Axes.AxisPosition;
 using LegendPosition = OxyPlot.Legends.LegendPosition;
 
@@ -32,12 +33,12 @@ public class ShellViewModel : Screen
     public ILogger Logger { get; }
     private readonly IDialogService dialogService;
     private readonly IRawViewerConfig config;
-    private Profile? selectedProfile;
-    public Dictionary<uint, ObservableCollection<Profile>> ProfilesDict { get; set; } = new();
+    private RawProfile? selectedProfile;
+    public Dictionary<uint, ObservableCollection<RawProfile>> ProfilesDict { get; set; } = new();
     public ObservableCollection<ISeries> Series { get; set; } = new ObservableCollection<ISeries>();
-    public ObservableCollection<Profile> Profiles { get; set; } = new();
+    public ObservableCollection<RawProfile> Profiles { get; set; } = new BindableCollection<RawProfile>();
 
-    public Profile? SelectedProfile
+    public RawProfile? SelectedProfile
     {
         get => selectedProfile;
         set
@@ -83,21 +84,25 @@ public class ShellViewModel : Screen
     {
         try
         {
+            Profiles.Clear();
             ProfilesDict.Clear();
+            int idx = 0;
             using var fs = new FileStream(fileName, FileMode.Open);
-
+            
             using var br = new BinaryReader(fs);
-            while (true)
+            while (true )
             {
 
                 var p = ProfileReaderWriter.Read(br);
               
                 if (!ProfilesDict.ContainsKey(p.ScanHeadId))
                 {
-                    ProfilesDict[p.ScanHeadId] = new ObservableCollection<Profile>();
+                    ProfilesDict[p.ScanHeadId] = new ObservableCollection<RawProfile>();
                 }
-                ProfilesDict[p.ScanHeadId].Add(p);
-                Profiles.Add(p);
+
+                var r = new RawProfile(p){Index = idx++};
+                ProfilesDict[p.ScanHeadId].Add(r);
+                Profiles.Add(r);
             }
         }
         catch (EndOfStreamException)
@@ -110,17 +115,17 @@ public class ShellViewModel : Screen
             Logger.Fatal(e, $"Failed to open/read replay file: {fileName}");
             throw;
         }
-
+        Series.Clear();
         foreach (var head in ProfilesDict.Keys)
         {
-            Series.Add(new ScatterSeries<Profile>()
+            Series.Add(new ScatterSeries<RawProfile>()
             {
                 Values = ProfilesDict[head],
                 Mapping = (profile, point) =>
                 {
                    
                     point.PrimaryValue = (float)profile.Data.Length;
-                    point.SecondaryValue = profile.EncoderValues[0];
+                    point.SecondaryValue = profile.EncoderValue;
                 },
                 Stroke = new SolidColorPaint(SKColor.Parse(ColorDefinitions.ColorForCableId(head).ToString())) { StrokeThickness = 1 },
                 Fill = null,
@@ -192,6 +197,25 @@ public class ShellViewModel : Screen
 
        
 
+    }
+
+    public void GoToFirstProfile()
+    {
+        SelectedProfile = Profiles[0];
+    }
+
+    public void GoToLastProfile()
+    {
+        SelectedProfile = Profiles[^1];
+    }
+
+    public void GoToNextProfile()
+    {
+        SelectedProfile = Profiles[Profiles.IndexOf(SelectedProfile) + 1];
+    }
+    public void GoToPreviousProfile()
+    {
+        SelectedProfile = Profiles[Profiles.IndexOf(SelectedProfile) - 1];
     }
 
 }

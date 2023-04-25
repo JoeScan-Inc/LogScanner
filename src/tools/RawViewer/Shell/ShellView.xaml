@@ -133,22 +133,24 @@
 
                         <DockPanel DockPanel.Dock="Top" LastChildFill="False">
                             <Button
-                                x:Name="FirstProfile"
+                                x:Name="GoToFirstProfile"
                                 Width="32"
                                 Height="32"
                                 Margin="5,5,5,5"
                                 Padding="0"
+                                cm:Message.Attach="GoToFirstProfile"
                                 DockPanel.Dock="Left"
                                 Focusable="False">
                                 <TextBlock FontFamily="{StaticResource MaterialDesignIcons}">&#xF0795;</TextBlock>
                             </Button>
 
                             <Button
-                                x:Name="NextProfile"
+                                x:Name="GoToNextProfile"
                                 Width="32"
                                 Height="32"
                                 Margin="5,5,5,5"
                                 Padding="0"
+                                cm:Message.Attach="GoToNextProfile"
                                 DockPanel.Dock="Left"
                                 Focusable="False">
                                 <Border VerticalAlignment="Center">
@@ -156,22 +158,24 @@
                                 </Border>
                             </Button>
                             <Button
-                                x:Name="LastProfile"
+                                x:Name="GoToLastProfile"
                                 Width="32"
                                 Height="32"
                                 Margin="5,5,5,5"
                                 Padding="0"
+                                cm:Message.Attach="GoToLastProfile"
                                 DockPanel.Dock="Right"
                                 Focusable="False">
                                 <TextBlock FontFamily="{StaticResource MaterialDesignIcons}">&#xF0792;</TextBlock>
                             </Button>
 
                             <Button
-                                x:Name="PreviousProfile"
+                                x:Name="GoToPreviousProfile"
                                 Width="32"
                                 Height="32"
                                 Margin="5,5,5,5"
                                 Padding="0"
+                                cm:Message.Attach="GoToPreviousProfile"
                                 DockPanel.Dock="Right"
                                 Focusable="False">
                                 <TextBlock FontFamily="{StaticResource MaterialDesignIcons}">&#xF0045;</TextBlock>
@@ -180,13 +184,20 @@
 
                         </DockPanel>
 
-                        <DataGrid AutoGenerateColumns="True" ItemsSource="{Binding Profiles}">
+                        <DataGrid
+                            MaxWidth="1200"
+                            MaxHeight="1800"
+                            AutoGenerateColumns="True"
+                            IsReadOnly="True"
+                            ItemsSource="{Binding Profiles}"
+                            SelectedItem="{Binding SelectedProfile}"
+                            >
                             <!-- <DataGrid.Columns> -->
                             <!--     <DataGridTextColumn Binding="{Binding ScanHeadId}" Header="Id" /> -->
                             <!--     <DataGridTextColumn Binding="{Binding SequenceNumber}" Header="Seq." /> -->
                             <!--     ~1~ <DataGridTextColumn Binding="{Binding EncoderValues[0]}" Header="Encoder" /> @1@ -->
                             <!--     ~1~ <DataGridTextColumn Binding="{Binding Data.Length}" Header="# Pts" /> @1@ -->
-                            <!-- -->
+                            <!--    -->
                             <!-- </DataGrid.Columns> -->
 
                         </DataGrid>
