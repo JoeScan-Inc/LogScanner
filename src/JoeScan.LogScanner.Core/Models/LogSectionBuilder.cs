@@ -2,6 +2,7 @@
 using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Geometry;
 using NLog;
+using System.Diagnostics;
 
 namespace JoeScan.LogScanner.Core.Models;
 
@@ -90,8 +91,8 @@ public class LogSectionBuilder
         var consensusSet = new List<Point2D>(c);
         foreach (var p in filteredPoints)
         {
-            double dist = CircleFit.DistanceSquare(bestModel.x, bestModel.y, p.X, p.Y);
-            if ((bestModel.r + maxDistance) * (bestModel.r + maxDistance) > dist)
+            double dist = Math.Sqrt(CircleFit.DistanceSquare(bestModel.x, bestModel.y, p.X, p.Y));
+            if( dist > (bestModel.r - maxDistance) && dist < (bestModel.r + maxDistance))
             {
                 consensusSet.Add(p);
             }
