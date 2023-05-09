@@ -3,6 +3,7 @@ using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using NLog;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Threading.Tasks.Dataflow;
 
@@ -11,8 +12,10 @@ namespace JoeScan.LogScanner.Replay;
 public class ReplayAdapter : IScannerAdapter
 {
     #region Injected Properties
+
     private IReplayAdapterConfig Config { get; }
     public ILogger Logger { get; set; }
+
     #endregion
 
     #region Private Fields
@@ -30,7 +33,8 @@ public class ReplayAdapter : IScannerAdapter
 
     #region Private Properties
 
-    private List<Tuple<int, int>> SequenceList { get; set; } = new List<Tuple<int, int>>(); // this is a list of indexes 
+    private List<Tuple<int, int>> SequenceList { get; set; } =
+        new List<Tuple<int, int>>(); // this is a list of indexes 
     // into the LegacyProfiles list, sorted by time. The idea is that we run a timer, and post the profiles
     // when their time has come
 
@@ -66,7 +70,7 @@ public class ReplayAdapter : IScannerAdapter
     public uint VersionPatch => 0;
     public Guid Id { get; } = Guid.Parse("{65FA101D-22EF-4161-8BBB-1E167986A126}");
     public bool IsRunning { get; private set; }
-    
+
 
     public BufferBlock<Profile> AvailableProfiles { get; } =
         new BufferBlock<Profile>(new DataflowBlockOptions
@@ -86,6 +90,7 @@ public class ReplayAdapter : IScannerAdapter
             return IsRunning;
         }));
     }
+
     public void Start()
     {
         if (!IsRunning)
@@ -97,7 +102,7 @@ public class ReplayAdapter : IScannerAdapter
         }
     }
 
-    
+
     public void Stop()
     {
         if (cts != null)
@@ -119,6 +124,7 @@ public class ReplayAdapter : IScannerAdapter
     #endregion
 
     // embedded helper class to read the binary format of some old logscanner implementations
+
     #region Private Methods
 
     private void ThreadMain(CancellationToken ct)
@@ -156,7 +162,7 @@ public class ReplayAdapter : IScannerAdapter
             IsRunning = false;
         }
     }
-    
+
 
     private void FillBuffer()
     {
@@ -192,8 +198,28 @@ public class ReplayAdapter : IScannerAdapter
             Logger.Fatal(e, $"Failed to open/read replay file: {simFile}");
             throw;
         }
+
+        // debugging code:
+
+        // for (uint headIndex = 0; headIndex < 3; headIndex++)
+        // {
+        //     var profiles = PlaybackProfiles.Where(q => q.ScanHeadId == headIndex).ToArray();
+        //     using (var s = File.OpenWrite($"C:\\Users\\fabian\\synced\\Customer Support\\Mebor\\May2023\\2023_2_27_17_14_27\\{headIndex}.csv"))
+        //     using (var sw = new StreamWriter(s))
+        //     {
+        //         foreach (var p in profiles)
+        //         {
+        //             var tsMs = p.TimeStampNs - profiles[0].TimeStampNs;
+        //
+        //             sw.WriteLine($"{p.TimeStampNs},{p.EncoderValues[0]},{p.ScanHeadId},{p.Data.Length}");
+        //         }
+        //         
+        //     }
+        // }
     }
+
     #endregion
+
     #region Event Invocation
 
     protected virtual void OnScanningStarted()
