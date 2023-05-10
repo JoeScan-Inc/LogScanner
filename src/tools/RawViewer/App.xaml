@@ -1,8 +1,8 @@
-﻿<Application x:Class="RawViewer.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:RawViewer"
-             >
+﻿<Application
+    x:Class="RawViewer.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:RawViewer">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -11,7 +11,7 @@
                 </ResourceDictionary>
 
                 <ResourceDictionary Source="pack://application:,,,/JoeScan.LogScanner.Shared;component/Externals.xaml" />
-
+                <ResourceDictionary Source="pack://application:,,,/BusyIndicator;component/Theme/Default.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

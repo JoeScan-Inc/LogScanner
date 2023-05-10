@@ -22,121 +22,66 @@ using NLog.Filters;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using OxyPlot.Legends;
+using RawViewer.Grid;
+using RawViewer.Timeline;
+using RawViewer.Toolbar;
+using System.Diagnostics;
 using System.Drawing;
+using System.Threading;
+using System.Threading.Tasks;
 using AxisPosition = OxyPlot.Axes.AxisPosition;
 using LegendPosition = OxyPlot.Legends.LegendPosition;
 
 namespace RawViewer.Shell;
 
-public class ShellViewModel : Screen
+public class ShellViewModel : Screen, IHandle<bool>
 {
+    public ToolbarViewModel ToolBar { get; }
+    public DataManager Data { get; }
+    public RawProfileGridViewModel DataGridView { get; }
+    public TimelinePlotViewModel TimelinePlot { get; }
+    public IEventAggregator EventAggregator { get; }
     public ILogger Logger { get; }
     private readonly IDialogService dialogService;
     private readonly IRawViewerConfig config;
     private RawProfile? selectedProfile;
-    public Dictionary<uint, ObservableCollection<RawProfile>> ProfilesDict { get; set; } = new();
-    public ObservableCollection<ISeries> Series { get; set; } = new ObservableCollection<ISeries>();
-    public ObservableCollection<RawProfile> Profiles { get; set; } = new BindableCollection<RawProfile>();
+    private bool isBusy;
 
-    public RawProfile? SelectedProfile
+    public ObservableCollection<ISeries> Series { get; set; } = new ObservableCollection<ISeries>();
+
+    public bool IsBusy
     {
-        get => selectedProfile;
+        get => isBusy;
         set
         {
-            if (Equals(value, selectedProfile))
-                return;
-            selectedProfile = value;
-            NotifyOfPropertyChange(() => SelectedProfile);
+            if (value == isBusy) return;
+            isBusy = value;
+            NotifyOfPropertyChange(() => IsBusy);
         }
     }
 
+
     public PlotModel? LiveView { get; private set; }
 
-    public ShellViewModel(IDialogService dialogService, IRawViewerConfig config, ILogger logger)
+    public ShellViewModel(ToolbarViewModel toolBar, DataManager dataManager,
+        RawProfileGridViewModel dataGridView,
+        TimelinePlotViewModel timelinePlot ,IEventAggregator eventAggregator,
+        IDialogService dialogService, IRawViewerConfig config, ILogger logger)
     {
+        ToolBar = toolBar;
+        Data= dataManager;
+        DataGridView = dataGridView;
+        TimelinePlot = timelinePlot;
+        EventAggregator = eventAggregator;
+        EventAggregator.Subscribe(this);
         Logger = logger;
         this.dialogService = dialogService;
         this.config = config;
         SetupPlotModel();
     }
 
-    public void Load()
-    {
-        var initialDirectory = config.LastFileBrowserLocation?? Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    
 
-        var openFileDialogSettings = new OpenFileDialogSettings()
-        {
-            Title = "Open raw log archive file",
-            InitialDirectory = initialDirectory,
-            Filter = $"Raw LogScanner Recording (*.raw)|*.raw|All Files (*.*)|*.*",
-            CheckFileExists = true
-        };
-
-        bool? success = dialogService.ShowOpenFileDialog(this, openFileDialogSettings);
-        if (success == true)
-        {
-            FillBuffer(openFileDialogSettings.FileName);
-            config.LastFileBrowserLocation = Path.GetDirectoryName(openFileDialogSettings.FileName);
-        }
-    }
-
-    private void FillBuffer(string fileName)
-    {
-        try
-        {
-            Profiles.Clear();
-            ProfilesDict.Clear();
-            int idx = 0;
-            using var fs = new FileStream(fileName, FileMode.Open);
-            
-            using var br = new BinaryReader(fs);
-            while (true )
-            {
-
-                var p = ProfileReaderWriter.Read(br);
-              
-                if (!ProfilesDict.ContainsKey(p.ScanHeadId))
-                {
-                    ProfilesDict[p.ScanHeadId] = new ObservableCollection<RawProfile>();
-                }
-
-                var r = new RawProfile(p){Index = idx++};
-                ProfilesDict[p.ScanHeadId].Add(r);
-                Profiles.Add(r);
-            }
-        }
-        catch (EndOfStreamException)
-        {
-            //ignore, eof
-        }
-        catch (Exception e)
-        {
-            // anything else
-            Logger.Fatal(e, $"Failed to open/read replay file: {fileName}");
-            throw;
-        }
-        Series.Clear();
-        foreach (var head in ProfilesDict.Keys)
-        {
-            Series.Add(new ScatterSeries<RawProfile>()
-            {
-                Values = ProfilesDict[head],
-                Mapping = (profile, point) =>
-                {
-                   
-                    point.PrimaryValue = (float)profile.Data.Length;
-                    point.SecondaryValue = profile.EncoderValue;
-                },
-                Stroke = new SolidColorPaint(SKColor.Parse(ColorDefinitions.ColorForCableId(head).ToString())) { StrokeThickness = 1 },
-                Fill = null,
-                GeometrySize = 1
-            });
-        }
-
-        // var timeInHeadDiff = ProfilesDict[0][^1].TimeStampNs - ProfilesDict[0][0].TimeStampNs;
-        // var encDiff = ProfilesDict[0][^1].EncoderValues[0] - ProfilesDict[0][0].EncoderValues[0];
-
-    }
     private void SetupPlotModel()
     {
         LiveView = new PlotModel
@@ -199,23 +144,9 @@ public class ShellViewModel : Screen
 
     }
 
-    public void GoToFirstProfile()
-    {
-        SelectedProfile = Profiles[0];
-    }
 
-    public void GoToLastProfile()
+    public Task HandleAsync(bool message, CancellationToken cancellationToken)
     {
-        SelectedProfile = Profiles[^1];
+        return Task.Run(()=>IsBusy = message, cancellationToken);
     }
-
-    public void GoToNextProfile()
-    {
-        SelectedProfile = Profiles[Profiles.IndexOf(SelectedProfile) + 1];
-    }
-    public void GoToPreviousProfile()
-    {
-        SelectedProfile = Profiles[Profiles.IndexOf(SelectedProfile) - 1];
-    }
-
 }
