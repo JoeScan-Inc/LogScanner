@@ -15,6 +15,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using AxisPosition = OxyPlot.Axes.AxisPosition;
 using LegendPosition = OxyPlot.Legends.LegendPosition;
+using AdonisUI.Controls;
+using System.Windows;
 
 namespace RawViewer.Shell;
 
@@ -54,7 +56,9 @@ public class ShellViewModel : Screen, IHandle<bool>
         CrossSectionViewModel crossSection, 
         ProfileDetailViewModel profileDetail,
         IEventAggregator eventAggregator,
-        IDialogService dialogService, IRawViewerConfig config, ILogger logger)
+        IDialogService dialogService, 
+        IRawViewerConfig config,
+        ILogger logger)
     {
         ToolBar = toolBar;
         Data= dataManager;
@@ -67,76 +71,32 @@ public class ShellViewModel : Screen, IHandle<bool>
         Logger = logger;
         this.dialogService = dialogService;
         this.config = config;
-        SetupPlotModel();
+        Data.EncoderPulseInterval = config.EncoderPulseInterval;
     }
 
     
-
-    private void SetupPlotModel()
-    {
-        LiveView = new PlotModel
-        {
-            PlotType = PlotType.Cartesian,
-            Background = OxyColorsForStyle.PlotBackgroundColor,
-            PlotAreaBorderColor = OxyColorsForStyle.PlotAreaBorderColor,
-            PlotAreaBorderThickness = new OxyThickness(0),
-            PlotMargins = new OxyThickness(-10)
-        };
-
-        LiveView.Legends.Add(new Legend
-        {
-            LegendPosition = LegendPosition.TopRight,
-            LegendTextColor = OxyColorsForStyle.LegendTextColor
-        });
-
-        
-        var columnAxis = new LinearAxis
-        {
-            Minimum = -100 ,
-            Maximum = 500,
-            PositionAtZeroCrossing = true,
-            AxislineStyle = LineStyle.Solid,
-            AxislineColor = OxyColorsForStyle.MajorGridLineColor,
-            AxislineThickness = 1.3,
-            TickStyle = TickStyle.Crossing,
-            TicklineColor = OxyColorsForStyle.MinorGridLineColor,
-            MajorGridlineStyle = LineStyle.Solid,
-            MinorGridlineStyle = LineStyle.Solid,
-            MajorGridlineColor = OxyColorsForStyle.MajorGridLineColor,
-            MinorGridlineColor = OxyColorsForStyle.MinorGridLineColor,
-            IsZoomEnabled = true,
-            TextColor = OxyColorsForStyle.AxisTextColor,
-          
-        };
-        LiveView.Axes.Add(columnAxis);
-
-        var rowAxis = new LinearAxis
-        {
-            Minimum = -300,
-            Maximum = 300,
-            Position = AxisPosition.Bottom,
-            PositionAtZeroCrossing = true,
-            AxislineStyle = LineStyle.Solid,
-            AxislineColor = OxyColorsForStyle.MajorGridLineColor,
-            AxislineThickness = 1.3,
-            TickStyle = TickStyle.Crossing,
-            TicklineColor = OxyColorsForStyle.MinorGridLineColor,
-            MajorGridlineStyle = LineStyle.Solid,
-            MinorGridlineStyle = LineStyle.Solid,
-            MajorGridlineColor = OxyColorsForStyle.MajorGridLineColor,
-            MinorGridlineColor = OxyColorsForStyle.MinorGridLineColor,
-            IsZoomEnabled = true,
-            TextColor = OxyColorsForStyle.AxisTextColor,
-        };
-        LiveView.Axes.Add(rowAxis);
-
-       
-
-    }
-
-
     public Task HandleAsync(bool message, CancellationToken cancellationToken)
     {
         return Task.Run(()=>IsBusy = message, cancellationToken);
+    }
+
+    public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken = new CancellationToken())
+    {
+        return await CheckBeforeClosing(cancellationToken);
+    }
+
+    private Task<bool> CheckBeforeClosing(CancellationToken cancellationToken = new CancellationToken())
+    {
+        return Task.Run((() =>
+        {
+            
+            // save the state of the application, needs to be done on UI thread, so Invoke()
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+               
+                config.EncoderPulseInterval = Data.EncoderPulseInterval;
+            });
+            return true;
+        }), cancellationToken);
     }
 }

@@ -61,6 +61,9 @@
             <TextBox MinWidth="100" Text="{Binding SelectedProfile.TimeStampNs, Mode=OneWay}" />
             <TextBlock>ns</TextBlock>
 
+            <Label Content="Position (Z):" />
+            <TextBox MinWidth="100" Text="{Binding ZOffset, StringFormat={}{0:F2}, Mode=OneWay}" />
+            <TextBlock>"</TextBlock>
         </st:AutoGrid>
         <DataGrid
             Grid.Column="1"
@@ -69,9 +72,9 @@
             IsReadOnly="True"
             ItemsSource="{Binding SelectedProfile.Data}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="X" Binding="{Binding X, StringFormat={}{0:F2}}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Y" Binding="{Binding Y, StringFormat={}{0:F2}}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Brightness" Binding="{Binding B}"></DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding X, StringFormat={}{0:F2}}" Header="X" />
+                <DataGridTextColumn Binding="{Binding Y, StringFormat={}{0:F2}}" Header="Y" />
+                <DataGridTextColumn Binding="{Binding B}" Header="Brightness" />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

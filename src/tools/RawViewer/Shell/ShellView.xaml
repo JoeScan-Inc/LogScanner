@@ -13,18 +13,19 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
     xmlns:oxy="http://oxyplot.org/wpf"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
     Title="ShellView"
     Width="800"
     Height="450"
     md:DialogServiceViews.IsRegistered="True"
     FontFamily="{StaticResource InterUI}"
+    IconVisibility="Hidden"
+    PlaceTitleBarOverContent="True"
     TextElement.FontSize="11"
     TextOptions.TextFormattingMode="Ideal"
     TextOptions.TextRenderingMode="Auto"
     TitleVisibility="Hidden"
     WindowState="Maximized"
-    PlaceTitleBarOverContent="True"
-    IconVisibility="Hidden"
     mc:Ignorable="d">
     <Window.Style>
         <Style BasedOn="{StaticResource {x:Type Window}}" TargetType="Window" />
@@ -35,12 +36,14 @@
             <GradientStop Offset="0" Color="{DynamicResource {x:Static adonisUi:Colors.AccentColor}}" />
             <GradientStop Offset="1" Color="{DynamicResource {x:Static adonisUi:Colors.AccentColor}}" />
         </LinearGradientBrush>
+        <system:Double x:Key="IndicatorScaleX">2</system:Double>
+        <system:Double x:Key="IndicatorScaleY">2</system:Double>
     </controls:AdonisWindow.Resources>
     <busyIndicator:BusyMask
         x:Name="BusyIndicator"
-        Background="#33FFFFFF"
-        BusyContent="Please wait..."
-        IndicatorType="Cupertino"
+        Background="#22FFFFFF"
+        BusyContent="Loading Profiles..."
+        IndicatorType="FourDots"
         IsBusy="{Binding IsBusy}">
         <Grid>
             <Grid.RowDefinitions>

@@ -31,14 +31,17 @@ public class DataManager : PropertyChangedBase
     private object _lock = new object();
     private readonly ICollectionView filteredView;
     private int scanHeadFilterById = -1;
+    private double encoderPulseInterval;
 
     public int ScanHeadFilterById
     {
         get => scanHeadFilterById;
         set
         {
-            if (value == scanHeadFilterById) 
+            if (value == scanHeadFilterById)
+            {
                 return;
+            }
             scanHeadFilterById = value;
             NotifyOfPropertyChange(() => ScanHeadFilterById);
             filteredView.Refresh();
@@ -52,9 +55,25 @@ public class DataManager : PropertyChangedBase
         set
         {
             if (Equals(value, selectedProfile))
+            {
                 return;
+            }
             selectedProfile = value;
             NotifyOfPropertyChange(() => SelectedProfile);
+        }
+    }
+
+    public double EncoderPulseInterval
+    {
+        get => encoderPulseInterval;
+        set
+        {
+            if (value.Equals(encoderPulseInterval))
+            {
+                return;
+            }
+            encoderPulseInterval = value;
+            NotifyOfPropertyChange(() => EncoderPulseInterval);
         }
     }
 
@@ -124,16 +143,42 @@ public class DataManager : PropertyChangedBase
 
     public void GoToNextProfile()
     {
+
         if (scanHeadFilterById < 0)
         {
+            // showing all heads, so just increase index
             SelectedProfile = Profiles[Profiles.IndexOf(SelectedProfile) + 1];
+        }
+        else
+        {
+            var idx = Profiles.IndexOf(SelectedProfile);
+            var offset = 1;
+            while (idx+offset < Profiles.Count && Profiles[idx+offset].ScanHeadId != scanHeadFilterById)
+            {
+                offset++;
+            }
+            SelectedProfile = Profiles[idx + offset];
         }
         
     }
 
     public void GoToPreviousProfile()
     {
-        SelectedProfile = Profiles[Profiles.IndexOf(SelectedProfile) - 1];
+        if (scanHeadFilterById < 0)
+        {
+            // showing all heads, so just decrease index
+            SelectedProfile = Profiles[Profiles.IndexOf(SelectedProfile) - 1];
+        }
+        else
+        {
+            var idx = Profiles.IndexOf(SelectedProfile);
+            var offset = -1;
+            while (idx + offset >= 0 && Profiles[idx + offset].ScanHeadId != scanHeadFilterById)
+            {
+                offset--;
+            }
+            SelectedProfile = Profiles[idx + offset];
+        }
     }
     
     public void FillAvailableHeads()

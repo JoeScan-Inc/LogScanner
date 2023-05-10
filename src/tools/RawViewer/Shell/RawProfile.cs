@@ -23,7 +23,7 @@ public class RawProfile
 
     public ulong ReducedTimeStampNs { get; set; }
     public long ReducedEncoder { get; set; }
-
+    public uint Camera => p.Camera;
     public double ReducedTimeStampMs => ReducedTimeStampNs / 1E6;
 
 }

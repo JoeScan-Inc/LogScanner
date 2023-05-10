@@ -87,7 +87,9 @@
                 Height="{Binding ElementName=HeightReference, Path=ActualHeight}"
                 MinWidth="120"
                 VerticalAlignment="Center"
-                Value="1.00" />
+                MaxValue="10"
+                MinValue="0.000001"
+                Value="{Binding Data.EncoderPulseInterval, UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>
     </Grid>
 </UserControl>

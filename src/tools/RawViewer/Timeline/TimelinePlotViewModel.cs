@@ -61,15 +61,17 @@ public class TimelinePlotViewModel : Screen
 
         PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("Pts over Encoder",
             new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedEncoder, p.NumPts))));
-        PlotFunctions.Add(new KeyValuePair<string,Func<RawProfile,Tuple<double,double>>>("Encoder Over Time",
+        PlotFunctions.Add(new KeyValuePair<string,Func<RawProfile,Tuple<double,double>>>("Encoder over Time",
             new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs/1000, (double)p.ReducedEncoder))));
-        PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("Pts Over Time",
+        PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("Pts over Time",
             new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs / 1000, p.NumPts))));
-        PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("LaserOnTime Over Time",
+        PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("LaserOnTime over Time",
             new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs / 1000, p.LaserOnTimeUs))));
         PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("Avg Brightness Over Time",
             new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs / 1000,
                 p.Data.Length > 0 ? p.Data.Average(q=>q.B) : 0))));
+        PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("Pts over Z",
+            new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedEncoder * DataManager.EncoderPulseInterval, p.NumPts))));
         SelectedPlotFunction = PlotFunctions[0].Value;
     }
 
