@@ -67,6 +67,9 @@ public class TimelinePlotViewModel : Screen
             new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs / 1000, p.NumPts))));
         PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("LaserOnTime Over Time",
             new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs / 1000, p.LaserOnTimeUs))));
+        PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("Avg Brightness Over Time",
+            new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs / 1000,
+                p.Data.Length > 0 ? p.Data.Average(q=>q.B) : 0))));
         SelectedPlotFunction = PlotFunctions[0].Value;
     }
 
@@ -131,6 +134,7 @@ public class TimelinePlotViewModel : Screen
 
             series.MouseDown += SeriesOnMouseDown;
             timeLinePlot.Series.Add(series);
+            timeLinePlot.ResetAllAxes();
             columnAxis.Minimum = xAxisMin;
             columnAxis.Maximum = xAxisMax;
             rowAxis.Minimum = yAxisMin;
