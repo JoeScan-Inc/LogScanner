@@ -5,6 +5,7 @@ using Nini.Config;
 using NLog;
 using RawViewer.Helpers;
 using RawViewer.Shell;
+using RawViewer.Timeline;
 using System;
 using System.IO;
 
@@ -15,15 +16,18 @@ public class ToolbarViewModel : Screen
     private readonly IRawViewerConfig config;
     private readonly IDialogService dialogService;
     public DataManager Data { get; }
+    public TimelinePlotViewModel TimelinePlot { get; }
     public IEventAggregator EventAggregator { get; }
     public ILogger Logger { get; }
 
-    public ToolbarViewModel(DataManager data, IRawViewerConfig config, IEventAggregator eventAggregator,
+    public ToolbarViewModel(DataManager data,
+        TimelinePlotViewModel timelinePlot, IRawViewerConfig config, IEventAggregator eventAggregator,
         IDialogService dialogService, ILogger logger)
     {
         this.config = config;
         this.dialogService = dialogService;
         Data = data;
+        TimelinePlot = timelinePlot;
         EventAggregator = eventAggregator;
         Logger = logger;
     }

@@ -8,6 +8,7 @@ using JoeScan.LogScanner.Shared;
 using MvvmDialogs;
 using RawViewer.Helpers;
 using RawViewer.Shell;
+using RawViewer.Timeline;
 using System;
 using System.IO;
 using System.Windows;
@@ -33,7 +34,7 @@ public class AppBootstrapper : AutofacBootstrapper
         builder.Register(c => new ConfigurationBuilder<IRawViewerConfig>()
             .UseJsonFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RawViewerConfig.json"))
             .Build()).SingleInstance();
-
+        builder.RegisterType<TimelinePlotViewModel>().AsSelf().SingleInstance();
         builder.RegisterType<DataManager>().AsSelf().SingleInstance();
         builder.RegisterType<PlotColorService>().AsSelf().SingleInstance();
         //

@@ -86,19 +86,26 @@
             VerticalAlignment="Stretch"
             extensions:ScrollViewerExtension.HorizontalScrollBarExpansionMode="AlwaysExpand"
             extensions:ScrollViewerExtension.VerticalScrollBarExpansionMode="AlwaysExpand"
-            AutoGenerateColumns="True"
+            AutoGenerateColumns="False"
             CanUserAddRows="False"
             CanUserDeleteRows="False"
             IsReadOnly="True"
             ItemsSource="{Binding Data.Profiles}"
             SelectedItem="{Binding Data.SelectedProfile}">
-            <!-- <DataGrid.Columns> -->
-            <!--     <DataGridTextColumn Binding="{Binding ScanHeadId}" Header="Id" /> -->
-            <!--     <DataGridTextColumn Binding="{Binding SequenceNumber}" Header="Seq." /> -->
-            <!--     ~1~ <DataGridTextColumn Binding="{Binding EncoderValues[0]}" Header="Encoder" /> @1@ -->
-            <!--     ~1~ <DataGridTextColumn Binding="{Binding Data.Length}" Header="# Pts" /> @1@ -->
-            <!--    -->
-            <!-- </DataGrid.Columns> -->
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Index}" Header="#" />
+                <DataGridTextColumn Binding="{Binding ScanHeadId, StringFormat=ScanHead {0}}" Header="ScanHead" />
+                <DataGridTextColumn Binding="{Binding NumPts}" Header="# Pts" />
+                <DataGridTextColumn Binding="{Binding LaserOnTimeUs, StringFormat={}{0} μs}" Header="LOT" />
+                <DataGridTextColumn Binding="{Binding EncoderValue}" Header="Encoder" />
+                <DataGridTextColumn Binding="{Binding ReducedEncoder}" Header="Red. Encoder" />
+                <DataGridTextColumn Binding="{Binding ReducedTimeStampMs, StringFormat={}{0:F0} ms}" Header="Timestamp" />
+                <!-- <DataGridTextColumn Binding="{Binding ReducedTimeStamp, StringFormat={}{0} ns}" Header="From Start" /> -->
+
+                <!-- <DataGridTextColumn Binding="{Binding EncoderValues[0]}" Header="Encoder" /> -->
+                <!-- <DataGridTextColumn Binding="{Binding Data.Length}" Header="# Pts" /> -->
+
+            </DataGrid.Columns>
 
         </DataGrid>
     </Grid>

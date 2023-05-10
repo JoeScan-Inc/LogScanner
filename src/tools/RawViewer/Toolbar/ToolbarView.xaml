@@ -67,6 +67,19 @@
                 ItemsSource="{Binding Data.SelectableHeads, IsAsync=True}"
                 SelectedValue="{Binding Data.ScanHeadFilterById}"
                 SelectedValuePath="Key" />
+
+            <TextBlock Margin="35,5,5,5" VerticalAlignment="Center">Timeline Shows:</TextBlock>
+
+            <ComboBox
+                Height="30"
+                MinWidth="120"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                DisplayMemberPath="Key"
+                Focusable="False"
+                ItemsSource="{Binding TimelinePlot.PlotFunctions}"
+                SelectedValue="{Binding TimelinePlot.SelectedPlotFunction}"
+                SelectedValuePath="Value" />
         </DockPanel>
     </Grid>
 </UserControl>

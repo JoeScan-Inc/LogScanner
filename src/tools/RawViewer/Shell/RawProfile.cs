@@ -21,7 +21,9 @@ public class RawProfile
     public uint SequenceNumber => p.SequenceNumber;
     public ulong TimeStampNs => p.TimeStampNs;
 
-    public ulong ReducedTimeStamp { get; set; }
+    public ulong ReducedTimeStampNs { get; set; }
     public long ReducedEncoder { get; set; }
+
+    public double ReducedTimeStampMs => ReducedTimeStampNs / 1E6;
 
 }

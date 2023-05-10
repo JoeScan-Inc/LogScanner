@@ -37,7 +37,10 @@ public class TimelinePlotViewModel : Screen
         get => selectedPlotFunction;
         set
         {
-            if (Equals(value, selectedPlotFunction)) return;
+            if (Equals(value, selectedPlotFunction))
+            {
+                return;
+            }
             selectedPlotFunction = value;
             NotifyOfPropertyChange(() => SelectedPlotFunction);
             RefreshPlot();
@@ -55,14 +58,15 @@ public class TimelinePlotViewModel : Screen
         DataManager.ProfileDataAdded += (_, _) => RefreshPlot();
         DataManager.HeadSelectionChanged += (_, _) => RefreshPlot();
         DataManager.PropertyChanged += SelectedProfileChanged;
+
         PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("Pts over Encoder",
             new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedEncoder, p.NumPts))));
         PlotFunctions.Add(new KeyValuePair<string,Func<RawProfile,Tuple<double,double>>>("Encoder Over Time",
-            new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStamp/1000, (double)p.ReducedEncoder))));
+            new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs/1000, (double)p.ReducedEncoder))));
         PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("Pts Over Time",
-            new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStamp / 1000, p.NumPts))));
+            new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs / 1000, p.NumPts))));
         PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("LaserOnTime Over Time",
-            new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStamp / 1000, p.LaserOnTimeUs))));
+            new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs / 1000, p.LaserOnTimeUs))));
         SelectedPlotFunction = PlotFunctions[0].Value;
     }
 
@@ -207,7 +211,7 @@ public class TimelinePlotViewModel : Screen
             MinorGridlineStyle = LineStyle.Solid,
             MajorGridlineColor = PlotColorService.MajorGridLineColor,
             MinorGridlineColor = PlotColorService.MinorGridLineColor,
-            IsZoomEnabled = true,
+            IsZoomEnabled = false,
             TextColor = PlotColorService.AxisTextColor,
             Position = AxisPosition.Left
             // LabelFormatter = q => $"{q} {scanSystemManager.ScanSystemUnits.UiString()}"

@@ -162,7 +162,7 @@ public class DataManager : PropertyChangedBase
     {
         foreach (var rawProfile in Profiles)
         {
-            rawProfile.ReducedTimeStamp = rawProfile.TimeStampNs - Profiles[0].TimeStampNs;
+            rawProfile.ReducedTimeStampNs = rawProfile.TimeStampNs - Profiles[0].TimeStampNs;
             rawProfile.ReducedEncoder = rawProfile.EncoderValue - Profiles[0].EncoderValue;
         }
     }

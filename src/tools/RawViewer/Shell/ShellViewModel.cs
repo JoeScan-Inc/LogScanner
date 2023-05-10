@@ -1,32 +1,16 @@
 ﻿using Caliburn.Micro;
-using JoeScan.LogScanner.Core.Models;
 using JoeScan.LogScanner.Shared.Helpers;
-using LiveChartsCore;
-using LiveChartsCore.SkiaSharpView;
-using LiveChartsCore.SkiaSharpView.Painting;
 using MvvmDialogs;
-using MvvmDialogs.FrameworkDialogs.OpenFile;
-using Nini.Config;
 using NLog;
 using OxyPlot;
-using SkiaSharp;
-using System;
-using System.IO.Compression;
-using System.IO;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Media;
-using JoeScan.LogScanner.Shared.Enums;
-using LiveChartsCore.Measure;
-using NLog.Filters;
-using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using OxyPlot.Legends;
+using RawViewer.CrossSection;
 using RawViewer.Grid;
+using RawViewer.ProfileDetail;
 using RawViewer.Timeline;
 using RawViewer.Toolbar;
-using System.Diagnostics;
-using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using AxisPosition = OxyPlot.Axes.AxisPosition;
@@ -40,6 +24,8 @@ public class ShellViewModel : Screen, IHandle<bool>
     public DataManager Data { get; }
     public RawProfileGridViewModel DataGridView { get; }
     public TimelinePlotViewModel TimelinePlot { get; }
+    public CrossSectionViewModel CrossSection { get; }
+    public ProfileDetailViewModel ProfileDetail { get; }
     public IEventAggregator EventAggregator { get; }
     public ILogger Logger { get; }
     private readonly IDialogService dialogService;
@@ -47,7 +33,6 @@ public class ShellViewModel : Screen, IHandle<bool>
     private RawProfile? selectedProfile;
     private bool isBusy;
 
-    public ObservableCollection<ISeries> Series { get; set; } = new ObservableCollection<ISeries>();
 
     public bool IsBusy
     {
@@ -65,13 +50,18 @@ public class ShellViewModel : Screen, IHandle<bool>
 
     public ShellViewModel(ToolbarViewModel toolBar, DataManager dataManager,
         RawProfileGridViewModel dataGridView,
-        TimelinePlotViewModel timelinePlot ,IEventAggregator eventAggregator,
+        TimelinePlotViewModel timelinePlot ,
+        CrossSectionViewModel crossSection, 
+        ProfileDetailViewModel profileDetail,
+        IEventAggregator eventAggregator,
         IDialogService dialogService, IRawViewerConfig config, ILogger logger)
     {
         ToolBar = toolBar;
         Data= dataManager;
         DataGridView = dataGridView;
         TimelinePlot = timelinePlot;
+        CrossSection = crossSection;
+        ProfileDetail = profileDetail;
         EventAggregator = eventAggregator;
         EventAggregator.Subscribe(this);
         Logger = logger;

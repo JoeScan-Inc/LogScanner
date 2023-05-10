@@ -10,7 +10,6 @@
     xmlns:dj="clr-namespace:DJ;assembly=NLogViewer"
     xmlns:extensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
     xmlns:local="clr-namespace:RawViewer.Shell"
-    xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
     xmlns:oxy="http://oxyplot.org/wpf"
@@ -22,8 +21,10 @@
     TextElement.FontSize="11"
     TextOptions.TextFormattingMode="Ideal"
     TextOptions.TextRenderingMode="Auto"
-    TitleVisibility="Visible"
+    TitleVisibility="Hidden"
     WindowState="Maximized"
+    PlaceTitleBarOverContent="True"
+    IconVisibility="Hidden"
     mc:Ignorable="d">
     <Window.Style>
         <Style BasedOn="{StaticResource {x:Type Window}}" TargetType="Window" />
@@ -85,11 +86,16 @@
                     <ColumnDefinition Width="2*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <GroupBox Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Margin="3" Padding="0">
+                <GroupBox
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Margin="3"
+                    Padding="0">
                     <GroupBox.Header>
                         <StackPanel MinHeight="25" Orientation="Horizontal">
                             <TextBlock
@@ -106,15 +112,15 @@
                 </GroupBox>
 
                 <GridSplitter
-                    Grid.Column="1"
                     Grid.Row="0"
                     Grid.RowSpan="2"
+                    Grid.Column="1"
                     MinWidth="5"
                     VerticalAlignment="Stretch" />
 
-                <GroupBox 
-                    Grid.Column="2"
+                <GroupBox
                     Grid.Row="0"
+                    Grid.Column="2"
                     Grid.ColumnSpan="3"
                     Margin="3"
                     Padding="0">
@@ -133,15 +139,15 @@
                     <ContentControl x:Name="TimelinePlot" />
                 </GroupBox>
                 <GridSplitter
-                    Grid.Column="3"
                     Grid.Row="0"
                     Grid.RowSpan="2"
+                    Grid.Column="3"
                     MinWidth="5"
                     VerticalAlignment="Stretch" />
                 <GroupBox
                     Grid.Row="1"
-                    Margin="3"
                     Grid.Column="2"
+                    Margin="3"
                     Padding="0">
                     <GroupBox.Header>
                         <StackPanel MinHeight="25" Orientation="Horizontal">
@@ -155,12 +161,14 @@
                             <TextBlock Margin="3" VerticalAlignment="Center">Selected Profile</TextBlock>
                         </StackPanel>
                     </GroupBox.Header>
-                    <oxy:PlotView
+                    <ContentControl
+                        x:Name="CrossSection"
                         Grid.Row="0"
                         Margin="0"
-                        Padding="0"
-                        Model="{Binding LiveView}" />
+                        Padding="0" />
                 </GroupBox>
+
+                <Grid Grid.Row="1" Grid.Column="2" />
                 <GroupBox
                     Grid.Row="1"
                     Grid.Column="4"
@@ -178,15 +186,8 @@
                             <TextBlock Margin="3" VerticalAlignment="Center">Properties</TextBlock>
                         </StackPanel>
                     </GroupBox.Header>
-
+                    <ContentControl x:Name="ProfileDetail" Margin="3" />
                 </GroupBox>
-
-                <Grid Grid.Column="2" Grid.Row="1">
-                   
-                    
-
-
-                </Grid>
             </Grid>
             <GridSplitter
                 Grid.Row="3"
