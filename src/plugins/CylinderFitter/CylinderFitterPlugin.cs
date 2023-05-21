@@ -111,7 +111,7 @@ public class CylinderFitterPlugin : ILogModelConsumerPlugin
 
             for (int i = 1; i < ncol; i++)
             {
-                solver.set_bounds(i, -100000.0, 100000.0);
+                solver.set_bounds(i, -10000.0, 10000.0);
             }
 
             //set an abort function that is periodically checked 
@@ -163,7 +163,7 @@ public class CylinderFitterPlugin : ILogModelConsumerPlugin
 
     #region Event Invocation
 
-    protected virtual void OnPluginMessage(PluginMessageEventArgs e)
+    private void OnPluginMessage(PluginMessageEventArgs e)
     {
         PluginMessage?.Invoke(this, e);
     }
@@ -171,7 +171,12 @@ public class CylinderFitterPlugin : ILogModelConsumerPlugin
     #endregion
 
     #region Helpers
-
+    /// <summary>
+    /// Strips the last newline from a string. Needed because the output from
+    /// LPSolve contains a trailing newline.
+    /// </summary>
+    /// <param name="s"></param>
+    /// <returns></returns>
     private static string StripLastNewline(string s)
     {
         if (s.EndsWith("\n"))
