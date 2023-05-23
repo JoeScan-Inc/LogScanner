@@ -30,6 +30,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="JsonSubTypes" Version="1.9.0" />
+    <PackageReference Include="LpSolveDotNet" Version="4.0.0" />
+    <PackageReference Include="LpSolveDotNet.Native.win-x64" Version="4.0.0" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="McMaster.NETCore.Plugins" Version="1.4.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

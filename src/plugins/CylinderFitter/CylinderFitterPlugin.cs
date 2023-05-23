@@ -13,6 +13,7 @@ namespace CylinderFitter;
 public class CylinderFitterPlugin : ILogModelConsumerPlugin
 {
     private bool isInitialized;
+    private Fitter? fitter;
 
     #region IPlugin implementation
 
@@ -42,6 +43,14 @@ public class CylinderFitterPlugin : ILogModelConsumerPlugin
         {
             isInitialized = LpSolve.Init(); // initialize the lp_solve library
             var version = LpSolve.LpSolveVersion;
+            fitter = new Fitter();
+            fitter.FitterMessage += (sender, args) =>
+            {
+                if (args is FitterMessageEventArgs fma)
+                {
+                    OnPluginMessage(new PluginMessageEventArgs(fma.Level, fma.Message));
+                }
+            };
             OnPluginMessage(new PluginMessageEventArgs(LogLevel.Info,
                 $"Initialized CylinderFitterPlugin with LPSolve {version.Major}.{version.Minor}.{version.Revision}.{version.Build}."));
         }
@@ -58,96 +67,14 @@ public class CylinderFitterPlugin : ILogModelConsumerPlugin
     {
     }
 
-    private void MessageCallback(IntPtr lp, IntPtr userhandle, string Buf)
+    public void Consume(LogModelResult res)
     {
-        OnPluginMessage(new PluginMessageEventArgs(LogLevel.Trace, StripLastNewline(Buf)));
-    }
-
-    
-
-    public void Consume(LogModelResult logModel)
-    {
-        if (!isInitialized || !logModel.IsValidModel)
+        if (!isInitialized || !res.IsValidModel)
         {
             return;
         }
-        var sw = Stopwatch.StartNew();
-        int ncol = 2 + 3;
-        using var solver = LpSolve.make_lp(0, ncol); // not using rows yet
-        solver.put_logfunc(MessageCallback, IntPtr.Zero);
-        solver.set_verbose(lpsolve_verbosity.NORMAL);
-        try
-        {
-            solver.set_col_name(1, "OffsetX");
-            solver.set_col_name(2, "OffsetY");
-            solver.set_col_name(3, "SlopeX");
-            solver.set_col_name(4, "SlopeY");
-            solver.set_col_name(5, "Radius");
-            var row = new double[ncol + 1];
-            solver.set_add_rowmode(true);
-            // build up solver matrix
-            foreach (var section in logModel.LogModel!.Sections)
-            {
-                foreach (var p in section.ModeledProfile)
-                {
-                    var pt = new Point2D((float)(p.X - section.CentroidX), (float)(p.Y - section.CentroidY), 0);
-                    row[1] = pt.X;
-                    row[2] = pt.Y;
-                    row[3] = -pt.X * section.SectionCenter;
-                    row[4] = -pt.Y * section.SectionCenter;
-                    row[5] = Math.Sqrt(pt.X * pt.X + pt.Y * pt.Y);
 
-                    if (!solver.add_constraint(row, LpSolveDotNet.lpsolve_constr_types.LE,
-                            pt.X * pt.X + pt.Y * pt.Y + section.CentroidX * pt.X + section.CentroidY * pt.Y))
-                    {
-                        throw new Exception("add_constraint() failed");
-                    }
-                }
-            }
-
-            solver.set_add_rowmode(false);
-            solver.set_obj_fn(new[] { 0, 0, 0, 0, 0, 1.0 });
-            solver.set_maxim();
-
-            for (int i = 1; i < ncol; i++)
-            {
-                solver.set_bounds(i, -10000.0, 10000.0);
-            }
-
-            //set an abort function that is periodically checked 
-            // LPSolveDotNet.put_abortfunc(solver, CancellationCallback, 0);
-            // now let lpsolve calculate a solution
-            var res = solver.solve();
-            if (res != LpSolveDotNet.lpsolve_return.OPTIMAL)
-            {
-                throw new Exception("solve() failed");
-            }
-
-            // a solution is calculated, now lets get some results
-            var results = new double[ncol];
-            
-            solver.get_variables(results);
-            var sol = new FitterSolution()
-            {
-                Radius = results[4],
-                XOffset = -results[0],
-                YOffset = -results[1],
-                XSlope = -results[2],
-                YSlope = -results[3]
-            };
-            sw.Stop();
-            OnPluginMessage(new PluginMessageEventArgs(LogLevel.Info,
-                $"Cylinder model solved for log # {logModel.LogNumber} in {sw.ElapsedMilliseconds} ms."));
-
-
-            OnPluginMessage(new PluginMessageEventArgs(LogLevel.Trace, $"Radius: { sol.Radius }, XOffset: { sol.XOffset}, YOffset: { sol.YOffset}, XSlope: { sol.XSlope}, YSlope: { sol.YSlope}"));
-            
-        }
-        catch (Exception e)
-        {
-            OnPluginMessage(new PluginMessageEventArgs(LogLevel.Error,
-                $"Failed to solve cylinder model for log {logModel.LogNumber}."));
-        }
+        var solution = fitter!.RunFit(res.LogModel!);
     }
 
     #endregion
@@ -168,22 +95,5 @@ public class CylinderFitterPlugin : ILogModelConsumerPlugin
         PluginMessage?.Invoke(this, e);
     }
 
-    #endregion
-
-    #region Helpers
-    /// <summary>
-    /// Strips the last newline from a string. Needed because the output from
-    /// LPSolve contains a trailing newline.
-    /// </summary>
-    /// <param name="s"></param>
-    /// <returns></returns>
-    private static string StripLastNewline(string s)
-    {
-        if (s.EndsWith("\n"))
-        {
-            return s.Substring(0, s.Length - 1);
-        }
-        return s;
-    }
     #endregion
 }
