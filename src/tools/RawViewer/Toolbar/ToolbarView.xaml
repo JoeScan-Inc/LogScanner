@@ -50,8 +50,7 @@
                 MaxWidth="140"
                 Margin="5"
                 DockPanel.Dock="Left"
-                Focusable="False"
-                IsEnabled="false">
+                Focusable="False">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Style="{StaticResource ButtonIcon}">&#xF0DCF;</TextBlock>
                     <TextBlock Style="{StaticResource ButtonText}">Open Log...</TextBlock>

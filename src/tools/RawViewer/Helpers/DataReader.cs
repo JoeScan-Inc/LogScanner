@@ -8,6 +8,7 @@ using System.IO.Compression;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Documents;
+using ToastNotifications;
 
 namespace RawViewer.Helpers;
 
@@ -55,6 +56,41 @@ public static class DataReader
 
             br.Dispose();
            
+            return l;
+        });
+    }
+
+    public static Task<List<RawProfile>> ReadFromLogModelAsync(string fileName)
+    {
+        return Task.Run(() =>
+        {
+            var l = new List<RawProfile>();
+            var sw = Stopwatch.StartNew();
+            int idx = 0;
+
+            try
+            {
+                var log = RawLogReaderWriter.Read(fileName);
+                foreach (var profile in log.ProfileData)
+                {
+                    var r = new RawProfile(profile) { Index = idx++ };
+                    l.Add(r);
+                }
+            }
+            catch (Exception e)
+            {
+               
+            }
+
+           
+
+            finally
+            {
+                sw.Stop();
+            }
+
+           
+
             return l;
         });
     }
