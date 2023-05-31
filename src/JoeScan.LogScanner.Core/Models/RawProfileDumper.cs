@@ -16,6 +16,7 @@ public class RawProfileDumper
 
     private BlockingCollection<Profile>? dumpQueue = null;
     private FixedSizedQueue<Profile>? historyQueue = null;
+    private bool isDumping;
 
     public bool IsEnabled { get; set; } = true;
 
@@ -23,6 +24,7 @@ public class RawProfileDumper
     {
         Config = config;
         this.logger = logger;
+        isDumping = false;
         DumpBlock = new TransformBlock<Profile, Profile>(ProcessProfile,
             new ExecutionDataflowBlockOptions()
             {
@@ -136,11 +138,44 @@ public class RawProfileDumper
         if (Config is
             {
                 HistorySize: > 0, HistoryEnabled: true, Location: not null
-            })
+            } && !isDumping)
         {
             historyQueue?.Enqueue((Profile)p.Clone());
         }
 
         return p;
+    }
+
+    public void DumpHistory()
+    {
+        if (Config is
+            {
+                HistorySize: > 0, HistoryEnabled: true, Location: not null
+            })
+        {
+            
+            if (!Directory.Exists(Config.Location))
+            {
+                try
+                {
+                    Directory.CreateDirectory(Config.Location);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error($"Failed to create directory: {Config.Location}: {ex.Message}. Dumping disabled.");
+                    return;
+                }
+            }
+            using var fs = new FileStream(CreateOutputFileName(), FileMode.Create);
+            using var gzip = new GZipStream(fs, CompressionMode.Compress);
+            using var writer = new BinaryWriter(gzip);
+            isDumping = true; // queue temporarily disabled
+            while (historyQueue!.TryDequeue(out Profile? p))
+            {
+                p.Write(writer);
+            }
+        }
+
+        isDumping = false;
     }
 }
