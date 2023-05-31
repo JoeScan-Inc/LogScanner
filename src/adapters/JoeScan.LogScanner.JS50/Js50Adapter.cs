@@ -239,8 +239,8 @@ public class Js50Adapter : IScannerAdapter
                 ct.ThrowIfCancellationRequested();
                 foreach (var scanHead in scanSystem.ScanHeads)
                 {
-                    var prof = scanHead.TakeNextProfile(ct);
-                    if (prof != null)
+                    var gotProfile = scanHead.TryTakeNextProfile(out var prof, TimeSpan.FromMilliseconds(1), ct);
+                    if (gotProfile)
                     {
                         //TODO: check the result of Post to see if we lose profiles
                         // due to the downstream processing being too slow
