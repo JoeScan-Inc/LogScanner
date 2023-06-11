@@ -1,0 +1,220 @@
+﻿<controls:AdonisWindow
+    x:Class="RawViewer.Shell.ShellView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+    xmlns:busyIndicator="https://github.com/Peoky/BusyIndicator"
+    xmlns:cm="http://caliburnmicro.com"
+    xmlns:controls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dj="clr-namespace:DJ;assembly=NLogViewer"
+    xmlns:extensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+    xmlns:local="clr-namespace:RawViewer.Shell"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
+    xmlns:oxy="http://oxyplot.org/wpf"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    Title="ShellView"
+    Width="800"
+    Height="450"
+    md:DialogServiceViews.IsRegistered="True"
+    FontFamily="{StaticResource InterUI}"
+    IconVisibility="Hidden"
+    PlaceTitleBarOverContent="True"
+    TextElement.FontSize="11"
+    TextOptions.TextFormattingMode="Ideal"
+    TextOptions.TextRenderingMode="Auto"
+    TitleVisibility="Hidden"
+    WindowState="Maximized"
+    mc:Ignorable="d">
+    <Window.Style>
+        <Style BasedOn="{StaticResource {x:Type Window}}" TargetType="Window" />
+    </Window.Style>
+
+    <controls:AdonisWindow.Resources>
+        <LinearGradientBrush x:Key="IndicatorForeground" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Offset="0" Color="{DynamicResource {x:Static adonisUi:Colors.AccentColor}}" />
+            <GradientStop Offset="1" Color="{DynamicResource {x:Static adonisUi:Colors.AccentColor}}" />
+        </LinearGradientBrush>
+        <system:Double x:Key="IndicatorScaleX">2</system:Double>
+        <system:Double x:Key="IndicatorScaleY">2</system:Double>
+    </controls:AdonisWindow.Resources>
+    <busyIndicator:BusyMask
+        x:Name="BusyIndicator"
+        Background="#22FFFFFF"
+        BusyContent="Loading Profiles..."
+        IndicatorType="FourDots"
+        IsBusy="{Binding IsBusy}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <!--  header  -->
+                <RowDefinition Height="Auto" />
+                <!--  toolbar  -->
+                <RowDefinition Height="Auto" />
+                <!--  main grid  -->
+                <RowDefinition Height="*" />
+                <!--  splitter  -->
+                <RowDefinition Height="Auto" />
+                <!--  logger  -->
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <DockPanel
+                Grid.Row="0"
+                Margin="0"
+                extensions:LayerExtension.IncreaseLayer="True"
+                LastChildFill="False">
+                <Image
+                    Height="45"
+                    Margin="0,5"
+                    HorizontalAlignment="Right"
+                    Source="../Assets/Logo.png" />
+                <TextBlock
+                    Margin="5,5,120,5"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontFamily="{StaticResource InterThin}"
+                    FontSize="33"
+                    TextAlignment="Right">
+                    Raw Viewer
+                </TextBlock>
+            </DockPanel>
+            <ContentControl x:Name="ToolBar" Grid.Row="1" />
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <GroupBox
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Margin="3"
+                    Padding="0">
+                    <GroupBox.Header>
+                        <StackPanel MinHeight="25" Orientation="Horizontal">
+                            <TextBlock
+                                Margin="3"
+                                VerticalAlignment="Center"
+                                FontFamily="{StaticResource MaterialDesignIcons}">
+                                &#xF0572;
+                            </TextBlock>
+                            <TextBlock Margin="3" VerticalAlignment="Center">Raw Profiles</TextBlock>
+                        </StackPanel>
+                    </GroupBox.Header>
+                    <ContentControl x:Name="DataGridView" VerticalAlignment="Stretch" />
+
+                </GroupBox>
+
+                <GridSplitter
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="1"
+                    MinWidth="5"
+                    VerticalAlignment="Stretch" />
+
+                <GroupBox
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    Grid.ColumnSpan="3"
+                    Margin="3"
+                    Padding="0">
+                    <GroupBox.Header>
+                        <StackPanel MinHeight="25" Orientation="Horizontal">
+                            <TextBlock
+                                Margin="3"
+                                VerticalAlignment="Center"
+                                FontFamily="{StaticResource MaterialDesignIcons}"
+                                Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}">
+                                &#xF066E;
+                            </TextBlock>
+                            <TextBlock Margin="3" VerticalAlignment="Center">Timeline</TextBlock>
+                        </StackPanel>
+                    </GroupBox.Header>
+                    <ContentControl x:Name="TimelinePlot" />
+                </GroupBox>
+                <GridSplitter
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="3"
+                    MinWidth="5"
+                    VerticalAlignment="Stretch" />
+                <GroupBox
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Margin="3"
+                    Padding="0">
+                    <GroupBox.Header>
+                        <StackPanel MinHeight="25" Orientation="Horizontal">
+                            <TextBlock
+                                Margin="3"
+                                VerticalAlignment="Center"
+                                FontFamily="{StaticResource MaterialDesignIcons}"
+                                Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}">
+                                &#xF0E92;
+                            </TextBlock>
+                            <TextBlock Margin="3" VerticalAlignment="Center">Selected Profile</TextBlock>
+                        </StackPanel>
+                    </GroupBox.Header>
+                    <ContentControl
+                        x:Name="CrossSection"
+                        Grid.Row="0"
+                        Margin="0"
+                        Padding="0" />
+                </GroupBox>
+
+                <Grid Grid.Row="1" Grid.Column="2" />
+                <GroupBox
+                    Grid.Row="1"
+                    Grid.Column="4"
+                    Margin="3"
+                    Padding="0">
+                    <GroupBox.Header>
+                        <StackPanel MinHeight="25" Orientation="Horizontal">
+                            <TextBlock
+                                Margin="3"
+                                VerticalAlignment="Center"
+                                FontFamily="{StaticResource MaterialDesignIcons}"
+                                Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}">
+                                &#xF04FC;
+                            </TextBlock>
+                            <TextBlock Margin="3" VerticalAlignment="Center">Properties</TextBlock>
+                        </StackPanel>
+                    </GroupBox.Header>
+                    <ContentControl x:Name="ProfileDetail" Margin="3" />
+                </GroupBox>
+            </Grid>
+            <GridSplitter
+                Grid.Row="3"
+                Height="5"
+                VerticalAlignment="Stretch" />
+            <GroupBox
+                Grid.Row="4"
+                Margin="3"
+                Padding="0">
+                <GroupBox.Header>
+                    <StackPanel MinHeight="25" Orientation="Horizontal">
+                        <TextBlock
+                            Margin="3"
+                            VerticalAlignment="Center"
+                            FontFamily="{StaticResource MaterialDesignIcons}"
+                            Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}">
+                            &#xF0BC3;
+                        </TextBlock>
+                        <TextBlock Margin="3" VerticalAlignment="Center">Log</TextBlock>
+                    </StackPanel>
+                </GroupBox.Header>
+                <dj:NLogViewer />
+            </GroupBox>
+
+        </Grid>
+    </busyIndicator:BusyMask>
+</controls:AdonisWindow>

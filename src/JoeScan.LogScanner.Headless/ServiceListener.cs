@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using JoeScan.LogScanner.Core.Models;
+using System.Threading;
 
 namespace JoeScan.LogScanner.Service
 {

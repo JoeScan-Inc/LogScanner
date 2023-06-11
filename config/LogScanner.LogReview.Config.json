@@ -1,8 +1,8 @@
 {
-  "FileBrowserLastFolder": "C:\\tmp\\RawLogs",
+  "FileBrowserLastFolder": "C:\\Users\\fabian\\synced\\Customer Support\\Mebor\\FailedLog",
   "Units": "Millimeters",
   "ShowAcceptedPoints": "true",
-  "ShowRejectedPoints": "false",
-  "ShowModel": "false",
+  "ShowRejectedPoints": "true",
+  "ShowModel": "true",
   "ShowModelPoints": "false"
 }

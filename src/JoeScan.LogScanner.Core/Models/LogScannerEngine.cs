@@ -265,7 +265,7 @@ namespace JoeScan.LogScanner.Core.Models
                 // entry point, the AvailableProfiles is the source of all profiles. 
                 unlinker = ActiveAdapter.AvailableProfiles.LinkTo(dumper.DumpBlock,
                     new DataflowLinkOptions { PropagateCompletion = true });
-                dumper.IsEnabled = !ActiveAdapter!.IsReplay;
+                // dumper.IsEnabled = !ActiveAdapter!.IsReplay;
             }
             else
             {

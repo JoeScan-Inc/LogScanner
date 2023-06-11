@@ -8,6 +8,7 @@ using NLog.Config;
 using NLog.Targets;
 using System.Reflection;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 

@@ -1,5 +1,5 @@
 {
-  "ActiveAdapter": "Synthetic Data",
+  "ActiveAdapter": "Replay",
   "Units": "Millimeters",
   "LiveProfileConfig": {
     "ShowFilters" :  true
