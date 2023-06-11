@@ -6,78 +6,71 @@
     "Units" : "Millimeter",
     "Left": -300,
     "Right": 300,
+
     "Bottom": 150,
     "Top": 500
   },
   {
     "Kind": "PolygonFilter",
-    "ScanHeadId": 1,
+    "ScanHeadId": 2,
     "Units": "Millimeter",
     "IsEnabled": true,
     "Vertices": [
       {
-        "X": -50,
-        "Y": 0
+        "X": -120,
+        "Y": 22
       },
       {
         "X": 0,
         "Y": -12
       },
       {
-        "X": 50,
-        "Y": -5
-      },
-      {
-        "X": 300,
-        "Y": 90
+        "X": 350,
+        "Y": 80
       },
       {
         "X": 350,
-        "Y": 350
+        "Y": 400
       },
       {
-        "X": -50,
-        "Y": 350
+        "X": -120,
+        "Y": 400
       },
       {
-        "X": -50,
-        "Y": 0
+        "X": -120,
+        "Y": 22
       }
     ]
   },
   {
     "Kind": "PolygonFilter",
-    "ScanHeadId": 2,
+    "ScanHeadId": 1,
     "IsEnabled": true,
     "Units": "Millimeter",
     "Vertices": [
       {
-        "X": 50,
-        "Y": -3
+        "X": 120,
+        "Y": 25
       },
       {
         "X": 0,
         "Y": -12
       },
       {
-        "X": -50,
-        "Y": 0
-      },
-      {
-        "X": -300,
+        "X": -350,
         "Y": 80
       },
       {
         "X": -350,
-        "Y": 350
+        "Y": 400
       },
       {
-        "X": -50,
-        "Y": 350
+        "X": 120,
+        "Y": 400
       },
       {
-        "X": 50,
-        "Y": -3
+        "X": 120,
+        "Y": 25
       }
     ]
   }

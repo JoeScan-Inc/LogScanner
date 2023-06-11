@@ -6,9 +6,11 @@ using JoeScan.LogScanner.Core.Models;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using System.Reflection;
 using System;
 using System.Linq;
 using System.Threading;
+
 
 AutoResetEvent autoResetEvent = new AutoResetEvent(false);
 Console.CancelKeyPress += (_, e) =>
@@ -22,13 +24,33 @@ var builder = new ContainerBuilder();
 builder.RegisterModule<CoreModule>();
 builder.RegisterModule<NLogModule>();
 
+Assembly executingAssembly = Assembly.GetExecutingAssembly();
+
+string applicationDirectory = Path.GetDirectoryName(executingAssembly.Location);
+foreach (var file in Directory.GetFiles(Path.Combine(applicationDirectory!, "vendor"), "*.dll"))
+{
+    try
+    {
+        var vendorAssembly = Assembly.LoadFile(file);
+        builder.RegisterAssemblyModules(new Assembly[] { vendorAssembly });
+    }
+    catch
+    {
+
+    }
+}
+
+
 var container = builder.Build();
 
 using var scope = container.BeginLifetimeScope();
 var engine= scope.Resolve<LogScannerEngine>();
-//engine.SetActiveAdapter(engine.AvailableAdapters.First(q=>q.Id.Equals(Guid.Parse("{6EAE7379-E27D-4BFE-B304-CF16D40E9A9B}")))); // JS-25
-engine.SetActiveAdapter(engine.AvailableAdapters.First(q=>q.Id.Equals(Guid.Parse("{C79255EF-9AB8-4B6D-B3F1-FA4D37AFD021}")))); // Synthetic
-engine.Start();
+engine.SetActiveAdapter(engine.AvailableAdapters.First()); // we only have the replay adapter registered
+//engine.Start();
+
+JoeScan.LogScanner.Service.ServiceListener joeScanListener = new JoeScan.LogScanner.Service.ServiceListener();
+joeScanListener.StartServer(ref engine);
+
 
 autoResetEvent.WaitOne();
 engine.Stop();
