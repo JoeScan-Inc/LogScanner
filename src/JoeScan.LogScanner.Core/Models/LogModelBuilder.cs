@@ -7,6 +7,12 @@ namespace JoeScan.LogScanner.Core.Models;
 
 public class LogModelBuilder
 {
+    #region Events
+
+    public event EventHandler ModelingFailed;
+
+    #endregion
+
     #region Injected Fields
 
     private readonly ILogger logger;
@@ -113,6 +119,7 @@ public class LogModelBuilder
         catch (Exception e)
         {
             logger.Warn($"Failed to generate LogModel for RawLog {log.LogNumber}");
+            OnModelingFailed();
             return new LogModelResult(log, null, new List<string>() { e.Message });
         }
         return new LogModelResult(log, model, new List<string>() );
@@ -299,5 +306,10 @@ public class LogModelBuilder
         avg[v.Length - 2] = v[^2];
         avg[v.Length - 1] = v.Last();
         return avg;
+    }
+
+    protected virtual void OnModelingFailed()
+    {
+        ModelingFailed?.Invoke(this, EventArgs.Empty);
     }
 }

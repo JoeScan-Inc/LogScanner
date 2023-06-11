@@ -10,6 +10,7 @@ using NLog.LayoutRenderers.Wrappers;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net.Mime;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks.Dataflow;
 
 namespace JoeScan.LogScanner.Core.Models
@@ -134,6 +135,10 @@ namespace JoeScan.LogScanner.Core.Models
             Logger.Debug($"LogScannerEngine {GitVersionInformation.FullSemVer}");
             LogAssembler = logAssembler;
             ModelBuilder = modelBuilder;
+            ModelBuilder.ModelingFailed += (_, _) =>
+            {
+                Task.Run(dumper.DumpHistory).ConfigureAwait(false);
+            };
             Consumers = consumers;
 
             foreach (var a in AvailableAdapters)
