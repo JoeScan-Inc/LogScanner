@@ -192,7 +192,7 @@ public class SingleZoneLogAssembler : ILogAssembler
                 break;
             }
 
-            if (last.Value.ScanHeadId == profile.ScanHeadId)
+            if (last.Value.ScanHeadId == profile.ScanHeadId && last.Value.Camera == profile.Camera)
             {
                 reversed = profile.EncoderValues[0] - last.Value.EncoderValues[0] < 0;
                 
