@@ -68,6 +68,17 @@
                 SelectedValue="{Binding Data.ScanHeadFilterById}"
                 SelectedValuePath="Key" />
 
+            <TextBlock Margin="15,5,5,5" VerticalAlignment="Center">For Camera:</TextBlock>
+            <ComboBox
+                Height="30"
+                MinWidth="60"
+                Margin="0,5,5,5"
+                VerticalAlignment="Center"
+                DisplayMemberPath="Value"
+                Focusable="False"
+                ItemsSource="{Binding Data.SelectableCameras, IsAsync=True}"
+                SelectedValue="{Binding Data.ScanHeadFilterByCamera}"
+                SelectedValuePath="Key" />
             <TextBlock Margin="35,5,5,5" VerticalAlignment="Center">Timeline Shows:</TextBlock>
 
             <ComboBox

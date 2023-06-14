@@ -57,6 +57,7 @@ public class TimelinePlotViewModel : Screen
         SetupPlot();
         DataManager.ProfileDataAdded += (_, _) => RefreshPlot();
         DataManager.HeadSelectionChanged += (_, _) => RefreshPlot();
+        DataManager.CameraSelectionChanged += (_, _) => RefreshPlot();
         DataManager.PropertyChanged += SelectedProfileChanged;
 
         PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("Pts over Encoder",
@@ -65,8 +66,8 @@ public class TimelinePlotViewModel : Screen
             new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs/1000, (double)p.ReducedEncoder))));
         PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("Pts over Time",
             new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs / 1000, p.NumPts))));
-        PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("LaserOnTime over Time",
-            new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs / 1000, p.LaserOnTimeUs))));
+        PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("LaserOnTime over Encoder",
+            new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedEncoder, p.LaserOnTimeUs))));
         PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("Avg Brightness Over Time",
             new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs / 1000,
                 p.Data.Length > 0 ? p.Data.Average(q=>q.B) : 0))));
@@ -108,6 +109,7 @@ public class TimelinePlotViewModel : Screen
         var headIds = DataManager.ScanHeadFilterById < 0
             ? DataManager.SelectableHeads.Skip(1).Select(q => q.Key)
             : new[] { DataManager.ScanHeadFilterById };
+         
         var xAxisMin = Double.MaxValue;
         var xAxisMax = Double.MinValue;
         var yAxisMin = Double.MaxValue;
@@ -123,7 +125,8 @@ public class TimelinePlotViewModel : Screen
                 MarkerFill = ColorDefinitions.OxyColorForCableId((uint)id),
                 MarkerSize = 1
             };
-            series.Points.AddRange(DataManager.Profiles.Where(q => q.ScanHeadId == id)
+            series.Points.AddRange(DataManager.Profiles.Where(q => q.ScanHeadId == id 
+                                                                   && (DataManager.ScanHeadFilterByCamera == 0 || q.Camera == DataManager.ScanHeadFilterByCamera) )
                 .Select(q =>
                 {
                     var t = SelectedPlotFunction(q);
