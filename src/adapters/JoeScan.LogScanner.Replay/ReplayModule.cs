@@ -9,11 +9,10 @@ public class ReplayModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
-        builder.RegisterType<ReplayAdapter>().As<IScannerAdapter>().WithAttributeFiltering();
+        builder.RegisterType<ReplayAdapter>().As<IScannerAdapter>();
         
         builder.Register(c => new ConfigurationBuilder<IReplayAdapterConfig>()
-            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetUserConfigLocation(), "adapters","replay","ReplayAdapter_user.json"))
-            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "adapters", "replay", "ReplayAdapter.json"))
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "ReplayAdapter.json"))
             .Build()).As<IReplayAdapterConfig>().SingleInstance();
     }
 }

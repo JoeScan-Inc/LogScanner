@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -27,11 +27,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ReplayAdapter.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    
     <None Update="ReplayAdapter.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+	<Target Name="CopyFiles" AfterTargets="PostBuildEvent">
+		<Copy SourceFiles="ReplayAdapter.json" DestinationFolder="C:\ProgramData\LogScanner\Profiles\Default">
+			<Output TaskParameter="CopiedFiles" ItemName="SuccessfullyCopiedFiles" />
+		</Copy>
+
+	</Target>
 </Project>

@@ -32,7 +32,7 @@ public class CoreModule : Module
         builder.RegisterType<RawProfileDumper>().AsSelf().SingleInstance();
 
 
-        builder.RegisterType<DefaultConfigLocator>().As<IConfigLocator>();
+        builder.RegisterType<DefaultConfigLocator>().As<IConfigLocator>().SingleInstance();
 
         // we store all configs in a single location, 
         // independent of the binaries location.

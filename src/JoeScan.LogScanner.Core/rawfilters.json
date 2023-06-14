@@ -1,0 +1,79 @@
+[
+  {
+    "Kind": "BoxFilter",
+    "ScanHeadId": 0,
+    "IsEnabled": true,
+    "Units" : "Millimeter",
+    "Left": -300,
+    "Right": 300,
+
+    "Bottom": 150,
+    "Top": 500
+  },
+  {
+    "Kind": "PolygonFilter",
+    "ScanHeadId": 2,
+    "Units": "Millimeter",
+    "IsEnabled": true,
+    "Vertices": [
+      {
+        "X": -120,
+        "Y": 22
+      },
+      {
+        "X": 0,
+        "Y": -12
+      },
+      {
+        "X": 350,
+        "Y": 80
+      },
+      {
+        "X": 350,
+        "Y": 400
+      },
+      {
+        "X": -120,
+        "Y": 400
+      },
+      {
+        "X": -120,
+        "Y": 22
+      }
+    ]
+  },
+  {
+    "Kind": "PolygonFilter",
+    "ScanHeadId": 1,
+    "IsEnabled": true,
+    "Units": "Millimeter",
+    "Vertices": [
+      {
+        "X": 120,
+        "Y": 25
+      },
+      {
+        "X": 0,
+        "Y": -12
+      },
+      {
+        "X": -350,
+        "Y": 80
+      },
+      {
+        "X": -350,
+        "Y": 400
+      },
+      {
+        "X": 120,
+        "Y": 400
+      },
+      {
+        "X": 120,
+        "Y": 25
+      }
+    ]
+  }
+]
+
+  

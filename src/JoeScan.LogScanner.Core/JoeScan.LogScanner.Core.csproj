@@ -16,12 +16,8 @@
     <Compile Include="..\Shared.AssemblyInfo.cs" Link="Shared.AssemblyInfo.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\config\rawfilters.json" Link="rawfilters.json" />
-  </ItemGroup>
-	<ItemGroup>
-		<None Include="..\..\config\core.ini" Link="core.ini" />
-	</ItemGroup>
+ 
+	
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.3.0" />
     <PackageReference Include="Autofac.Extras.NLog" Version="4.0.0" />
@@ -48,6 +44,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+	<Target Name="CopyFiles" AfterTargets="PostBuildEvent">
+		<Copy SourceFiles="core.ini;rawfilters.json" DestinationFolder="C:\ProgramData\LogScanner\Profiles\Default">
+			<Output TaskParameter="CopiedFiles" ItemName="SuccessfullyCopiedFiles" />
+		</Copy>
+
+	</Target>
+
+	
 
   
 

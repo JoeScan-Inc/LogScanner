@@ -40,11 +40,16 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="js50adapter.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
-  
+	<Target Name="CopyFiles" AfterTargets="PostBuildEvent">
+		<Copy SourceFiles="js50adapter.json" DestinationFolder="C:\ProgramData\LogScanner\Profiles\Default">
+			<Output TaskParameter="CopiedFiles" ItemName="SuccessfullyCopiedFiles" />
+		</Copy>
+
+	</Target>
 
   <ItemGroup>
     <ProjectReference Include="..\..\JoeScan.LogScanner.Core\JoeScan.LogScanner.Core.csproj" />

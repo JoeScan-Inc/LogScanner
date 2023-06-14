@@ -12,15 +12,8 @@ public class SyntheticDataModule : Module
     {
         builder.RegisterType<SyntheticDataAdapter>().As<IScannerAdapter>();
         builder.RegisterType<FakeLogGenerator>().AsSelf();
-        builder.Register(c =>
-        {
-            // since we're loaded into the main engine's application context,
-            // we won't find the config file next to the plugin dll. 
-            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-            return new ConfigurationBuilder<ISyntheticDataAdapterConfig>()
-                .UseJsonFile(Path.Combine(assemblyPath!,"SyntheticDataAdapter.json"))
-                .Build();
-        }).As<ISyntheticDataAdapterConfig>().SingleInstance();
+        builder.Register(c => new ConfigurationBuilder<ISyntheticDataAdapterConfig>()
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(),"SyntheticDataAdapter.json"))
+            .Build()).As<ISyntheticDataAdapterConfig>().SingleInstance();
     }
 }
