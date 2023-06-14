@@ -9,6 +9,7 @@ using RawViewer.Timeline;
 using System;
 using System.IO;
 using JoeScan.LogScanner.Core.Models;
+using System.Linq;
 
 namespace RawViewer.Toolbar;
 
@@ -53,7 +54,7 @@ public class ToolbarViewModel : Screen
                 EventAggregator.PublishOnUIThreadAsync(true);
                 var newProfiles = await DataReader.ReadFromFileAsync(openFileDialogSettings.FileName);
                 int count = 0;
-                Data.SetProfiles(newProfiles);
+                Data.SetProfiles(newProfiles.OrderBy(q=>q.TimeStampNs).ToList());
                 
             }
             catch (Exception e)
