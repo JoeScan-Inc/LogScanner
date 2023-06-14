@@ -5,12 +5,12 @@
   "EncoderPulseInterval": 0.2,
   "ScanHeads": [
     {
-      "Serial": 20669,
+      "Serial": 21416,
       "Id": 0,
       "Name": "Top",
       "MinLaserOn": 100,
-      "DefaultLaserOn": 1000,
-      "MaxLaserOn": 5000,
+      "DefaultLaserOn": 100,
+      "MaxLaserOn": 150,
       "ScanPhaseOffset": 0,
       "Alignment": {
         "ShiftX": 0.299,
@@ -23,48 +23,6 @@
         "Bottom": -2,
         "Left": -15,
         "Right": 15
-      }
-    },
-    {
-      "Serial": 20673,
-      "Id": 1,
-      "Name": "Left",
-      "MinLaserOn": 100,
-      "DefaultLaserOn": 1000,
-      "MaxLaserOn": 5000,
-      "ScanPhaseOffset": 500,
-      "Alignment": {
-        "ShiftX": -16.28,
-        "ShiftY": 19.357,
-        "RollDegrees": -114.8,
-        "Orientation": "CableIsDownstream"
-      },
-      "Window": {
-        "Top": 30,
-        "Bottom": -2,
-        "Left": -10,
-        "Right": 10
-      }
-    },
-    {
-      "Serial": 20674,
-      "Id": 2,
-      "Name": "Right",
-      "MinLaserOn": 100,
-      "DefaultLaserOn": 1000,
-      "MaxLaserOn": 5000,
-      "ScanPhaseOffset": 1000,
-      "Alignment": {
-        "ShiftX": 16.847,
-        "ShiftY": 19.264,
-        "RollDegrees": 115.01,
-        "Orientation": "CableIsDownstream"
-      },
-      "Window": {
-        "Top": 25,
-        "Bottom": -2,
-        "Left": -30,
-        "Right": 10
       }
     }
   ]

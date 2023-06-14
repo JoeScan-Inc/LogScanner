@@ -217,19 +217,19 @@ public class Js50Adapter : IScannerAdapter
             logger.Debug($"All scan heads connected.");
             foreach (var scanHead in scanSystem.ScanHeads)
             {
-                logger.Debug($"Active scan head: {scanHead.SerialNumber} ({scanHead.ID}) FW: {scanHead.Status.FirmwareVersion.Version}");
+                logger.Debug($"Active scan head: {scanHead.SerialNumber} ({scanHead.ID}) ");
             }
 
             logger.Debug($"Using DataFormat {Config.DataFormat}.");
-            var systemMaxScanRate = scanSystem!.GetMaxScanRate();
+            var minScanPeriod = scanSystem!.GetMinScanPeriod();
             logger!.Debug(
-                $"ScanSystem reported a Max Scan Rate of {systemMaxScanRate} Hz (min Scan Period: {1000.0 / systemMaxScanRate:F2} ms)");
-            logger.Debug($"Configuration requested ScanRate is {Config.ScanRate} Hz (min Scan Period: {1000.0 / Config.ScanRate:F2} ms)");
-            if (Config.ScanRate > systemMaxScanRate)
-            {
-                logger.Warn($"Configuration requested rate ({Config.ScanRate} Hz) is higher than the system max rate ({systemMaxScanRate} Hz) - using system max rate.");
-            }
-            scanSystem.StartScanning(Config.ScanRate > systemMaxScanRate ? systemMaxScanRate : Config.ScanRate, Config.DataFormat);
+                $"ScanSystem reported a MinScanPeriod of {minScanPeriod} μs)");
+           // logger.Debug($"Configuration requested ScanRate is {Config.ScanRate} Hz (min Scan Period: {1000.0 / Config.ScanRate:F2} ms)");
+            // if (Config.ScanRate > minScanPeriod)
+            // {
+            //     logger.Warn($"Configuration requested rate ({Config.ScanRate} Hz) is higher than the system max rate ({minScanPeriod} Hz) - using system max rate.");
+            // }
+            scanSystem.StartScanning(minScanPeriod+100, Config.DataFormat);
             int failedToPost = 0;
             // we seem to have connected and are scanning
             autoResetEvent.Set();
@@ -285,7 +285,7 @@ public class Js50Adapter : IScannerAdapter
     private ScanSystem SetupScanSystem()
     {
         logger!.Debug("Setting up ScanSystem");
-        var system = new ScanSystem();
+        var system = new ScanSystem(ScanSystemUnits.Inches);
         logger.Debug($"Configuration contains {Config.ScanHeads.Count()} heads.");
 
         try
@@ -299,9 +299,9 @@ public class Js50Adapter : IScannerAdapter
                 logger.Debug($"Setting Laser Exposure for {scanHead.ID} " +
                              $"to {headConfig.MinLaserOn}/{headConfig.DefaultLaserOn}/{headConfig.MaxLaserOn} "
                              + "(min/default/max)");
-                conf.SetLaserOnTime(headConfig.MinLaserOn, headConfig.DefaultLaserOn, headConfig.MaxLaserOn);
-                logger.Debug($"Setting Scan Phase Offset for {scanHead.ID} to {headConfig.ScanPhaseOffset} µs");
-                conf.ScanPhaseOffset = headConfig.ScanPhaseOffset;
+                conf.SetLaserOnTime((uint)headConfig.MinLaserOn,(uint) headConfig.DefaultLaserOn, (uint)headConfig.MaxLaserOn);
+                
+                
                 logger.Debug($"Applying configuration to {scanHead.ID}");
                 scanHead.Configure(conf);
                 logger.Debug($"Setting Window for {scanHead.ID} to {headConfig.WindowTop}/"
@@ -319,8 +319,11 @@ public class Js50Adapter : IScannerAdapter
                 + $" Orientation: {headConfig.AlignmentOrientation}");
                 scanHead.SetAlignment(headConfig.AlignmentRollDegrees,
                     headConfig.AlignmentShiftX,
-                    headConfig.AlignmentShiftY,
-                    headConfig.AlignmentOrientation);
+                    headConfig.AlignmentShiftY
+                    );
+                system.AddPhase();
+                system.AddPhaseElement(headConfig.Id,Camera.CameraA);
+                system.AddPhaseElement(headConfig.Id,Camera.CameraB);
             }
             logger.Debug("Done setting up ScanSystem");
             return system;
