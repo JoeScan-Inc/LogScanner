@@ -20,6 +20,7 @@ public class DataManager : PropertyChangedBase
 {
     public event EventHandler ProfileDataAdded;
     public event EventHandler HeadSelectionChanged;
+    public event EventHandler CameraSelectionChanged;
 
     private RawProfile? selectedProfile;
     public ILogger Logger { get; }
@@ -28,9 +29,19 @@ public class DataManager : PropertyChangedBase
 
     public ObservableCollection<KeyValuePair<int, string>> SelectableHeads { get; } =
         new ObservableCollection<KeyValuePair<int, string>>();
+    public ObservableCollection<KeyValuePair<int, string>> SelectableCameras { get; } =
+        new ObservableCollection<KeyValuePair<int, string>>()
+        {
+            new KeyValuePair<int, string>(0, "A and B"),
+            new KeyValuePair<int, string>(1, "A"),
+            new KeyValuePair<int, string>(2, "B"),
+        };
+
+
     private object _lock = new object();
     private readonly ICollectionView filteredView;
     private int scanHeadFilterById = -1;
+    private int scanHeadFilterByCamera = 0;
     private double encoderPulseInterval;
 
     public int ScanHeadFilterById
@@ -48,7 +59,21 @@ public class DataManager : PropertyChangedBase
             OnHeadSelectionChanged();
         }
     }
-
+    public int ScanHeadFilterByCamera
+    {
+        get => scanHeadFilterByCamera;
+        set
+        {
+            if (value == scanHeadFilterByCamera)
+            {
+                return;
+            }
+            scanHeadFilterByCamera = value;
+            NotifyOfPropertyChange(() => ScanHeadFilterByCamera);
+            filteredView.Refresh();
+            OnCameraSelectionChanged();
+        }
+    }
     public RawProfile? SelectedProfile
     {
         get => selectedProfile;
@@ -102,16 +127,24 @@ public class DataManager : PropertyChangedBase
 
     private bool Filter(object obj)
     {
-        if (ScanHeadFilterById == -1)
+        if (ScanHeadFilterById == -1 && ScanHeadFilterByCamera == 0)
         {
             return true;
         }
         if (obj is RawProfile profile)
         {
-            if (profile.ScanHeadId == (uint)ScanHeadFilterById)
+           
+            if (ScanHeadFilterById != -1 && profile.ScanHeadId != (uint)ScanHeadFilterById)
             {
-                return true;
+                return false;
             }
+
+            if (ScanHeadFilterByCamera != 0 && profile.Camera != (uint)ScanHeadFilterByCamera)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         return false;
@@ -220,5 +253,10 @@ public class DataManager : PropertyChangedBase
     protected virtual void OnHeadSelectionChanged()
     {
         HeadSelectionChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    protected virtual void OnCameraSelectionChanged()
+    {
+        CameraSelectionChanged?.Invoke(this, EventArgs.Empty);
     }
 }
