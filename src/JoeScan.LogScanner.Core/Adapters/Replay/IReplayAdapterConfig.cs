@@ -1,6 +1,6 @@
 ﻿using Config.Net;
 
-namespace JoeScan.LogScanner.Replay;
+namespace JoeScan.LogScanner.Core.Adapters.Replay;
 
 public interface IReplayAdapterConfig
 {

@@ -1,15 +1,13 @@
 ﻿using JoeScan.LogScanner.Core.Events;
 using JoeScan.LogScanner.Core.Extensions;
-using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
-using JoeScan.Pinchot;
 using NLog;
 using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
 using Profile = JoeScan.LogScanner.Core.Models.Profile;
 
-namespace JoeScan.LogScanner.SyntheticDataAdapter;
+namespace JoeScan.LogScanner.Core.Adapters.SyntheticData;
 
 public class SyntheticDataAdapter : IScannerAdapter
 {

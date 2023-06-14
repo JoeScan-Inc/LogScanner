@@ -1,5 +1,4 @@
-﻿using Autofac.Features.AttributeFilters;
-using Config.Net;
+﻿using Config.Net;
 using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.Core.Events;
 using JoeScan.LogScanner.Core.Extensions;
@@ -10,7 +9,7 @@ using NLog;
 using System.Threading.Tasks.Dataflow;
 using Profile = JoeScan.LogScanner.Core.Models.Profile;
 
-namespace JoeScan.LogScanner.Js50;
+namespace JoeScan.LogScanner.Core.Adapters.JS50;
 
 public class Js50Adapter : IScannerAdapter
 {
@@ -35,11 +34,10 @@ public class Js50Adapter : IScannerAdapter
 
     #region Lifecycle
 
-    public Js50Adapter(ILogger logger, IConfigLocator configLocator)
+    public Js50Adapter(ILogger logger, IJs50AdapterConfig config)
     {
-        Config = new ConfigurationBuilder<IJs50AdapterConfig>()
-            .UseJsonFile(Path.Combine(configLocator.GetDefaultConfigLocation(),"js50adapter.json"))
-            .Build();
+        Config = config;
+
         this.logger = logger;
         encoderUpdater = new ScanSyncReceiverThread(logger);
         logger.Debug($"Created Js50Adapter using JoeScan Pinchot API version {Pinchot.VersionInformation.Version}");
@@ -51,7 +49,7 @@ public class Js50Adapter : IScannerAdapter
     #endregion
 
     #region IScannerAdapter Implementation
-    public string Name => $"JS-50";
+    public string Name => $"JS-50 v16.1";
     public UnitSystem Units { get; }
     public bool IsConfigured { get; private set; }
 

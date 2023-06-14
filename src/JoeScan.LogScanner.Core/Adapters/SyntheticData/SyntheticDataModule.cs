@@ -2,10 +2,9 @@
 using Config.Net;
 using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.Core.Interfaces;
-using System.Reflection;
 using Module = Autofac.Module;
 
-namespace JoeScan.LogScanner.SyntheticDataAdapter;
+namespace JoeScan.LogScanner.Core.Adapters.SyntheticData;
 public class SyntheticDataModule : Module
 {
     protected override void Load(ContainerBuilder builder)

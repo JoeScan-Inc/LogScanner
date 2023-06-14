@@ -1,10 +1,9 @@
 ﻿using Autofac;
-using Autofac.Features.AttributeFilters;
 using Config.Net;
 using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.Core.Interfaces;
 
-namespace JoeScan.LogScanner.Replay;
+namespace JoeScan.LogScanner.Core.Adapters.Replay;
 public class ReplayModule : Module 
 {
     protected override void Load(ContainerBuilder builder)

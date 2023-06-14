@@ -1,7 +1,7 @@
 ﻿using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Models;
 
-namespace JoeScan.LogScanner.Js50;
+namespace JoeScan.LogScanner.Core.Adapters.JS50;
 
 public static class PinchotProfileConverter
 {

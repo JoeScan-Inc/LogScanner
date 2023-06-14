@@ -1,8 +1,7 @@
 ﻿using Config.Net;
 using JoeScan.Pinchot;
-using System.Security.Permissions;
 
-namespace JoeScan.LogScanner.Js50;
+namespace JoeScan.LogScanner.Core.Adapters.JS50;
 
 public interface IJs50AdapterConfig
 {

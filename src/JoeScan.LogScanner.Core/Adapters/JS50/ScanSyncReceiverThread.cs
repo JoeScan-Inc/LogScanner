@@ -4,7 +4,7 @@ using NLog;
 using System.Net;
 using System.Net.Sockets;
 
-namespace JoeScan.LogScanner.Js50;
+namespace JoeScan.LogScanner.Core.Adapters.JS50;
 
 // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
 public  class ScanSyncReceiverThread : IDisposable

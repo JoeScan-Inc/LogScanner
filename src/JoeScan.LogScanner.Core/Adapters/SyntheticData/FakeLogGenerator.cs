@@ -2,7 +2,7 @@
 using JoeScan.LogScanner.Core.Models;
 using NLog;
 
-namespace JoeScan.LogScanner.SyntheticDataAdapter;
+namespace JoeScan.LogScanner.Core.Adapters.SyntheticData;
 
 public class FakeLogGenerator
 {

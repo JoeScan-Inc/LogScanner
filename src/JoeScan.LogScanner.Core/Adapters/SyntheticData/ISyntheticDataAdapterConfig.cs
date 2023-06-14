@@ -1,7 +1,6 @@
-﻿using Config.Net;
-using JoeScan.LogScanner.Core.Models;
+﻿using JoeScan.LogScanner.Core.Models;
 
-namespace JoeScan.LogScanner.SyntheticDataAdapter;
+namespace JoeScan.LogScanner.Core.Adapters.SyntheticData;
 
 public interface ISyntheticDataAdapterConfig
 {

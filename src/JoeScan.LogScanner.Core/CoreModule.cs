@@ -1,6 +1,9 @@
 ﻿using Autofac;
 using Autofac.Extras.NLog;
 using Autofac.Features.AttributeFilters;
+using JoeScan.LogScanner.Core.Adapters.JS50;
+using JoeScan.LogScanner.Core.Adapters.Replay;
+using JoeScan.LogScanner.Core.Adapters.SyntheticData;
 using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
@@ -17,6 +20,9 @@ public class CoreModule : Module
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterModule<NLogModule>();
+        builder.RegisterModule<SyntheticDataModule>();
+        builder.RegisterModule<Js50Module>();
+        builder.RegisterModule<ReplayModule>();
 
         builder.RegisterType<LogScannerEngine>().AsSelf().SingleInstance();
         builder.RegisterType<SingleZoneLogAssembler>().As<ILogAssembler>().SingleInstance();
@@ -31,8 +37,9 @@ public class CoreModule : Module
         builder.RegisterType<LogSectionBuilder>().AsSelf().SingleInstance();
         builder.RegisterType<RawProfileDumper>().AsSelf().SingleInstance();
 
-
         builder.RegisterType<DefaultConfigLocator>().As<IConfigLocator>().SingleInstance();
+
+
 
         // we store all configs in a single location, 
         // independent of the binaries location.
