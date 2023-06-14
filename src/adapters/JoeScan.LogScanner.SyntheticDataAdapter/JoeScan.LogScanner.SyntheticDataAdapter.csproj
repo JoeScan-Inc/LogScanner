@@ -24,8 +24,13 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <None Update="SyntheticDataAdapter.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
-	
+	<Target Name="CopyFiles" AfterTargets="PostBuildEvent">
+		<Copy SourceFiles="SyntheticDataAdapter.json" DestinationFolder="C:\ProgramData\LogScanner\Profiles\Default">
+			<Output TaskParameter="CopiedFiles" ItemName="SuccessfullyCopiedFiles" />
+		</Copy>
+
+	</Target>
 </Project>

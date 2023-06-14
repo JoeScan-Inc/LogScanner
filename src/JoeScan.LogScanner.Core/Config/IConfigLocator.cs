@@ -4,4 +4,6 @@ public interface IConfigLocator
 {
     string GetDefaultConfigLocation ();
     string GetUserConfigLocation ();
+
+    string ProfileName { get; }
 }

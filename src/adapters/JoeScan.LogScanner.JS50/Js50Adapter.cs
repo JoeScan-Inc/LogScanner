@@ -1,5 +1,6 @@
 ﻿using Autofac.Features.AttributeFilters;
 using Config.Net;
+using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.Core.Events;
 using JoeScan.LogScanner.Core.Extensions;
 using JoeScan.LogScanner.Core.Interfaces;
@@ -34,10 +35,10 @@ public class Js50Adapter : IScannerAdapter
 
     #region Lifecycle
 
-    public Js50Adapter(ILogger logger)
+    public Js50Adapter(ILogger logger, IConfigLocator configLocator)
     {
         Config = new ConfigurationBuilder<IJs50AdapterConfig>()
-            .UseJsonFile("js50adapter.json")
+            .UseJsonFile(Path.Combine(configLocator.GetDefaultConfigLocation(),"js50adapter.json"))
             .Build();
         this.logger = logger;
         encoderUpdater = new ScanSyncReceiverThread(logger);
