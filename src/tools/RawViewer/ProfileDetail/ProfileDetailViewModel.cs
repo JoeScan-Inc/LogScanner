@@ -9,7 +9,8 @@ public class ProfileDetailViewModel : Screen
     private RawProfile? selectedProfile;
     public DataManager DataManager { get; }
 
-    public double ZOffset => selectedProfile.ReducedEncoder * DataManager.EncoderPulseInterval;
+    public double ZOffset =>
+        selectedProfile != null ? selectedProfile.ReducedEncoder * DataManager.EncoderPulseInterval : 0;
 
     public RawProfile? SelectedProfile
     {
