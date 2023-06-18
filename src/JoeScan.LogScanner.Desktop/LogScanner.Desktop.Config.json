@@ -1,0 +1,7 @@
+{
+  "ActiveAdapter": "Replay",
+  "Units": "Inches",
+  "LiveProfileConfig": {
+    "ShowFilters" :  true
+  }
+}

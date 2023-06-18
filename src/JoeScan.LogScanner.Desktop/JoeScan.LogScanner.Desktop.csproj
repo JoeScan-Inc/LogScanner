@@ -84,7 +84,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\config\LogScanner.Desktop.Config.json" Link="LogScanner.Desktop.Config.json" />
     <Content Include="Assets\icon.ico" />
   </ItemGroup>
 
@@ -93,5 +92,14 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+    
+	<Target Name="CopyFiles" AfterTargets="PostBuildEvent">
+		<ItemGroup>
+			<ConfigFiles Include="LogScanner.Desktop.Config.json" />
+		</ItemGroup>
+		<Copy SourceFiles="@(ConfigFiles)" DestinationFolder="C:\ProgramData\LogScanner\Profiles\Default">
+			<Output TaskParameter="CopiedFiles" ItemName="SuccessfullyCopiedFiles" />
+		</Copy>
 
+	</Target>
 </Project>
