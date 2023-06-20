@@ -39,14 +39,25 @@
 
 
                     <ToggleButton
+                        x:Name="ShowBoundingBox"
                         Content="&#xF0485;"
                         DockPanel.Dock="Left"
                         Style="{StaticResource ToolbarToggleButton}">
                         <ToggleButton.ToolTip>
-                            <ToolTip>Show/Hide Bounding Box</ToolTip>
+                            <ToolTip>Show/Hide Profile Bounding Box</ToolTip>
+                        </ToggleButton.ToolTip>
+                    </ToggleButton>
+                    <ToggleButton
+                        x:Name="ShowFilters"
+                        Content="&#xF1856;"
+                        DockPanel.Dock="Left"
+                        Style="{StaticResource ToolbarToggleButton}">
+                        <ToggleButton.ToolTip>
+                            <ToolTip>Show/Hide Flights and Window Filter Outline</ToolTip>
                         </ToggleButton.ToolTip>
                     </ToggleButton>
                     <Button
+                        x:Name="FitAll"
                         Margin="4"
                         Padding="4"
                         VerticalAlignment="Center"
@@ -57,7 +68,7 @@
                         Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}"
                         Style="{DynamicResource {x:Static adonisUi:Styles.AccentToolbarButton}}">
                         <Button.ToolTip>
-                            <ToolTip>Show/Hide Bounding Box</ToolTip>
+                            <ToolTip>Fit All</ToolTip>
                         </Button.ToolTip>
                     </Button>
                 </DockPanel>
