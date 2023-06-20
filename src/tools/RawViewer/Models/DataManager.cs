@@ -1,4 +1,6 @@
 ﻿using Caliburn.Micro;
+using JoeScan.LogScanner.Core.Config;
+using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using NLog;
 using RawViewer.Helpers;
@@ -14,18 +16,44 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace RawViewer;
+namespace RawViewer.Models;
 
 public class DataManager : PropertyChangedBase
 {
+    #region Events
+
     public event EventHandler ProfileDataAdded;
     public event EventHandler HeadSelectionChanged;
     public event EventHandler CameraSelectionChanged;
 
+    #endregion
+
+    #region Private Fields
+
     private RawProfile? selectedProfile;
+    private List<Profile> originalData;
+    private readonly object locker = new();
+    private readonly ICollectionView filteredView;
+
+    private int scanHeadFilterById = -1;
+    private int scanHeadFilterByCamera = 0;
+    private double encoderPulseInterval;
+    private bool useFlightsAndWindowFilter;
+
+    #endregion
+
+    #region Injected Properties
+
     public ILogger Logger { get; }
+    public ILogAssembler Assembler { get; }
+    public IFlightsAndWindowFilter FlightsFilter { get; }
+
+    #endregion
+
+    #region UI Bound Properties
+
     public IObservableCollection<RawProfile> Profiles { get; } = new BindableCollection<RawProfile>();
-    
+
 
     public ObservableCollection<KeyValuePair<int, string>> SelectableHeads { get; } =
         new ObservableCollection<KeyValuePair<int, string>>();
@@ -36,13 +64,6 @@ public class DataManager : PropertyChangedBase
             new KeyValuePair<int, string>(1, "A"),
             new KeyValuePair<int, string>(2, "B"),
         };
-
-
-    private object _lock = new object();
-    private readonly ICollectionView filteredView;
-    private int scanHeadFilterById = -1;
-    private int scanHeadFilterByCamera = 0;
-    private double encoderPulseInterval;
 
     public int ScanHeadFilterById
     {
@@ -102,28 +123,69 @@ public class DataManager : PropertyChangedBase
         }
     }
 
+    public bool UseFlightsAndWindowFilter
+    {
+        get => useFlightsAndWindowFilter;
+        set
+        {
+            if (value == useFlightsAndWindowFilter)
+            {
+                return;
+            }
+            useFlightsAndWindowFilter = value;
+            FilterAndAdd();
+            NotifyOfPropertyChange(() => UseFlightsAndWindowFilter);
+        }
+    }
+
+    #endregion
+
+
+    #region Commands
+
     public RelayCommand GoToFirstProfileCommand { get; }
     public RelayCommand GoToLastProfileCommand { get; }
     public RelayCommand GoToNextProfileCommand { get; }
     public RelayCommand GoToPreviousProfileCommand { get; }
 
-    public DataManager(ILogger logger)
+    #endregion
+
+    #region Lifecycle
+
+    public DataManager(ILogger logger, CoreConfig config, ILogAssembler assembler,
+        IFlightsAndWindowFilter flightsFilter)
     {
         Logger = logger;
-        BindingOperations.EnableCollectionSynchronization(SelectableHeads, _lock);
+        Assembler = assembler;
+        FlightsFilter = flightsFilter;
+        BindingOperations.EnableCollectionSynchronization(SelectableHeads, locker);
         filteredView = CollectionViewSource.GetDefaultView(Profiles);
         filteredView.Filter = Filter;
-        GoToFirstProfileCommand = new RelayCommand((o) => GoToFirstProfile(), 
-            (o) =>Profiles.Count > 0 && SelectedProfile != Profiles[0]);
+        GoToFirstProfileCommand = new RelayCommand((o) => GoToFirstProfile(),
+            (o) => Profiles.Count > 0 && SelectedProfile != Profiles[0]);
         GoToLastProfileCommand = new RelayCommand((o) => GoToLastProfile(),
             (o) => Profiles.Count > 0 && SelectedProfile != Profiles[^1]);
         GoToNextProfileCommand = new RelayCommand((o) => GoToNextProfile(),
             (o) => Profiles.Count > 0 && SelectedProfile != Profiles[^1]);
         GoToPreviousProfileCommand = new RelayCommand((o) => GoToPreviousProfile(),
             (o) => Profiles.Count > 0 && SelectedProfile != Profiles[0]);
+        EncoderPulseInterval = config.EncoderPulseInterval;
     }
 
-    
+    #endregion
+
+
+    #region Public Methods
+
+    public void SetProfiles(List<Profile> newProfiles)
+    {  
+        originalData = newProfiles;
+        FilterAndAdd();
+    }
+
+    #endregion
+
+    #region Private Methods
 
     private bool Filter(object obj)
     {
@@ -133,7 +195,7 @@ public class DataManager : PropertyChangedBase
         }
         if (obj is RawProfile profile)
         {
-           
+
             if (ScanHeadFilterById != -1 && profile.ScanHeadId != (uint)ScanHeadFilterById)
             {
                 return false;
@@ -148,6 +210,60 @@ public class DataManager : PropertyChangedBase
         }
 
         return false;
+    }
+
+    private void FilterAndAdd()
+    {
+        Profiles.Clear();
+        SelectableHeads.Clear();
+        SelectableHeads.Add(new KeyValuePair<int, string>(-1, "All Heads"));
+        HashSet<uint> headsInFile = new HashSet<uint>();
+        int index = 0;
+        foreach (var p in originalData)
+        {
+            var rp = UseFlightsAndWindowFilter ? new RawProfile(FlightsFilter.Apply((Profile)p.Clone())) { Index = index++ } : new RawProfile(p) { Index = index++ };
+            Profiles.Add(rp);
+            rp.ReducedTimeStampNs = rp.TimeStampNs - Profiles[0].TimeStampNs;
+            rp.ReducedEncoder = rp.EncoderValue - Profiles[0].EncoderValue;
+            headsInFile.Add(p.ScanHeadId);
+        }
+        foreach (uint headIds in headsInFile)
+        {
+            SelectableHeads.Add(new KeyValuePair<int, string>((int)headIds, $"Head {headIds}"));
+        }
+        OnProfileDataAdded();
+    }
+
+    #endregion
+
+
+    #region Event Invocation
+
+    protected virtual void OnProfileDataAdded()
+    {
+        ProfileDataAdded?.Invoke(this, EventArgs.Empty);
+    }
+
+    protected virtual void OnHeadSelectionChanged()
+    {
+        HeadSelectionChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    protected virtual void OnCameraSelectionChanged()
+    {
+        CameraSelectionChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    #endregion
+
+    #region UI Callbacks
+
+    public void RunAssembler()
+    {
+        foreach (var rawProfile in Profiles)
+        {
+            Assembler.AddProfile(rawProfile.Profile);
+        }
     }
 
     public void GoToFirstProfile()
@@ -186,13 +302,13 @@ public class DataManager : PropertyChangedBase
         {
             var idx = Profiles.IndexOf(SelectedProfile);
             var offset = 1;
-            while (idx+offset < Profiles.Count && Profiles[idx+offset].ScanHeadId != scanHeadFilterById)
+            while (idx + offset < Profiles.Count && Profiles[idx + offset].ScanHeadId != scanHeadFilterById)
             {
                 offset++;
             }
             SelectedProfile = Profiles[idx + offset];
         }
-        
+
     }
 
     public void GoToPreviousProfile()
@@ -213,50 +329,6 @@ public class DataManager : PropertyChangedBase
             SelectedProfile = Profiles[idx + offset];
         }
     }
-    
-    public void FillAvailableHeads()
-    {
-        SelectableHeads.Clear();
-        SelectableHeads.Add(new KeyValuePair<int, string>(-1,"All Heads"));
-        foreach (uint headIds in Profiles.Select(q=>q.ScanHeadId).Distinct())
-        {
-            SelectableHeads.Add(new KeyValuePair<int, string>((int) headIds, $"Head {headIds}"));
-        }
-    }
 
-    public void SetProfiles(List<RawProfile> newProfiles)
-    {
-        Profiles.Clear();
-        foreach (var newProfile in newProfiles)
-        {
-            Profiles.Add(newProfile);
-        }
-        FillAvailableHeads();
-        ReduceToStart();
-        OnProfileDataAdded();
-    }
-
-    private void ReduceToStart()
-    {
-        foreach (var rawProfile in Profiles)
-        {
-            rawProfile.ReducedTimeStampNs = rawProfile.TimeStampNs - Profiles[0].TimeStampNs;
-            rawProfile.ReducedEncoder = rawProfile.EncoderValue - Profiles[0].EncoderValue;
-        }
-    }
-
-    protected virtual void OnProfileDataAdded()
-    {
-        ProfileDataAdded?.Invoke(this, EventArgs.Empty);
-    }
-
-    protected virtual void OnHeadSelectionChanged()
-    {
-        HeadSelectionChanged?.Invoke(this, EventArgs.Empty);
-    }
-
-    protected virtual void OnCameraSelectionChanged()
-    {
-        CameraSelectionChanged?.Invoke(this, EventArgs.Empty);
-    }
+    #endregion
 }

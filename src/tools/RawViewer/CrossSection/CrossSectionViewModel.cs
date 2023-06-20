@@ -2,10 +2,12 @@
 using JoeScan.LogScanner.Shared.Helpers;
 using NLog;
 using OxyPlot;
+using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using OxyPlot.Legends;
 using OxyPlot.Series;
 using RawViewer.Helpers;
+using RawViewer.Models;
 using System.ComponentModel;
 using System.Linq;
 
@@ -39,6 +41,7 @@ public class CrossSectionViewModel : Screen
         }
         var p = DataManager.SelectedProfile;
         CrossSectionPlot.Series.Clear();
+        CrossSectionPlot.Annotations.Clear();
         if (p != null)
         {
             var series = new ScatterSeries()
@@ -50,7 +53,18 @@ public class CrossSectionViewModel : Screen
             };
             CrossSectionPlot.Series.Add(series);
             series.Points.AddRange(p.Data.Select(q=>new ScatterPoint(q.X,q.Y)));
-
+            CrossSectionPlot.Annotations.Add(new RectangleAnnotation()
+            {
+                MinimumX = p.Profile.BoundingBox.Left,
+                MaximumX = p.Profile.BoundingBox.Right,
+                MinimumY = p.Profile.BoundingBox.Bottom,
+                MaximumY = p.Profile.BoundingBox.Top,
+                Stroke = OxyColor.FromArgb(100,ColorDefinitions.OxyColorForCableId(p.ScanHeadId).R,
+                    ColorDefinitions.OxyColorForCableId(p.ScanHeadId).G, ColorDefinitions.OxyColorForCableId(p.ScanHeadId).B),
+                StrokeThickness = 1,
+                Fill = OxyColors.Transparent
+                
+            });
         }
         CrossSectionPlot.InvalidatePlot(true);
     }
@@ -76,8 +90,8 @@ public class CrossSectionViewModel : Screen
 
         columnAxis = new LinearAxis
         {
-            Minimum = -30,
-            Maximum = 30,
+            Minimum = -500,
+            Maximum = 500,
             PositionAtZeroCrossing = true,
             AxislineStyle = LineStyle.Solid,
             AxislineColor = PlotColorService.MajorGridLineColor,
@@ -90,15 +104,15 @@ public class CrossSectionViewModel : Screen
             MinorGridlineColor = PlotColorService.MinorGridLineColor,
             IsZoomEnabled = true,
             TextColor = PlotColorService.AxisTextColor,
-            Position = AxisPosition.Bottom
-            // LabelFormatter = q => $"{q} {scanSystemManager.ScanSystemUnits.UiString()}"
+            Position = AxisPosition.Bottom,
+             LabelFormatter = q => $"{q} mm"
         };
         CrossSectionPlot.Axes.Add(columnAxis);
 
         rowAxis = new LinearAxis
         {
-            Minimum = -30,
-            Maximum = 30,
+            Minimum = -200,
+            Maximum = 800,
             PositionAtZeroCrossing = true,
             AxislineStyle = LineStyle.Solid,
             AxislineColor = PlotColorService.MajorGridLineColor,
@@ -111,8 +125,8 @@ public class CrossSectionViewModel : Screen
             MinorGridlineColor = PlotColorService.MinorGridLineColor,
             IsZoomEnabled = true,
             TextColor = PlotColorService.AxisTextColor,
-            Position = AxisPosition.Left
-            // LabelFormatter = q => $"{q} {scanSystemManager.ScanSystemUnits.UiString()}"
+            Position = AxisPosition.Left,
+            LabelFormatter = q => $"{q} mm"
         };
         CrossSectionPlot.Axes.Add(rowAxis);
     }

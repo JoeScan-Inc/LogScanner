@@ -14,6 +14,7 @@ using JoeScan.LogScanner.Shared.Helpers;
 using OxyPlot.Annotations;
 using System.ComponentModel;
 using System.Drawing.Imaging;
+using RawViewer.Models;
 
 namespace RawViewer.Timeline;
 

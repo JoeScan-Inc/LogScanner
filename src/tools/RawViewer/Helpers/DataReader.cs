@@ -1,4 +1,5 @@
-﻿using JoeScan.LogScanner.Core.Models;
+﻿using JoeScan.LogScanner.Core.Geometry;
+using JoeScan.LogScanner.Core.Models;
 using RawViewer.Shell;
 using System;
 using System.Collections.Generic;
@@ -14,11 +15,11 @@ namespace RawViewer.Helpers;
 
 public static class DataReader
 {
-    public static Task<List<RawProfile>> ReadFromFileAsync(string fileName)
+    public static Task<List<Profile>> ReadFromFileAsync(string fileName)
     {
         return Task.Run(() =>
         {
-            var l = new List<RawProfile>();
+            var l = new List<Profile>();
             var sw = Stopwatch.StartNew();
             int idx = 0;
             BinaryReader? br = null;
@@ -40,7 +41,7 @@ public static class DataReader
                 {
                     var p = ProfileReaderWriter.Read(br);
 
-                    var r = new RawProfile(p) { Index = idx++ };
+                    var r = BoundingBox.UpdateBoundingBox(UnitConverter.Convert(p!.Units, UnitSystem.Millimeters, p));
                     l.Add(r);
                 }
             }
@@ -60,11 +61,11 @@ public static class DataReader
         });
     }
 
-    public static Task<List<RawProfile>> ReadFromLogModelAsync(string fileName)
+    public static Task<List<Profile>> ReadFromLogModelAsync(string fileName)
     {
         return Task.Run(() =>
         {
-            var l = new List<RawProfile>();
+            var l = new List<Profile>();
             var sw = Stopwatch.StartNew();
             int idx = 0;
 
@@ -73,8 +74,8 @@ public static class DataReader
                 var log = RawLogReaderWriter.Read(fileName);
                 foreach (var profile in log.ProfileData)
                 {
-                    var r = new RawProfile(profile) { Index = idx++ };
-                    l.Add(r);
+                   
+                    l.Add(profile);
                 }
             }
             catch (Exception e)

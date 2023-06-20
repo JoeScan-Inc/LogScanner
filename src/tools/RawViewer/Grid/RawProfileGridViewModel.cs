@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using NLog;
+using RawViewer.Models;
 using System.Windows.Controls;
 
 namespace RawViewer.Grid;

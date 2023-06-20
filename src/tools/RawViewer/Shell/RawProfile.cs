@@ -11,6 +11,8 @@ public class RawProfile
     {
         this.p = p;
     }
+
+    public Profile Profile => p;
     public int Index { get; set; }
     public uint ScanHeadId => p.ScanHeadId;
     public Point2D[] Data => p.Data;

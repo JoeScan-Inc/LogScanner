@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using RawViewer.Models;
 using RawViewer.Shell;
 using System.ComponentModel;
 
@@ -11,6 +12,7 @@ public class ProfileDetailViewModel : Screen
 
     public double ZOffset =>
         selectedProfile != null ? selectedProfile.ReducedEncoder * DataManager.EncoderPulseInterval : 0;
+    public double ZOffsetM => ZOffset/1000.0;
 
     public RawProfile? SelectedProfile
     {
@@ -24,6 +26,7 @@ public class ProfileDetailViewModel : Screen
             selectedProfile = value;
             NotifyOfPropertyChange(() => SelectedProfile);
             NotifyOfPropertyChange(() => ZOffset);
+            NotifyOfPropertyChange(() => ZOffsetM);
         }
     }
 

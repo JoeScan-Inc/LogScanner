@@ -69,7 +69,7 @@ public class Profile : ICloneable
     /// </summary>
     public InputFlags Inputs { get; set; }
 
-    internal Rect BoundingBox { get; set; } = Rect.Empty;
+    public Rect BoundingBox { get; set; } = Rect.Empty;
 
     // TODO: add container to hold filtered data instead of throwing it away
 

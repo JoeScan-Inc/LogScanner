@@ -17,6 +17,7 @@ using AxisPosition = OxyPlot.Axes.AxisPosition;
 using LegendPosition = OxyPlot.Legends.LegendPosition;
 using AdonisUI.Controls;
 using System.Windows;
+using RawViewer.Models;
 
 namespace RawViewer.Shell;
 
@@ -71,7 +72,7 @@ public class ShellViewModel : Screen, IHandle<bool>
         Logger = logger;
         this.dialogService = dialogService;
         this.config = config;
-        Data.EncoderPulseInterval = config.EncoderPulseInterval;
+        
     }
 
     
@@ -94,7 +95,7 @@ public class ShellViewModel : Screen, IHandle<bool>
             Application.Current.Dispatcher.Invoke(() =>
             {
                
-                config.EncoderPulseInterval = Data.EncoderPulseInterval;
+                // config.EncoderPulseInterval = Data.EncoderPulseInterval;
             });
             return true;
         }), cancellationToken);
