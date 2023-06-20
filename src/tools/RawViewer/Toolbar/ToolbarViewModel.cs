@@ -10,6 +10,7 @@ using System;
 using System.IO;
 using JoeScan.LogScanner.Core.Models;
 using System.Linq;
+using RawViewer.Models;
 
 namespace RawViewer.Toolbar;
 
@@ -52,10 +53,7 @@ public class ToolbarViewModel : Screen
             try
             {
                 EventAggregator.PublishOnUIThreadAsync(true);
-                var newProfiles = await DataReader.ReadFromFileAsync(openFileDialogSettings.FileName);
-                int count = 0;
-                Data.SetProfiles(newProfiles.OrderBy(q=>q.TimeStampNs).ToList());
-                
+                Data.SetProfiles(await DataReader.ReadFromFileAsync(openFileDialogSettings.FileName));
             }
             catch (Exception e)
             {
@@ -103,5 +101,10 @@ public class ToolbarViewModel : Screen
             }
             config.LastFileBrowserLocation = Path.GetDirectoryName(openFileDialogSettings.FileName);
         }
+    }
+
+    public void RunAssembler()
+    {
+        Data.RunAssembler();
     }
 }

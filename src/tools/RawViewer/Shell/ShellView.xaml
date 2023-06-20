@@ -146,29 +146,12 @@
                     Grid.Column="3"
                     MinWidth="5"
                     VerticalAlignment="Stretch" />
-                <GroupBox
+                <ContentControl
+                    x:Name="CrossSection"
                     Grid.Row="1"
                     Grid.Column="2"
-                    Margin="3"
-                    Padding="0">
-                    <GroupBox.Header>
-                        <StackPanel MinHeight="25" Orientation="Horizontal">
-                            <TextBlock
-                                Margin="3"
-                                VerticalAlignment="Center"
-                                FontFamily="{StaticResource MaterialDesignIcons}"
-                                Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}">
-                                &#xF0E92;
-                            </TextBlock>
-                            <TextBlock Margin="3" VerticalAlignment="Center">Selected Profile</TextBlock>
-                        </StackPanel>
-                    </GroupBox.Header>
-                    <ContentControl
-                        x:Name="CrossSection"
-                        Grid.Row="0"
-                        Margin="0"
-                        Padding="0" />
-                </GroupBox>
+                    Margin="0"
+                    Padding="0" />
 
                 <Grid Grid.Row="1" Grid.Column="2" />
                 <GroupBox

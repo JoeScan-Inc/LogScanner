@@ -12,6 +12,7 @@ using RawViewer.Timeline;
 using System;
 using System.IO;
 using System.Windows;
+using RawViewer.Models;
 
 namespace RawViewer;
 
@@ -37,6 +38,7 @@ public class AppBootstrapper : AutofacBootstrapper
         builder.RegisterType<TimelinePlotViewModel>().AsSelf().SingleInstance();
         builder.RegisterType<DataManager>().AsSelf().SingleInstance();
         builder.RegisterType<PlotColorService>().AsSelf().SingleInstance();
+        builder.RegisterModule<CoreModule>();
         //
         // builder.RegisterType<EngineViewModel>().AsSelf().SingleInstance();
         //

@@ -71,7 +71,10 @@
 
             <Label Content="Position (Z):" />
             <TextBox MinWidth="100" Text="{Binding ZOffset, StringFormat={}{0:F2}, Mode=OneWay}" />
-            <TextBlock>"</TextBlock>
+            <TextBlock>mm</TextBlock>
+            <Label Content="Position (Z):" />
+            <TextBox MinWidth="100" Text="{Binding ZOffsetM, StringFormat={}{0:F3}, Mode=OneWay}" />
+            <TextBlock>m</TextBlock>
         </st:AutoGrid>
         <DataGrid
             Grid.Column="1"
