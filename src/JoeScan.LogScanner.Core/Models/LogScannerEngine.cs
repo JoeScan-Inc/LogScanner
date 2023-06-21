@@ -188,7 +188,12 @@ namespace JoeScan.LogScanner.Core.Models
             // the raw logs get sent to ModelBuilder. 
             RawLogsBroadcastBlock.LinkTo(ModelBuilder.BuilderBlock);
 
-            ModelBuilder.BuilderBlock.LinkTo(LogModelBroadcastBlock);
+            // #116 this is a temporary fix:
+            // instead of linking the output of LogModelBuilder to the broadcast block, only link it to 
+            // the action block of the first consumer (see below, from plugin)
+
+            // ModelBuilder.BuilderBlock.LinkTo(LogModelBroadcastBlock);
+            //ModelBuilder.BuilderBlock.LinkTo(new ActionBlock<LogModelResult>((l)=>Console.WriteLine("Log Model Consumed")));
             // ModelBuilder.BuilderBlock.LinkTo(new ActionBlock<LogModel>((l) => { Debugger.Break(); }));
             // the LogModelBroadcastBlock receives finished LogModels and now the end user can subscribe to 
             // it and do any processing needed, like a sorter or sending to an optimizer
@@ -201,8 +206,10 @@ namespace JoeScan.LogScanner.Core.Models
                 {
                     // TODO: check for version and GUID here
                     var userBlock = new ActionBlock<LogModelResult>(logModelConsumer.Consume);
-                    // TODO: save disposable for possible unlinking
-                    LogModelBroadcastBlock.LinkTo(userBlock);
+                    // #116 - no intermediate broadcast block, instead, get the model directly from the builder
+                    // LogModelBroadcastBlock.LinkTo(userBlock);
+                    ModelBuilder.BuilderBlock.LinkTo(userBlock);
+                  
                 }
             }
         }
