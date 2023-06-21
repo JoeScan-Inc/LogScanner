@@ -29,7 +29,7 @@ public static class DataReader
                 var zipped = new GZipStream(fs, CompressionMode.Decompress);
                 br = new BinaryReader(zipped);
             }
-            else
+            else 
             {
                 var fs = new FileStream(fileName, FileMode.Open);
                 br = new BinaryReader(fs);
@@ -40,7 +40,7 @@ public static class DataReader
                 while (true)
                 {
                     var p = ProfileReaderWriter.Read(br);
-
+                    p.EncoderValues[0] = -p.EncoderValues[0];
                     var r = BoundingBox.UpdateBoundingBox(UnitConverter.Convert(p!.Units, UnitSystem.Millimeters, p));
                     l.Add(r);
                 }

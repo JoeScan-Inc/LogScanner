@@ -4,7 +4,6 @@ using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Core.Models;
 using NLog;
 using RawViewer.Helpers;
-using RawViewer.Shell;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -60,7 +59,7 @@ public class DataManager : PropertyChangedBase
     public ObservableCollection<KeyValuePair<int, string>> SelectableCameras { get; } =
         new ObservableCollection<KeyValuePair<int, string>>()
         {
-            new KeyValuePair<int, string>(0, "A and B"),
+            new KeyValuePair<int, string>(0, "A/B"),
             new KeyValuePair<int, string>(1, "A"),
             new KeyValuePair<int, string>(2, "B"),
         };
@@ -216,7 +215,7 @@ public class DataManager : PropertyChangedBase
     {
         Profiles.Clear();
         SelectableHeads.Clear();
-        SelectableHeads.Add(new KeyValuePair<int, string>(-1, "All Heads"));
+        SelectableHeads.Add(new KeyValuePair<int, string>(-1, "*"));
         HashSet<uint> headsInFile = new HashSet<uint>();
         int index = 0;
         foreach (var p in originalData)
@@ -229,7 +228,7 @@ public class DataManager : PropertyChangedBase
         }
         foreach (uint headIds in headsInFile)
         {
-            SelectableHeads.Add(new KeyValuePair<int, string>((int)headIds, $"Head {headIds}"));
+            SelectableHeads.Add(new KeyValuePair<int, string>((int)headIds, $"{headIds}"));
         }
         OnProfileDataAdded();
     }

@@ -1,9 +1,9 @@
 ﻿using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Models;
 
-namespace RawViewer.Shell;
+namespace RawViewer.Models;
 
-public class RawProfile 
+public class RawProfile
 {
     private readonly Profile p;
 
@@ -26,6 +26,6 @@ public class RawProfile
     public ulong ReducedTimeStampNs { get; set; }
     public long ReducedEncoder { get; set; }
     public uint Camera => p.Camera;
-    public double ReducedTimeStampMs => ReducedTimeStampNs / 1E6;
+    public double ReducedTimeStampUs => ReducedTimeStampNs / 1000.0 ;
 
 }

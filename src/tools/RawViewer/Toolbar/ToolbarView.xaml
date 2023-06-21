@@ -8,8 +8,8 @@
     xmlns:local="clr-namespace:RawViewer.Toolbar"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
-    d:DesignHeight="45"
-    d:DesignWidth="1800"
+    d:DesignHeight="900"
+    d:DesignWidth="45"
     md:DialogServiceViews.IsRegistered="True"
     mc:Ignorable="d">
     <Grid>
@@ -30,104 +30,55 @@
                 <Setter Property="Margin" Value="3,0" />
             </Style>
         </Grid.Resources>
-        <DockPanel LastChildFill="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Vertical">
             <Button
                 x:Name="Load"
-                Height="30"
-                MinWidth="80"
-                MaxWidth="140"
-                Margin="25,5,5,5"
-                DockPanel.Dock="Left"
+                Width="45"
+                Height="45"
+                Margin="5,0,5,5"
                 Focusable="False">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource ButtonIcon}">&#xF0DCF;</TextBlock>
-                    <TextBlock Style="{StaticResource ButtonText}">Open Raw...</TextBlock>
+                    <TextBlock Style="{StaticResource ButtonIcon}">&#xF1A0F;</TextBlock>
+
                 </StackPanel>
+                <Button.ToolTip>
+                    <ToolTip>Open Raw Recording File</ToolTip>
+                </Button.ToolTip>
             </Button>
             <Button
                 x:Name="LoadLogFile"
-                Height="30"
-                MinWidth="80"
-                MaxWidth="140"
-                Margin="5"
-                DockPanel.Dock="Left"
+                Width="45"
+                Height="45"
+                Margin="5,5,5,5"
                 Focusable="False">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource ButtonIcon}">&#xF0DCF;</TextBlock>
-                    <TextBlock Style="{StaticResource ButtonText}">Open Log...</TextBlock>
+                    <TextBlock Style="{StaticResource ButtonIcon}">&#xF1632;</TextBlock>
+
                 </StackPanel>
+                <Button.ToolTip>
+                    <ToolTip>Open Recorded Log (loga) File</ToolTip>
+                </Button.ToolTip>
             </Button>
-            <CheckBox
-                Margin="10,5"
-                Focusable="False"
-                IsChecked="{Binding Data.UseFlightsAndWindowFilter}">
-                Use Flights Filter
-            </CheckBox>
-            <TextBlock Margin="15,5,5,5" VerticalAlignment="Center">Show Profiles From:</TextBlock>
-            <ComboBox
-                Height="30"
-                MinWidth="120"
-                Margin="0,5,5,5"
-                VerticalAlignment="Center"
-                DisplayMemberPath="Value"
-                Focusable="False"
-                ItemsSource="{Binding Data.SelectableHeads, IsAsync=True}"
-                SelectedValue="{Binding Data.ScanHeadFilterById}"
-                SelectedValuePath="Key" />
 
-            <TextBlock Margin="15,5,5,5" VerticalAlignment="Center">For Camera:</TextBlock>
-            <ComboBox
-                Height="30"
-                MinWidth="60"
-                Margin="0,5,5,5"
-                VerticalAlignment="Center"
-                DisplayMemberPath="Value"
-                Focusable="False"
-                ItemsSource="{Binding Data.SelectableCameras, IsAsync=True}"
-                SelectedValue="{Binding Data.ScanHeadFilterByCamera}"
-                SelectedValuePath="Key" />
-            <TextBlock Margin="35,5,5,5" VerticalAlignment="Center">Timeline Shows:</TextBlock>
+            <Button
+                x:Name="RunAssembler"
+                Width="45"
+                Height="45"
+                Margin="5"
+                Focusable="False">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource ButtonIcon}">&#xF0AA4;</TextBlock>
+                </StackPanel>
+                <Button.ToolTip>
+                    <ToolTip>Run Log Assembler</ToolTip>
+                </Button.ToolTip>
+            </Button>
 
-            <ComboBox
-                x:Name="HeightReference"
-                Height="30"
-                MinWidth="120"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                DisplayMemberPath="Key"
-                Focusable="False"
-                ItemsSource="{Binding TimelinePlot.PlotFunctions}"
-                SelectedValue="{Binding TimelinePlot.SelectedPlotFunction}"
-                SelectedValuePath="Value" />
-            <TextBlock Margin="35,5,5,5" VerticalAlignment="Center">Encoder Pulse Interval:</TextBlock>
-            <controls:NumericSpinner
-                Height="{Binding ElementName=HeightReference, Path=ActualHeight}"
-                MinWidth="120"
-                VerticalAlignment="Center"
-                MaxValue="10"
-                MinValue="0.000001"
-                Value="{Binding Data.EncoderPulseInterval, UpdateSourceTrigger=PropertyChanged}" />
-            <Border
-                Margin="10,3,3,3"
-                Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}"
-                CornerRadius="3"
-                DockPanel.Dock="Right">
-                <DockPanel LastChildFill="False">
-                    <Button
-                        x:Name="RunAssembler"
-                        Height="30"
-                        MinWidth="80"
-                        MaxWidth="150"
-                        Margin="25,1,1,1"
-                        DockPanel.Dock="Left"
-                        Focusable="False">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Style="{StaticResource ButtonIcon}">&#xF0AA4;</TextBlock>
-                            <TextBlock Style="{StaticResource ButtonText}">Run Assembler</TextBlock>
-                        </StackPanel>
-                    </Button>
-                </DockPanel>
-            </Border>
-        </DockPanel>
+        </StackPanel>
+
     </Grid>
 </UserControl>

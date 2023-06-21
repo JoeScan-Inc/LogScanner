@@ -1,6 +1,5 @@
 ﻿using Caliburn.Micro;
 using RawViewer.Models;
-using RawViewer.Shell;
 using System.ComponentModel;
 
 namespace RawViewer.ProfileDetail;

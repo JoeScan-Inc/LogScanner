@@ -5,7 +5,6 @@ using OxyPlot.Legends;
 using OxyPlot;
 using OxyPlot.Series;
 using RawViewer.Helpers;
-using RawViewer.Shell;
 using System;
 using System.Collections.Generic;
 using System.Linq;
