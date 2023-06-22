@@ -54,12 +54,12 @@ public class LogModelBuilder
         
             List<LogSection> sections = new List<LogSection>();
             List<LogSection> rejectedSections = new List<LogSection>();
-            var firstEncVal = log.ProfileData[0].EncoderValues[0];
+            var firstEncVal = log.ProfileData[0].Encoder;
 
             // this will contain the z position of each profile - for the JS-25 we will need more work as the encoder may be de-synced
             // but for the JS-50 series we have always synchronized encoder positions for all heads
             var zPositions = log.ProfileData.Select(q =>
-                (q.EncoderValues[0] - firstEncVal) * encoderPulseInterval).ToArray();
+                (q.Encoder - firstEncVal) * encoderPulseInterval).ToArray();
 
             double nextSection = interval;
             var startOffset = 0;
