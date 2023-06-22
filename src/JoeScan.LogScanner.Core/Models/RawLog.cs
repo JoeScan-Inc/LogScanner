@@ -21,7 +21,7 @@ public class RawLog
     public RawLog(int logNumber, IEnumerable<Profile> profiles)
     {
         LogNumber = logNumber;
-        profileData = profiles.OrderBy(q => q.EncoderValues[0]).ToList();
+        profileData = profiles.OrderBy(q => q.Encoder).ToList();
         TimeScanned = DateTime.Now;
         Id = Guid.NewGuid();
     }

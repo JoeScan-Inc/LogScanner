@@ -192,12 +192,12 @@ public class SingleZoneLogAssembler : ILogAssembler
                 break;
             }
 
-            if (last.Value.ScanHeadId == profile.ScanHeadId && last.Value.Camera == profile.Camera)
+            if (last.Value.ScanHeadId == profile.ScanHeadId && last.Value.CameraIndex == profile.CameraIndex)
             {
-                reversed = profile.EncoderValues[0] - last.Value.EncoderValues[0] < 0;
+                reversed = profile.Encoder - last.Value.Encoder < 0;
                 
-                stopped = Math.Abs((profile.EncoderValues[0] * encoderPulseInterval)
-                                   - (last.Value.EncoderValues[0] * encoderPulseInterval)) <
+                stopped = Math.Abs((profile.Encoder * encoderPulseInterval)
+                                   - (last.Value.Encoder * encoderPulseInterval)) <
                           minProfileSpacing;
                 break;
             }
@@ -214,8 +214,8 @@ public class SingleZoneLogAssembler : ILogAssembler
         while (last != null)
         {
             if (last.Value.ScanHeadId == profile.ScanHeadId &&
-                last.Value.EncoderValues[0] * encoderPulseInterval >
-                profile.EncoderValues[0] * encoderPulseInterval)
+                last.Value.Encoder * encoderPulseInterval >
+                profile.Encoder * encoderPulseInterval)
             {
                 var temp = last.Previous;
                 accumulatedProfiles.Remove(last);
@@ -240,7 +240,7 @@ public class SingleZoneLogAssembler : ILogAssembler
         if (last != null)
         {
             //TODO: does travel direction matter?
-            return (last.EncoderValues[0] - accumulatedProfiles.First().EncoderValues[0]) * encoderPulseInterval;
+            return (last.Encoder - accumulatedProfiles.First().Encoder) * encoderPulseInterval;
         }
 
         return 0.0;

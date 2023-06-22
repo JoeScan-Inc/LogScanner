@@ -4,9 +4,9 @@ namespace JoeScan.LogScanner.Core.Geometry;
 
 public static class BoundingBox
 {
-    public static Rect Get(Point2D[] pts)
+    public static Rect Get(IReadOnlyCollection<Point2D> pts)
     {
-        if (pts.Length < 2)
+        if (pts.Count < 2)
         {
             return Rect.Empty;
         }
@@ -17,9 +17,5 @@ public static class BoundingBox
         return new Rect(minX, minY, (maxX - minX), (maxY - minY));
     }
 
-    public static Profile UpdateBoundingBox(Profile p)
-    {
-        p.BoundingBox = Get(p.Data);
-        return p;
-    }
+    
 }

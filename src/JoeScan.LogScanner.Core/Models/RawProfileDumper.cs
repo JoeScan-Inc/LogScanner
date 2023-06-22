@@ -132,7 +132,7 @@ public class RawProfileDumper
     {
         if (dumpQueue != null && !dumpQueue.IsAddingCompleted && IsEnabled)
         {
-            dumpQueue.Add((Profile)p.Clone());
+            dumpQueue.Add(p);
         }
 
         if (Config is
@@ -140,7 +140,7 @@ public class RawProfileDumper
                 HistorySize: > 0, HistoryEnabled: true, Location: not null
             } && !isDumping)
         {
-            historyQueue?.Enqueue((Profile)p.Clone());
+            historyQueue?.Enqueue(p);
         }
 
         return p;

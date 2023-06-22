@@ -220,7 +220,7 @@ public class DataManager : PropertyChangedBase
         int index = 0;
         foreach (var p in originalData)
         {
-            var rp = UseFlightsAndWindowFilter ? new RawProfile(FlightsFilter.Apply((Profile)p.Clone())) { Index = index++ } : new RawProfile(p) { Index = index++ };
+            var rp = UseFlightsAndWindowFilter ? new RawProfile(FlightsFilter.Apply(p)) { Index = index++ } : new RawProfile(p) { Index = index++ };
             Profiles.Add(rp);
             rp.ReducedTimeStampNs = rp.TimeStampNs - Profiles[0].TimeStampNs;
             rp.ReducedEncoder = rp.EncoderValue - Profiles[0].EncoderValue;

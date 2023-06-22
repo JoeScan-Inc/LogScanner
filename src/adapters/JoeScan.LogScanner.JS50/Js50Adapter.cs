@@ -245,7 +245,7 @@ public class Js50Adapter : IScannerAdapter
                     {
                         //TODO: check the result of Post to see if we lose profiles
                         // due to the downstream processing being too slow
-                        if (!AvailableProfiles.Post(prof.ToLogScannerProfile()))
+                        if (!AvailableProfiles.Post(prof.ToLogScannerProfile(scanSystem.Units)))
                         {
                             failedToPost++;
                             if (failedToPost >= 100)

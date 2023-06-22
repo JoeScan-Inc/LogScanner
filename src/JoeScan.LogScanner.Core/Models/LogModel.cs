@@ -72,7 +72,7 @@ public class LogModel
         LogNumber = logNumber;
         Interval = interval;
         TimeScanned = timeScanned;
-        length = new Lazy<double>(() => (LastGoodProfile.EncoderValues[0] - FirstGoodProfile.EncoderValues[0])*encoderPulseInterval);
+        length = new Lazy<double>(() => (LastGoodProfile.Encoder - FirstGoodProfile.Encoder)*encoderPulseInterval);
         lastGoodProfile = new Lazy<Profile>(() =>
         {
             var section = Sections.Last();

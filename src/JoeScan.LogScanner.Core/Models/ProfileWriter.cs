@@ -4,10 +4,11 @@ namespace JoeScan.LogScanner.Core.Models
 {
     public static class ProfileReaderWriter
     {
-         const int FileMagicV1 = 0x010203;
-         const int FileMagicV2 = 0x010204;
+        const int FileMagicV1 = 0x010203;
+        const int FileMagicV2 = 0x010204;
+        const int FileMagicV3 = 0x010205;
 
-         private const int LatestVersion = FileMagicV2;
+        private const int LatestVersion = FileMagicV3;
 
         public static void Write(this Profile p, BinaryWriter bw)
         {
@@ -16,28 +17,18 @@ namespace JoeScan.LogScanner.Core.Models
             bw.Write((int)p.ScanningFlags);
             bw.Write(p.LaserIndex);
             bw.Write(p.LaserOnTimeUs);
-            bw.Write(p.EncoderValues.Keys.Count);
-            for (uint i = 0; i < p.EncoderValues.Keys.Count; i++)
-            {
-                bw.Write(p.EncoderValues[i]);
-            }
+            bw.Write(p.Encoder);
             bw.Write(p.SequenceNumber);
             bw.Write(p.TimeStampNs);
             bw.Write(p.ScanHeadId);
-            bw.Write(p.Camera);
+            bw.Write(p.CameraIndex);
             bw.Write((int)p.Inputs);
-            bw.Write(p.Data.Length);
+            bw.Write(p.Data.Count);
             foreach (var t in p.Data)
             {
-                // DEPRECATED: up to v1 for profiles in inches: to save disk space, save as 1/100 of an inch 
-                // this lets us map an area of -327" to 327" 
-                // which is sufficient in most cases. Our accuracy is 
-                // limited to 1/100 of an inch, or 0.25 mm - good enough for debugging etc
-
                 // NEW: as of v2 we use floats. They use 4 bytes and work for both mm and inches
                 bw.Write((float)t.X);
                 bw.Write((float)t.Y);
-
                 // scale brightness to 8 bit
                 bw.Write((byte)t.B);
             }
@@ -52,6 +43,8 @@ namespace JoeScan.LogScanner.Core.Models
                     return Read_v1(br);
                 case FileMagicV2:
                     return Read_v2(br);
+                case FileMagicV3:
+                    return Read_v3(br);
                 default:
                     return null;
             }
@@ -59,62 +52,97 @@ namespace JoeScan.LogScanner.Core.Models
 
         public static Profile? Read_v1(BinaryReader br)
         {
-            var p = new Profile();
             // this version assumes all is in inches
-            p.ScanningFlags = (ScanFlags)br.ReadInt32();
-            p.LaserIndex = br.ReadUInt32();
-            p.LaserOnTimeUs = br.ReadUInt16();
+            var scanningFlags = (ScanFlags)br.ReadInt32();
+            var laserIndex = br.ReadUInt32();
+            var laserOnTimeUs = br.ReadUInt16();
             var numEncoderVals = br.ReadInt32();
-            for (uint i = 0; i < numEncoderVals; i++)
+            long encoderVal = 0;
+            if (numEncoderVals > 0)
             {
-                p.EncoderValues[i] = br.ReadInt64();
+                encoderVal = br.ReadInt64();
             }
-            p.SequenceNumber = br.ReadUInt32();
-            p.TimeStampNs = br.ReadUInt64();
-            p.ScanHeadId = br.ReadUInt32();
-            p.Camera = br.ReadUInt32();
-            p.Inputs = (InputFlags)br.ReadInt32();
+
+            var sequenceNumber = br.ReadUInt32();
+            var timeStampNs = br.ReadUInt64();
+            var scanHeadId = br.ReadUInt32();
+            var cameraIndex = br.ReadUInt32();
+            var inputs = (InputFlags)br.ReadInt32();
             var numPts = br.ReadInt32();
-            p.Data = new Point2D[numPts];
+            var data = new Point2D[numPts];
             for (int i = 0; i < numPts; i++)
             {
                 // see scaling remarks above
                 var x = br.ReadInt16() / 100.0;
                 var y = br.ReadInt16() / 100.0;
                 var b = (double)br.ReadByte();
-                p.Data[i] = new Point2D(x, y, b);
+                data[i] = new Point2D(x, y, b);
             }
-            return p;
+
+            return Profile.Build(UnitSystem.Inches, scanHeadId, laserIndex, cameraIndex, laserOnTimeUs,
+                encoderVal, sequenceNumber, timeStampNs, scanningFlags, inputs, data);
         }
 
         public static Profile? Read_v2(BinaryReader br)
         {
-          // ReSharper disable once UseObjectOrCollectionInitializer
-            var p = new Profile(){Units = (UnitSystem)br.ReadByte() };
-            p.ScanningFlags = (ScanFlags)br.ReadInt32();
-            p.LaserIndex = br.ReadUInt32();
-            p.LaserOnTimeUs = br.ReadUInt16();
+            var units = (UnitSystem)br.ReadByte();
+            var scanningFlags = (ScanFlags)br.ReadInt32();
+            var laserIndex = br.ReadUInt32();
+            var laserOnTimeUs = br.ReadUInt16();
             var numEncoderVals = br.ReadInt32();
-            for (uint i = 0; i < numEncoderVals; i++)
+            long encoderVal = 0;
+            if (numEncoderVals > 0)
             {
-                p.EncoderValues[i] = br.ReadInt64();
+                encoderVal = br.ReadInt64();
             }
-            p.SequenceNumber = br.ReadUInt32();
-            p.TimeStampNs = br.ReadUInt64();
-            p.ScanHeadId = br.ReadUInt32();
-            p.Camera = br.ReadUInt32();
-            p.Inputs = (InputFlags)br.ReadInt32();
+
+            var sequenceNumber = br.ReadUInt32();
+            var timeStampNs = br.ReadUInt64();
+            var scanHeadId = br.ReadUInt32();
+            var cameraIndex = br.ReadUInt32();
+            var inputs = (InputFlags)br.ReadInt32();
             var numPts = br.ReadInt32();
-            p.Data = new Point2D[numPts];
+            var data = new Point2D[numPts];
             for (int i = 0; i < numPts; i++)
             {
                 // see scaling remarks above
                 var x = br.ReadSingle();
                 var y = br.ReadSingle();
                 var b = (double)br.ReadByte();
-                p.Data[i] = new Point2D(x, y, b);
+                data[i] = new Point2D(x, y, b);
             }
-            return p;
+
+            return Profile.Build(units, scanHeadId, laserIndex, cameraIndex, laserOnTimeUs,
+                encoderVal, sequenceNumber, timeStampNs, scanningFlags, inputs, data);
+        }
+
+        public static Profile? Read_v3(BinaryReader br)
+        {
+            // only difference to v2 is that we have one encoder value, defaulting to zero
+            var units = (UnitSystem)br.ReadByte();
+            var scanningFlags = (ScanFlags)br.ReadInt32();
+            var laserIndex = br.ReadUInt32();
+            var laserOnTimeUs = br.ReadUInt16();
+            var encoderVal = br.ReadInt64();
+
+            var sequenceNumber = br.ReadUInt32();
+            var timeStampNs = br.ReadUInt64();
+            var scanHeadId = br.ReadUInt32();
+            var cameraIndex = br.ReadUInt32();
+            var inputs = (InputFlags)br.ReadInt32();
+            var numPts = br.ReadInt32();
+            var data = new Point2D[numPts];
+            for (int i = 0; i < numPts; i++)
+            {
+                // see scaling remarks above
+                var x = br.ReadSingle();
+                var y = br.ReadSingle();
+                var b = (double)br.ReadByte();
+                data[i] = new Point2D(x, y, b);
+            }
+
+            return Profile.Build(units, scanHeadId, laserIndex, cameraIndex, laserOnTimeUs,
+                encoderVal, sequenceNumber, timeStampNs, scanningFlags, inputs, data);
         }
     }
 }

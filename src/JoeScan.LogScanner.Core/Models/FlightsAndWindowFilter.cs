@@ -42,8 +42,8 @@ public class FlightsAndWindowFilter : IFlightsAndWindowFilter
         {
             if (Filters[p.ScanHeadId].IsEnabled)
             {
-                p.Data = p.Data.Where(q => Filters[p.ScanHeadId].Contains(q)).ToArray();
-                BoundingBox.UpdateBoundingBox(p);
+                return new Profile(p, p.Data.Where(q => Filters[p.ScanHeadId].Contains(q)).ToArray());
+                
             }
         }
         return p;

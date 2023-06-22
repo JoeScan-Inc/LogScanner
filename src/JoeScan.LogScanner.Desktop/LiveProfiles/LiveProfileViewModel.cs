@@ -143,7 +143,7 @@ public sealed class LiveProfileViewModel : Screen
         // high scan rates we would get bogged down quickly 
 
         // we used scan head id and camera as the index
-        var t = new Tuple<uint, uint>(profile.ScanHeadId, profile.Camera);
+        var t = new Tuple<uint, uint>(profile.ScanHeadId, profile.CameraIndex);
         headCamDict[t] = profile;
 
     }

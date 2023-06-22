@@ -13,6 +13,6 @@ internal class RawProfileValidator : IRawProfileValidator
     public bool IsValid(Profile p)
     {
         //TODO: use better heuristics
-        return p.Data.Length > 20;
+        return p.Data.Count > 20;
     }
 }

@@ -95,20 +95,9 @@ public class FakeLogGenerator
         foreach (var headCamPair in heads)
         {
             var pts = CreatePointsForProfile(scaler, headCamPair);
-            yield return new Profile()
-            {
-                Camera = headCamPair.cam,
-                Data = pts,
-                EncoderValues = new Dictionary<uint, long>() { { 0, encVal + 10 * headCamPair.cam } },
-                Inputs = InputFlags.None,
-                LaserIndex = 1,
-                LaserOnTimeUs = 200,
-                ScanHeadId = headCamPair.head,
-                ScanningFlags = ScanFlags.None,
-                SequenceNumber = sequenceNumber,
-                TimeStampNs = (ulong)timeStampNs,
-                Units = units
-            };
+            yield return Profile.Build(units,headCamPair.head,1,headCamPair.cam,
+                200, encVal + 10 * headCamPair.cam,sequenceNumber, (ulong)timeStampNs,ScanFlags.None,
+                InputFlags.None,pts);
         }
     }
 
@@ -127,20 +116,9 @@ public class FakeLogGenerator
     {
         foreach (var headCamPair in heads)
         {
-            yield return new Profile()
-            {
-                Camera = headCamPair.cam,
-                Data = Array.Empty<Point2D>(),
-                EncoderValues = new Dictionary<uint, long>() { { 0, encVal } },
-                Inputs = InputFlags.None,
-                LaserIndex = 1,
-                LaserOnTimeUs = 200,
-                ScanHeadId = headCamPair.head,
-                ScanningFlags = ScanFlags.None,
-                SequenceNumber = sequenceNumber,
-                TimeStampNs = (ulong)timeStampNs,
-                Units = units
-            };
+            yield return Profile.Build(units, headCamPair.head, 1, headCamPair.cam,
+                200, encVal + 10 * headCamPair.cam, sequenceNumber, (ulong)timeStampNs, ScanFlags.None,
+                InputFlags.None, Array.Empty<Point2D>());
         }
         sequenceNumber++;
     }

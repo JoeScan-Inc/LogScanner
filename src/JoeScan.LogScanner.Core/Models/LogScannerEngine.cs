@@ -162,15 +162,13 @@ namespace JoeScan.LogScanner.Core.Models
 
 
             var unitConverterBlock = new TransformBlock<Profile, Profile>((p) =>
-                UnitConverter.Convert(ActiveAdapter.Units, UnitSystem.Millimeters, p));
+                Profile.ConvertTo(p,UnitSystem.Millimeters));
             // dumper.DumpBlock is a pass-through from the source block where the profiles originate, scannerAdapter.AvailableProfiles
             dumper.DumpBlock.LinkTo(unitConverterBlock, linkOptions);
-            var boundingBoxBlock = new TransformBlock<Profile, Profile>(BoundingBox.UpdateBoundingBox, blockOptions);
-            unitConverterBlock.LinkTo(boundingBoxBlock, linkOptions);
-            // then we transform profiles by using a flights-and-window filter 
+             // then we transform profiles by using a flights-and-window filter 
             var filterTransformBlock = new TransformBlock<Profile, Profile>(Filter.Apply, blockOptions);
-            // the output of the bounding box block is linked to the filter block
-            boundingBoxBlock.LinkTo(filterTransformBlock, linkOptions);
+            unitConverterBlock.LinkTo(filterTransformBlock, linkOptions);
+            
             // the engine also has a broadcast block, basically a tee that distributes all incoming 
             // profiles to all connected further processing steps
             // in our case, we use it for distributing the profiles both to the assembler as well as to 
