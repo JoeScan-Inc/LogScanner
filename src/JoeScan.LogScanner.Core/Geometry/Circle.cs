@@ -18,8 +18,8 @@ namespace JoeScan.LogScanner.Core.Geometry
             {
                 var t = startAngleRad + i * dT;
                 var radius = addNoise ? diameter/2 + RandomHelper.GetRandomDouble() / 50.0 * diameter / 2:diameter/2;
-                pts[i] = new Point2D(center.X + Math.Cos(t) * radius,
-                    center.Y + Math.Sin(t) * radius,
+                pts[i] = new Point2D((float)(center.X + Math.Cos(t) * radius),
+                    (float)(center.Y + Math.Sin(t) * radius),
                     100);
 
 

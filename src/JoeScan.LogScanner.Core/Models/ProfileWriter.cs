@@ -23,14 +23,13 @@ namespace JoeScan.LogScanner.Core.Models
             bw.Write(p.ScanHeadId);
             bw.Write(p.CameraIndex);
             bw.Write((int)p.Inputs);
-            bw.Write(p.Data.Count);
-            foreach (var t in p.Data)
+            bw.Write(p.NumPoints);
+            foreach (var pt in p.GetAllPoints())
             {
                 // NEW: as of v2 we use floats. They use 4 bytes and work for both mm and inches
-                bw.Write((float)t.X);
-                bw.Write((float)t.Y);
-                // scale brightness to 8 bit
-                bw.Write((byte)t.B);
+                bw.Write(pt.X);
+                bw.Write(pt.Y);
+                bw.Write(pt.B);
             }
         }
 
@@ -75,8 +74,8 @@ namespace JoeScan.LogScanner.Core.Models
                 // see scaling remarks above
                 var x = br.ReadInt16() / 100.0;
                 var y = br.ReadInt16() / 100.0;
-                var b = (double)br.ReadByte();
-                data[i] = new Point2D(x, y, b);
+                var b = br.ReadByte();
+                data[i] = new Point2D((float)x, (float)y, b);
             }
 
             return Profile.Build(UnitSystem.Inches, scanHeadId, laserIndex, cameraIndex, laserOnTimeUs,
@@ -108,7 +107,7 @@ namespace JoeScan.LogScanner.Core.Models
                 // see scaling remarks above
                 var x = br.ReadSingle();
                 var y = br.ReadSingle();
-                var b = (double)br.ReadByte();
+                var b = br.ReadByte();
                 data[i] = new Point2D(x, y, b);
             }
 
@@ -137,7 +136,7 @@ namespace JoeScan.LogScanner.Core.Models
                 // see scaling remarks above
                 var x = br.ReadSingle();
                 var y = br.ReadSingle();
-                var b = (double)br.ReadByte();
+                var b = br.ReadByte();
                 data[i] = new Point2D(x, y, b);
             }
 

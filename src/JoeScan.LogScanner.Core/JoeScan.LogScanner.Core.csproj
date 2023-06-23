@@ -46,10 +46,9 @@
   </ItemGroup>
 
 	<Target Name="CopyFiles" AfterTargets="PostBuildEvent">
-		<Copy SourceFiles="core.ini;rawfilters.json" DestinationFolder="C:\ProgramData\LogScanner\Profiles\Default">
+		<Copy SourceFiles="core.ini;rawfilters.json" DestinationFolder="$(ProgramData)\LogScanner\Profiles\Default">
 			<Output TaskParameter="CopiedFiles" ItemName="SuccessfullyCopiedFiles" />
 		</Copy>
-
 	</Target>
 
 	

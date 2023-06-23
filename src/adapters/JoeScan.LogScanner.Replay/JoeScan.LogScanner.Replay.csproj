@@ -33,9 +33,9 @@
     </None>
   </ItemGroup>
 	<Target Name="CopyFiles" AfterTargets="PostBuildEvent">
-		<Copy SourceFiles="ReplayAdapter.json" DestinationFolder="C:\ProgramData\LogScanner\Profiles\Default">
+		<Copy SourceFiles="ReplayAdapter.json" DestinationFolder="$(ProgramData)\LogScanner\Profiles\Default">
 			<Output TaskParameter="CopiedFiles" ItemName="SuccessfullyCopiedFiles" />
 		</Copy>
-
 	</Target>
+
 </Project>

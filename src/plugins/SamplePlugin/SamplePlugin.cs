@@ -7,6 +7,7 @@ using System.Globalization;
 namespace SamplePlugin;
 public class SamplePlugin: ILogModelConsumerPlugin, IDisposable
 {
+    public ILogger Logger { get; }
     // A plugin for the LogScannerEngine implements multiple interfaces:
     // IPlugin is the base interface that each plugin needs to provide. IPlugin here 
     // is implicitly declared via ILogModelConsumerPlugin, which itself is inheriting IPlugin, 
@@ -93,6 +94,13 @@ public class SamplePlugin: ILogModelConsumerPlugin, IDisposable
     /// i.e. when you're not ready to receive calls. 
     /// </summary>
     public bool IsInitialized => myStream != null;
+
+    public SamplePlugin(ILogger logger)
+    {
+        Logger = logger;
+        Logger.Debug("Created SamplePlugin Instance");
+    }
+
     public void Cleanup()
     {
         // currently not called by the Engine
@@ -103,6 +111,7 @@ public class SamplePlugin: ILogModelConsumerPlugin, IDisposable
     /// <param name="logModel"></param>
     public void Consume(LogModelResult logModel)
     {
+        
         if (logModel.IsValidModel)
         {
             if (myStream != null)
@@ -110,12 +119,15 @@ public class SamplePlugin: ILogModelConsumerPlugin, IDisposable
                 
                 myStream.WriteLine($"{logModel.LogNumber},{logModel.LogModel!.Volume:F1}");
                 OnPluginMessage(new PluginMessageEventArgs(LogLevel.Trace, $"Successfully wrote Volume for log {logModel.LogNumber} to database."));
+                Logger.Trace("Successfully wrote Volume for log {logModel.LogNumber} to database.");
             }
         }
         else
         {
             OnPluginMessage(new PluginMessageEventArgs(LogLevel.Warn, "LogModel is invalid. Cannot get Volume."));
+            Logger.Error("LogModel is invalid. Cannot get Volume.");
         }
+        Thread.Sleep(1000);
     }
 
     #endregion

@@ -104,7 +104,7 @@ public class FakeLogGenerator
     private Point2D[] CreatePointsForProfile(double scaler, HeadCamPair headCamPair)
     {
         var currentDiameter = startDiameter + scaler * (endDiameter - startDiameter);
-        return Circle.MakeSectionPoints(new Point2D(0, currentDiameter / 2, 0)
+        return Circle.MakeSectionPoints(new Point2D(0, (float)(currentDiameter / 2), 0)
             , currentDiameter
             , (headCamPair.angle - coverageAngle / 2) * RHO
             , (headCamPair.angle + coverageAngle / 2) * RHO

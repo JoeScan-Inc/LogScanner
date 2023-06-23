@@ -42,7 +42,10 @@ public class FlightsAndWindowFilter : IFlightsAndWindowFilter
         {
             if (Filters[p.ScanHeadId].IsEnabled)
             {
-                return new Profile(p, p.Data.Where(q => Filters[p.ScanHeadId].Contains(q)).ToArray());
+                foreach (var pt in p.GetAllPoints())
+                {
+                    pt.IsValid = Filters[p.ScanHeadId].Contains(pt);
+                }
                 
             }
         }

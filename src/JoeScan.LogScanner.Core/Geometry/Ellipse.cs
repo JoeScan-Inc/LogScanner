@@ -53,8 +53,8 @@
             var angle = 0.0;
             for (int i = 0; i < numPoints; i++)
             {
-                l.Add(new Point2D(A * Math.Cos(angle) * Math.Cos(Theta) - B * Math.Sin(angle) * Math.Sin(Theta) + X,
-                    B * Math.Sin(angle) * Math.Cos(Theta) + A * Math.Cos(angle) * Math.Sin(Theta) + Y, 1.0F));
+                l.Add(new Point2D((float)(A * Math.Cos(angle) * Math.Cos(Theta) - B * Math.Sin(angle) * Math.Sin(Theta) + X),
+                    (float)(B * Math.Sin(angle) * Math.Cos(Theta) + A * Math.Cos(angle) * Math.Sin(Theta) + Y), 0));
                 angle += inc;
             }
             return l.ToArray();
@@ -80,10 +80,10 @@
             var res = new Point2D[2];
             var x1 = (-b + Math.Sqrt(b * b - 4 * a * c)) / (2 * a) + X;
             var y1 = m * x1 + b1;
-            res[0] = new Point2D(x1, y1, 1.0F);
+            res[0] = new Point2D((float)x1, (float)y1, 0);
             var x2 = (-b - Math.Sqrt(b * b - 4 * a * c)) / (2 * a) + X;
             var y2 = m * x2 + b1;
-            res[1] = new Point2D(x2, y2, 1.0F);
+            res[1] = new Point2D((float)x2, (float)y2, 0);
             return res;
         }
 

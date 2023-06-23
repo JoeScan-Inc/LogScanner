@@ -6,9 +6,7 @@ using JoeScan.LogScanner.Core.Models;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
-using System.Reflection;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -25,34 +23,12 @@ var builder = new ContainerBuilder();
 builder.RegisterModule<CoreModule>();
 builder.RegisterModule<NLogModule>();
 
-Assembly executingAssembly = Assembly.GetExecutingAssembly();
-
-string applicationDirectory = Path.GetDirectoryName(executingAssembly.Location);
-foreach (var file in Directory.GetFiles(Path.Combine(applicationDirectory!, "vendor"), "*.dll"))
-{
-    try
-    {
-        var vendorAssembly = Assembly.LoadFile(file);
-        builder.RegisterAssemblyModules(new Assembly[] { vendorAssembly });
-    }
-    catch
-    {
-
-    }
-}
-
-
 var container = builder.Build();
 
 using var scope = container.BeginLifetimeScope();
 var engine= scope.Resolve<LogScannerEngine>();
 engine.SetActiveAdapter(engine.AvailableAdapters.First()); // we only have the replay adapter registered
-//engine.Start();
-
-JoeScan.LogScanner.Service.ServiceListener joeScanListener = new JoeScan.LogScanner.Service.ServiceListener();
-joeScanListener.StartServer(ref engine);
-
-
+await engine.Start();
 autoResetEvent.WaitOne();
 engine.Stop();
 

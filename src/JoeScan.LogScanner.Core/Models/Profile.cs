@@ -8,7 +8,7 @@ namespace JoeScan.LogScanner.Core.Models;
 /// This is a generic profile, representing a single scan. It is assumed to be in
 /// mill coordinate system already.
 /// </summary>
-[DebuggerDisplay("Id = {ScanHeadId}, NumPoints = {Data.Length}, Enc = {EncoderValues[0]}")]
+[DebuggerDisplay("Id = {ScanHeadId}, NumPoints = {GetAllPoints.Length}, Enc = {EncoderValues[0]}")]
 public record Profile
 {
     /// <summary>
@@ -19,6 +19,7 @@ public record Profile
         // just to keep the nullability checker happy
         data = Array.Empty<Point2D>();
     }
+
 
     public static Profile Build(
         UnitSystem unitSystem,
@@ -47,10 +48,13 @@ public record Profile
             Inputs = inputs,
             data = new Point2D[pts.Length]
         };
+        p.AllPointsMemory = new Memory<Point2D>(p.data);
         Array.Copy(pts, p.data, pts.Length);
-        p.BoundingBox = Geometry.BoundingBox.Get(p.Data);
+        p.BoundingBox = Geometry.BoundingBox.Get(p.data);
         return p;
     }
+
+    public Memory<Point2D> AllPointsMemory { get; private set; }
 
     public UnitSystem Units { get; init; }
 
@@ -105,65 +109,34 @@ public record Profile
     /// </summary>
     public InputFlags Inputs { get; init; }
 
-    public IReadOnlyCollection<Point2D> Data => data;
+    public IEnumerable<Point2D> GetAllPoints()
+    {
+        foreach (var t in data)
+        {
+            yield return t;
+        }
+    }
+
+    private IEnumerable<Point2D> GetValidPoints()
+    {
+        foreach (var t in data)
+        {
+            if (t.IsValid)
+            {
+                yield return t;
+            }
+        }
+    }
+
+    public int NumValidPoints => GetValidPoints().Count();
+    public int NumPoints => data.Length;
+
     private Point2D[] data { get; init; }
 
     public Rect BoundingBox { get; private set; } = Rect.Empty;
 
-    public Profile(Profile original, Point2D[]? newPoints = null)
-    {
-        Units = original.Units;
-        ScanningFlags = original.ScanningFlags;
-        LaserIndex = original.LaserIndex;
-        LaserOnTimeUs = original.LaserOnTimeUs;
-        Encoder = original.Encoder;
-        SequenceNumber = original.SequenceNumber;
-        TimeStampNs = original.TimeStampNs;
-        ScanHeadId = original.ScanHeadId;
-        CameraIndex = original.CameraIndex;
-        Inputs = original.Inputs;
-        if (newPoints != null)
-        {
-            data = new Point2D[newPoints.Length];
-            Array.Copy(newPoints, data, newPoints.Length);
-            BoundingBox = Geometry.BoundingBox.Get(data);
-        }
-        else
-        {
-            data = new Point2D[original.data.Length];
-            Array.Copy(original.data, data, original.data.Length);
-            BoundingBox = original.BoundingBox;
-        }
-        
-    }
 
-    public static Profile ConvertTo(Profile original, UnitSystem to)
-    {
-        if (original.Units == to)
-        {
-            return original;
-        }
+    
 
-        var p = Build(to,
-            original.ScanHeadId,
-            original.LaserIndex,
-            original.CameraIndex,
-            original.LaserOnTimeUs,
-            original.Encoder,
-            original.SequenceNumber,
-            original.TimeStampNs,
-            original.ScanningFlags,
-            original.Inputs,
-            (original.Units == UnitSystem.Inches
-                ? original.Data.Select(q => new Point2D(q.X * 25.4, q.Y * 25.4, q.B))
-                : original.Data.Select(q => new Point2D(q.X / 25.4, q.Y / 25.4, q.B))).ToArray());
-        return p;
-        
-       
-    }
-
-    public static Profile BuildWith(Profile profile, Point2D[] toArray)
-    {
-        throw new NotImplementedException();
-    }
+    
 }

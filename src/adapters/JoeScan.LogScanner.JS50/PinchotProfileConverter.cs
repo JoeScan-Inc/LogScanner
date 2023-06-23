@@ -18,7 +18,7 @@ public static class PinchotProfileConverter
             pProfile.TimestampNs,
             (ScanFlags)pProfile.Flags,
             InputFlags.None,
-            pProfile.GetValidXYPoints().Select(p => new Point2D(p.X, p.Y, p.Brightness)).ToArray()
+            pProfile.GetValidXYPoints().Select(p => new Point2D(p.X, p.Y, (byte)int.Clamp(p.Brightness,byte.MinValue,byte.MaxValue))).ToArray()
         );
     }
 }

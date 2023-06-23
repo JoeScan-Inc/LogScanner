@@ -13,13 +13,13 @@ public class BoxFilter : FilterBase
     public double Bottom { get; set; }
     public override bool IsValid => isValid;
 
-    private bool isValid = false;
+    private bool isValid = false; 
     public override IReadOnlyList<Point2D> Outline => new List<Point2D>()
     {
-        new Point2D(Left, Bottom, 0),
-        new Point2D(Left, Top, 0),
-        new Point2D(Right, Top, 0),
-        new Point2D(Right, Bottom, 0)
+        new Point2D((float)Left, (float)Bottom, 0),
+        new Point2D((float) Left, (float) Top, 0),
+        new Point2D((float) Right, (float) Top, 0),
+        new Point2D((float) Right, (float) Bottom, 0)
     };
 
     public override string Kind => "BoxFilter";

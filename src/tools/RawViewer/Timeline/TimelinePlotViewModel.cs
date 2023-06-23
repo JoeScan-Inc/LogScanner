@@ -70,7 +70,7 @@ public class TimelinePlotViewModel : Screen
             new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedEncoder, p.LaserOnTimeUs))));
         PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("Avg Brightness Over Time",
             new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedTimeStampNs / 1000,
-                p.Data.Count > 0 ? p.Data.Average(q=>q.B) : 0))));
+                p.NumPts > 0 ? p.Data.Average(q=>q.B) : 0))));
         PlotFunctions.Add(new KeyValuePair<string, Func<RawProfile, Tuple<double, double>>>("Pts over Z",
             new Func<RawProfile, Tuple<double, double>>((p) => new Tuple<double, double>((double)p.ReducedEncoder * DataManager.EncoderPulseInterval, p.NumPts))));
         SelectedPlotFunction = PlotFunctions[0].Value;

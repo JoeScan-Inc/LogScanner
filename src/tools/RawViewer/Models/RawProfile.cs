@@ -16,8 +16,8 @@ public class RawProfile
     public Profile Profile => p;
     public int Index { get; set; }
     public uint ScanHeadId => p.ScanHeadId;
-    public IReadOnlyCollection<Point2D> Data => p.Data;
-    public int NumPts => p.Data.Count;
+    public IEnumerable<Point2D> Data => p.GetValidPoints();
+    public int NumPts => p.NumValidPoints;
     public ScanFlags ScanningFlags => p.ScanningFlags;
     public ushort LaserOnTimeUs => p.LaserOnTimeUs;
     public long EncoderValue => p.Encoder;

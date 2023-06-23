@@ -160,7 +160,8 @@ public sealed class LiveProfileViewModel : Screen
         {
             var series = GetSeries(key);
             series.Points.Clear();
-            series.Points.AddRange(headCamDict[key].Data.Select(q => new ScatterPoint(q.X*scaler, q.Y*scaler)));
+            //TODO: add drawing flag to show only valid points or all points
+            series.Points.AddRange(headCamDict[key].GetValidPoints().Select(q => new ScatterPoint(q.X*scaler, q.Y*scaler)));
             LiveView!.InvalidatePlot(true);
         }
         headCamDict.Clear();

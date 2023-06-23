@@ -268,7 +268,8 @@ namespace JoeScan.LogScanner.Shared.Live3D
 
             foreach (var grp in profiles)
             {
-                var pts = new Point3DCollection(grp.SelectMany(p => p.Data.Select(r => new Point3D(r.X, r.Y,
+                //TODO: add drawing flag to show only valid points or all points
+                var pts = new Point3DCollection(grp.SelectMany(p => p.GetValidPoints().Select(r => new Point3D(r.X, r.Y,
                     (p.Encoder - firstEncVal) * CurrentLogModel.EncoderPulseInterval))));
 
                 var visual = new PointsVisual3D
@@ -290,7 +291,8 @@ namespace JoeScan.LogScanner.Shared.Live3D
                 foreach (var profile in logSection.Profiles)
                 {
                     var z = (profile.Encoder - firstEncVal) * CurrentLogModel.EncoderPulseInterval;
-                    foreach (var point2D in profile.Data)
+                    //TODO: add drawing flag to show only valid points or all points
+                    foreach (var point2D in profile.GetValidPoints())
                     {
                         var pt3d = new Point3D(point2D.X, point2D.Y, z);
                         var colorValue = BinByBrightness(point2D.B);

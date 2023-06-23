@@ -49,8 +49,8 @@ public class PolygonFilter : FilterBase
         {
             if (Enum.TryParse(Units, out LengthUnit lu))
             {
-                Vertices = Vertices!.Select(q => new Point2D(UnitConverter.Convert(q.X, lu, LengthUnit.Millimeter),
-                    UnitConverter.Convert(q.Y, lu, LengthUnit.Millimeter), 0)).ToList();
+                Vertices = Vertices!.Select(q => new Point2D((float)UnitConverter.Convert(q.X, lu, LengthUnit.Millimeter),
+                    (float)UnitConverter.Convert(q.Y, lu, LengthUnit.Millimeter), 0)).ToList();
                 
             }
         }
