@@ -7,6 +7,7 @@ using JoeScan.LogScanner.Shared;
 using System.Windows;
 using Config.Net;
 using JoeScan.LogScanner.Core.Config;
+using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.LogReview.Config;
 using JoeScan.LogScanner.LogReview.CrossSection;
 using JoeScan.LogScanner.LogReview.Interfaces;

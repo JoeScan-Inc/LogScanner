@@ -10,18 +10,7 @@
 	<PropertyGroup>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
-  <ItemGroup>
-    <None Remove="Fonts\Inter-Black.ttf" />
-    <None Remove="Fonts\Inter-Bold.ttf" />
-    <None Remove="Fonts\Inter-ExtraBold.ttf" />
-    <None Remove="Fonts\Inter-ExtraLight.ttf" />
-    <None Remove="Fonts\Inter-Light.ttf" />
-    <None Remove="Fonts\Inter-Medium.ttf" />
-    <None Remove="Fonts\Inter-Regular.ttf" />
-    <None Remove="Fonts\Inter-SemiBold.ttf" />
-    <None Remove="Fonts\Inter-Thin.ttf" />
-    <None Remove="Fonts\materialdesignicons-webfont.ttf" />
-  </ItemGroup>
+  
   <ItemGroup>
     <Compile Include="..\Shared.AssemblyInfo.cs" Link="Shared.AssemblyInfo.cs" />
   </ItemGroup>

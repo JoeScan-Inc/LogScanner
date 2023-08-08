@@ -3,6 +3,7 @@ using Autofac.Extras.NLog;
 using Config.Net;
 using JoeScan.LogScanner.Core;
 using JoeScan.LogScanner.Core.Config;
+using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Desktop.Config;
 using JoeScan.LogScanner.Desktop.Engine;
 using JoeScan.LogScanner.Desktop.Shell;
@@ -33,7 +34,7 @@ public class AppBootstrapper : AutofacBootstrapper
     protected override void ConfigureContainer(ContainerBuilder builder)
     {
         builder.Register(c => new ConfigurationBuilder<ILogScannerConfig>()
-            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "LogScannerConfig.json"))
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "LogScanner.Desktop.Config.json"))
             .Build()).SingleInstance();
 
         builder.RegisterType<EngineViewModel>().AsSelf().SingleInstance();
