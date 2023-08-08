@@ -11,7 +11,9 @@ public class Js50Module : Module
     {
         builder.RegisterType<Js50Adapter>().As<IScannerAdapter>();
         builder.Register(c => new ConfigurationBuilder<IJs50AdapterConfig>()
-            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "js50adapter.json"))
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(),
+                "Adapters", "JS50",
+                "js50adapter.json"))
             .Build()).As<IJs50AdapterConfig>().SingleInstance();
         
     }

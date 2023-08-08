@@ -9,7 +9,7 @@ public class DefaultConfigLocator : IConfigLocator
 {
     public ILogger Logger { get; }
     private const string defaultProfileName = "Default";
-
+    private bool standalone = true;
     public string ProfileName { get; private set; } = defaultProfileName;
 
     public DefaultConfigLocator(ILogger logger)
@@ -27,12 +27,25 @@ public class DefaultConfigLocator : IConfigLocator
             }
         }
         Logger.Info($"Using Profile \"{ProfileName}\"");
+        var envVars = Environment.GetEnvironmentVariables();
+        if (envVars.Contains("VisualStudioVersion") || envVars.Contains("IDEA_INITIAL_DIRECTORY"))
+        {
+            Logger.Info("Running within IDE");
+            standalone = false;
+        }
+        else
+        {
+            Logger.Info("Running standalone");
+        }
+
     }
 
     public string GetDefaultConfigLocation()
     {
-        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-            "LogScanner","Profiles", ProfileName);
+        // get the path of the executing assembly
+        var executable = Assembly.GetExecutingAssembly().Location;
+        var path = Path.GetDirectoryName(executable);
+        return standalone ? Path.Combine(path!, "..", "config") : path!;
     }
 
     public string GetUserConfigLocation()
