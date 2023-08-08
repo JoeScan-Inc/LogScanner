@@ -11,7 +11,7 @@ using Profile = JoeScan.LogScanner.Core.Models.Profile;
 
 namespace JoeScan.LogScanner.Core.Adapters.JS50;
 
-public class Js50Adapter : IScannerAdapter
+public  class Js50Adapter : AdapterBase, IScannerAdapter
 {
     #region Private Fields
 
@@ -26,7 +26,6 @@ public class Js50Adapter : IScannerAdapter
 
     #region Injected
 
-    private readonly ILogger? logger;
     private IJs50AdapterConfig Config { get; }
     private readonly ScanSyncReceiverThread encoderUpdater;
 
@@ -34,13 +33,14 @@ public class Js50Adapter : IScannerAdapter
 
     #region Lifecycle
 
-    public Js50Adapter(ILogger logger, IJs50AdapterConfig config)
+    public  Js50Adapter(ILogger logger, IJs50AdapterConfig config)
+    : base(logger)
     {
         Config = config;
 
-        this.logger = logger;
         encoderUpdater = new ScanSyncReceiverThread(logger);
-        logger.Debug($"Created Js50Adapter using JoeScan Pinchot API version {Pinchot.VersionInformation.Version}");
+        var msg = $"Created Js50Adapter using JoeScan Pinchot API version {Pinchot.VersionInformation.Version}";
+        DiagnosticMessage(msg, LogLevel.Info);
         Units = UnitSystem.Inches;
         encoderUpdater.EventUpdateFrequencyMs = 100;
         encoderUpdater.ScanSyncUpdate += EncoderUpdaterOnScanSyncUpdate;
@@ -49,7 +49,7 @@ public class Js50Adapter : IScannerAdapter
     #endregion
 
     #region IScannerAdapter Implementation
-    public string Name => $"JS-50 v16.1";
+    public string Name => $"JS-50 v16.1.x";
     public UnitSystem Units { get; }
     public bool IsConfigured { get; private set; }
 
@@ -68,12 +68,12 @@ public class Js50Adapter : IScannerAdapter
             {
                 encoderUpdater.Start();
                 IsConfigured = true;
-                logger!.Debug("Started ScanSyncReceiverThread.");
+               DiagnosticMessage("Started ScanSyncReceiverThread.", LogLevel.Info);
             }
             catch (Exception e)
             {
                 IsConfigured = false;
-                logger!.Error($"Could not start ScanSyncReceiverThread: {e.Message}");
+                DiagnosticMessage($"Could not start ScanSyncReceiverThread: {e.Message}", LogLevel.Error);
             }
 
             return IsConfigured;
@@ -93,7 +93,7 @@ public class Js50Adapter : IScannerAdapter
 
     public void Start()
     {
-        logger!.Debug($"Trying to start {this.GetType().Name}.");
+        DiagnosticMessage($"Trying to start {this.GetType().Name}.",LogLevel.Info);
         if (!IsConfigured)
         {
             throw new ApplicationException(
@@ -111,8 +111,8 @@ public class Js50Adapter : IScannerAdapter
                 scanThread.Start();
                 if (!autoResetEvent.WaitOne(TimeSpan.FromSeconds(maxStartupTimeS)))
                 {
-                    string msg = "Timed out connecting.";
-                    logger.Error(msg);
+                    string msg = "ScanThread did not start in time. Abandoning it.";
+                    DiagnosticMessage(msg, LogLevel.Error);
                     throw new ApplicationException(msg);
                 }
                 IsRunning = true;
@@ -120,14 +120,15 @@ public class Js50Adapter : IScannerAdapter
             else
             {
                 string msg = "Could not create ScanSystem.";
-                logger.Error(msg);
+              
+                DiagnosticMessage(msg, LogLevel.Error);
                 throw new ApplicationException(msg);
             }
         }
         else
         {
             string msg = "Failed to Start: adapter already running.";
-            logger.Error(msg);
+            DiagnosticMessage(msg, LogLevel.Error);
             throw new ApplicationException(msg);
         }
     }
@@ -136,7 +137,8 @@ public class Js50Adapter : IScannerAdapter
 
     public void Stop()
     {
-        logger!.Debug($"Trying to stop {this.GetType().Name}.");
+        var msg = $"Trying to stop {this.GetType().Name}.";
+        DiagnosticMessage(msg, LogLevel.Info);
         if (!IsRunning)
         {
             return;
@@ -144,11 +146,11 @@ public class Js50Adapter : IScannerAdapter
         cancellationTokenSource!.Cancel();
         if (!scanThread!.Join(TimeSpan.FromSeconds(1)))
         {
-            logger.Warn("ScanThread did not exit. Abandoning it.");
+            DiagnosticMessage("ScanThread did not exit. Abandoning it.", LogLevel.Warn);
         }
         else
         {
-            logger.Debug("Clean shutdown of scan thread successful.");
+            DiagnosticMessage("ScanThread exited cleanly.", LogLevel.Info);
         }
 
         if (scanSystem != null)
@@ -184,7 +186,7 @@ public class Js50Adapter : IScannerAdapter
     public event EventHandler? ScanningStopped;
     public event EventHandler? ScanErrorEncountered;
     public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
-    public event EventHandler<PluginMessageEventArgs>? PluginMessage;
+   
 
     public bool IsReplay => false;
     public uint VersionMajor => 1;
@@ -199,7 +201,7 @@ public class Js50Adapter : IScannerAdapter
         try
         {
             var timeOut = TimeSpan.FromSeconds(10);
-            logger!.Debug($"Attempting to connect to scan heads with timeout of {timeOut} seconds.");
+            DiagnosticMessage($"Attempting to connect to scan heads with timeout of {timeOut} seconds.",LogLevel.Info);
             var disconnectedHeads = scanSystem!.Connect(timeOut);
             if (disconnectedHeads == null)
             {
@@ -209,21 +211,20 @@ public class Js50Adapter : IScannerAdapter
             {
                 foreach (var scanHead in disconnectedHeads)
                 {
-                    logger.Error($"Scan head {scanHead.SerialNumber} did not respond to connection request.");
+                    DiagnosticMessage($"Scan head {scanHead.SerialNumber} did not respond to connection request.",LogLevel.Error);
                 }
                 throw new InvalidOperationException($"Not starting scan thread due to connection error.");
             }
-            logger.Debug($"All scan heads connected.");
+            DiagnosticMessage($"All scan heads connected.",LogLevel.Info);
             foreach (var scanHead in scanSystem.ScanHeads)
             {
-                logger.Debug($"Active scan head: {scanHead.SerialNumber} ({scanHead.ID}) ");
+                DiagnosticMessage($"Active scan head: {scanHead.SerialNumber} ({scanHead.ID}) ",LogLevel.Info);
             }
 
-            logger.Debug($"Using DataFormat {Config.DataFormat}.");
+            DiagnosticMessage($"Using DataFormat {Config.DataFormat}.",LogLevel.Info);
             var minScanPeriod = scanSystem!.GetMinScanPeriod();
-            logger!.Debug(
-                $"ScanSystem reported a MinScanPeriod of {minScanPeriod} μs)");
-           // logger.Debug($"Configuration requested ScanRate is {Config.ScanRate} Hz (min Scan Period: {1000.0 / Config.ScanRate:F2} ms)");
+            DiagnosticMessage($"ScanSystem reported a MinScanPeriod of {minScanPeriod} μs)",LogLevel.Info);
+           // SendMessage($"Configuration requested ScanRate is {Config.ScanRate} Hz (min Scan Period: {1000.0 / Config.ScanRate:F2} ms)",LogLevel.Info);
             // if (Config.ScanRate > minScanPeriod)
             // {
             //     logger.Warn($"Configuration requested rate ({Config.ScanRate} Hz) is higher than the system max rate ({minScanPeriod} Hz) - using system max rate.");
@@ -249,7 +250,7 @@ public class Js50Adapter : IScannerAdapter
                             if (failedToPost >= 100)
                             {
                                 string msg = "BufferBlock failed to post new profiles 100 times.";
-                                logger.Error(msg);
+                                DiagnosticMessage(msg, LogLevel.Error);
                                 throw new InternalBufferOverflowException(msg);
                             }
                         }
@@ -263,8 +264,7 @@ public class Js50Adapter : IScannerAdapter
         }
         catch (Exception e)
         {
-            string msg = $"Encountered scanning error: {e}";
-            logger!.Error(msg);
+            DiagnosticMessage($"Encountered scanning error: {e}", LogLevel.Error);
             OnScanErrorEncountered();
         }
         finally
@@ -283,39 +283,38 @@ public class Js50Adapter : IScannerAdapter
 
     private ScanSystem SetupScanSystem()
     {
-        logger!.Debug("Setting up ScanSystem");
         var system = new ScanSystem(ScanSystemUnits.Inches);
-        logger.Debug($"Configuration contains {Config.ScanHeads.Count()} heads.");
+        DiagnosticMessage($"Configuration contains {Config.ScanHeads.Count()} heads.",LogLevel.Info);
 
         try
         {
             foreach (var headConfig in Config.ScanHeads)
             {
-                logger.Debug($"Creating ScanHead for serial number {headConfig.Serial} with ID {headConfig.Id}.");
+                DiagnosticMessage($"Creating ScanHead for serial number {headConfig.Serial} with ID {headConfig.Id}.",LogLevel.Info);
                 var scanHead = system.CreateScanHead(headConfig.Serial, headConfig.Id);
                 var conf = new ScanHeadConfiguration();
-                logger.Debug($"Configuring head {scanHead.ID}.");
-                logger.Debug($"Setting Laser Exposure for {scanHead.ID} " +
+                DiagnosticMessage($"Configuring head {scanHead.ID}.",LogLevel.Info);
+                DiagnosticMessage($"Setting Laser Exposure for {scanHead.ID} " +
                              $"to {headConfig.MinLaserOn}/{headConfig.DefaultLaserOn}/{headConfig.MaxLaserOn} "
-                             + "(min/default/max)");
+                             + "(min/default/max)",LogLevel.Info);
                 conf.SetLaserOnTime((uint)headConfig.MinLaserOn,(uint) headConfig.DefaultLaserOn, (uint)headConfig.MaxLaserOn);
                 
                 
-                logger.Debug($"Applying configuration to {scanHead.ID}");
+                DiagnosticMessage($"Applying configuration to {scanHead.ID}",LogLevel.Info);
                 scanHead.Configure(conf);
-                logger.Debug($"Setting Window for {scanHead.ID} to {headConfig.WindowTop}/"
+                DiagnosticMessage($"Setting Window for {scanHead.ID} to {headConfig.WindowTop}/"
                              + $"{headConfig.WindowBottom}/"
                              + $"{headConfig.WindowLeft}/"
                              + $"{headConfig.WindowRight}"
-                             + "(Top/Bottom/Left/Right");
+                             + "(Top/Bottom/Left/Right",LogLevel.Info);
                 scanHead.SetWindow(ScanWindow.CreateScanWindowRectangular(headConfig.WindowTop,
                     headConfig.WindowBottom,
                     headConfig.WindowLeft,
                     headConfig.WindowRight));
-                logger.Debug($"Setting Alignment for head {scanHead.ID} to ShiftX: {headConfig.AlignmentShiftX}"
-                + $" ShiftY: {headConfig.AlignmentShiftY} "
-                + $" RollDeg: {headConfig.AlignmentRollDegrees}"
-                + $" Orientation: {headConfig.AlignmentOrientation}");
+                DiagnosticMessage($"Setting Alignment for head {scanHead.ID} to ShiftX: {headConfig.AlignmentShiftX}"
+                            + $" ShiftY: {headConfig.AlignmentShiftY} "
+                            + $" RollDeg: {headConfig.AlignmentRollDegrees}"
+                            + $" Orientation: {headConfig.AlignmentOrientation}", LogLevel.Info);
                 scanHead.SetAlignment(headConfig.AlignmentRollDegrees,
                     headConfig.AlignmentShiftX,
                     headConfig.AlignmentShiftY
@@ -324,12 +323,12 @@ public class Js50Adapter : IScannerAdapter
                 system.AddPhaseElement(headConfig.Id,Camera.CameraA);
                 system.AddPhaseElement(headConfig.Id,Camera.CameraB);
             }
-            logger.Debug("Done setting up ScanSystem");
+            DiagnosticMessage("Done setting up ScanSystem",LogLevel.Info);
             return system;
         }
         catch (Exception e)
         {
-            logger.Error($"Failed to create ScanSystem: {e.Message}");
+            DiagnosticMessage($"Failed to create ScanSystem: {e.Message}",LogLevel.Error);
             throw;
         }
     }
@@ -355,8 +354,5 @@ public class Js50Adapter : IScannerAdapter
         EncoderUpdated.Raise(this, e);
     }
 
-    protected virtual void OnAdapterMessage(PluginMessageEventArgs e)
-    {
-        PluginMessage?.Invoke(this, e);
-    }
+    
 }

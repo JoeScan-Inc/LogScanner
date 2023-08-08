@@ -1,4 +1,4 @@
-﻿namespace JoeScan.LogScanner.Core.Config;
+﻿namespace JoeScan.LogScanner.Core.Interfaces;
 
 public interface IConfigLocator
 {

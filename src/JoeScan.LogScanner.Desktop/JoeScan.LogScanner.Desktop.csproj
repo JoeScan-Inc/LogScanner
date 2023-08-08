@@ -13,15 +13,7 @@
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
   <ItemGroup>
-    <None Remove="Assets\icon.ico" />
-    <None Remove="Assets\icon.png" />
-    <None Remove="Assets\logo.png" />
-    <None Remove="C:\Users\fabian\.nuget\packages\nlog.config\4.7.13\contentFiles\any\any\NLog.config" />
-    <None Remove="C:\Users\Fabian\.nuget\packages\nlog.schema\5.0.1\contentFiles\any\any\NLog.xsd" />
-    <None Remove="Interfaces\**" />
-    <None Remove="Main\**" />
-    <None Remove="NLogViewer\**" />
-    <None Remove="Themes\**" />
+    
   </ItemGroup>
 
   <ItemGroup>
@@ -48,36 +40,16 @@
     <ProjectReference Include="..\JoeScan.LogScanner.Shared\JoeScan.LogScanner.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Config\" />
-    <Folder Include="Engine\" />
-  </ItemGroup>
+  
 
   <ItemGroup>
     <Resource Include="Assets\icon.png" />
     <Resource Include="Assets\logo.png" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Interfaces\**" />
-    <Compile Remove="Main\**" />
-    <Compile Remove="NLogViewer\**" />
-    <Compile Remove="Themes\**" />
-  </ItemGroup>
+  
 
-  <ItemGroup>
-    <EmbeddedResource Remove="Interfaces\**" />
-    <EmbeddedResource Remove="Main\**" />
-    <EmbeddedResource Remove="NLogViewer\**" />
-    <EmbeddedResource Remove="Themes\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Remove="Interfaces\**" />
-    <Page Remove="Main\**" />
-    <Page Remove="NLogViewer\**" />
-    <Page Remove="Themes\**" />
-  </ItemGroup>
+  
 
   <ItemGroup>
     <Compile Include="..\Shared.AssemblyInfo.cs" Link="Shared.AssemblyInfo.cs" />
@@ -93,13 +65,5 @@
     </None>
   </ItemGroup>
     
-	<Target Name="CopyFiles" AfterTargets="PostBuildEvent">
-		<ItemGroup>
-			<ConfigFiles Include="LogScanner.Desktop.Config.json" />
-		</ItemGroup>
-		<Copy SourceFiles="@(ConfigFiles)" DestinationFolder="C:\ProgramData\LogScanner\Profiles\Default">
-			<Output TaskParameter="CopiedFiles" ItemName="SuccessfullyCopiedFiles" />
-		</Copy>
-
-	</Target>
+	
 </Project>

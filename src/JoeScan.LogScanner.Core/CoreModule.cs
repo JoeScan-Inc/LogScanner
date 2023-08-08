@@ -101,7 +101,7 @@ public class CoreModule : Module
 
         // the sensor adapter plugins (JS-50Adapter, Replay, Synthetic etc.) all live in 
         // a separate folder. 
-        RegisterPlugins(builder, GetPluginLoaders("adapters"));
+       // RegisterPlugins(builder, GetPluginLoaders("adapters"));
         // extension plugins (things that implement ILogModelConsumerPlugin) live here.
         RegisterPlugins(builder, GetPluginLoaders("extensions"));
     }

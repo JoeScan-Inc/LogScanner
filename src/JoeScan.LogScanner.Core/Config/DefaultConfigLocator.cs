@@ -1,4 +1,5 @@
 ﻿using JoeScan.LogScanner.Core.Helpers.CommandLine;
+using JoeScan.LogScanner.Core.Interfaces;
 using NLog;
 using System.Reflection;
 

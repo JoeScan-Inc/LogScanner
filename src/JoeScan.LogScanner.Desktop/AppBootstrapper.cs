@@ -3,6 +3,7 @@ using Autofac.Extras.NLog;
 using Config.Net;
 using JoeScan.LogScanner.Core;
 using JoeScan.LogScanner.Core.Config;
+using JoeScan.LogScanner.Core.Interfaces;
 using JoeScan.LogScanner.Desktop.Config;
 using JoeScan.LogScanner.Desktop.Engine;
 using JoeScan.LogScanner.Desktop.Shell;

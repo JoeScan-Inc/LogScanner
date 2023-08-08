@@ -38,10 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Adapters\JS50\" />
-    <Folder Include="Adapters\Replay\" />
-    <Folder Include="Adapters\SyntheticData\" />
-    <Folder Include="Enums\" />
+        <Folder Include="Enums\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,19 +47,7 @@
     </None>
   </ItemGroup>
 
-	<Target Name="CopyFiles"  AfterTargets="PostBuildEvent">
-		<ItemGroup>
-			<ConfigFiles Include="core.ini" />
-			<ConfigFiles Include="rawfilters.json" />
-			<ConfigFiles Include="Adapters\SyntheticData\SyntheticDataAdapter.json" />
-			<ConfigFiles Include="Adapters\JS50\js50adapter.json" />
-			<ConfigFiles Include="Adapters\Replay\ReplayAdapter.json" />
-		</ItemGroup>
-		<Copy SourceFiles="@(ConfigFiles)" DestinationFolder="$(ProgramData)\LogScanner\Profiles\Default">
-			<Output TaskParameter="CopiedFiles" ItemName="SuccessfullyCopiedFiles" />
-		</Copy>
-
-	</Target>
+	
 
 	
 

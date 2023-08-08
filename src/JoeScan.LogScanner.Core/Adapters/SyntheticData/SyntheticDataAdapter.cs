@@ -9,10 +9,9 @@ using Profile = JoeScan.LogScanner.Core.Models.Profile;
 
 namespace JoeScan.LogScanner.Core.Adapters.SyntheticData;
 
-public class SyntheticDataAdapter : IScannerAdapter
+public class SyntheticDataAdapter : AdapterBase, IScannerAdapter
 {
     private readonly FakeLogGenerator fakeLogGenerator;
-    private readonly ILogger logger;
     public ISyntheticDataAdapterConfig Config { get; }
 
     #region Private Fields
@@ -27,10 +26,9 @@ public class SyntheticDataAdapter : IScannerAdapter
     #region Lifecycle
 
     public SyntheticDataAdapter(ISyntheticDataAdapterConfig config,
-        FakeLogGenerator fakeLogGenerator, ILogger logger)
+        FakeLogGenerator fakeLogGenerator, ILogger logger) : base(logger)
     {
         this.fakeLogGenerator = fakeLogGenerator;
-        this.logger = logger;
         Config = config;
         timeBase = new Stopwatch();
         tickFrequency = (double) Stopwatch.Frequency;

@@ -8,12 +8,11 @@ using System.Threading.Tasks.Dataflow;
 
 namespace JoeScan.LogScanner.Core.Adapters.Replay;
 
-public class ReplayAdapter : IScannerAdapter
+public class ReplayAdapter : AdapterBase, IScannerAdapter
 {
     #region Injected Properties
 
     private IReplayAdapterConfig Config { get; }
-    public ILogger Logger { get; set; }
 
     #endregion
 
@@ -43,11 +42,12 @@ public class ReplayAdapter : IScannerAdapter
 
     #region Lifecycle
 
-    public ReplayAdapter(IReplayAdapterConfig config, ILogger? logger = null)
+    public ReplayAdapter(IReplayAdapterConfig config, ILogger logger)
+    :base(logger)
     {
         Config = config;
         // get injected logger if there is one
-        Logger = logger ?? LogManager.GetCurrentClassLogger();
+        
         IsRunning = false;
     }
 
@@ -67,6 +67,7 @@ public class ReplayAdapter : IScannerAdapter
     public uint VersionMajor => 1;
     public uint VersionMinor => 0;
     public uint VersionPatch => 0;
+    
     public Guid Id { get; } = Guid.Parse("{65FA101D-22EF-4161-8BBB-1E167986A126}");
     public bool IsRunning { get; private set; }
 
@@ -94,6 +95,7 @@ public class ReplayAdapter : IScannerAdapter
     {
         if (!IsRunning)
         {
+            DiagnosticMessage("Starting replay adapter", LogLevel.Info);
             cts = new CancellationTokenSource();
             thread = new Thread(() => ThreadMain(cts.Token)) { IsBackground = true };
             thread.Start();
@@ -106,6 +108,7 @@ public class ReplayAdapter : IScannerAdapter
     {
         if (cts != null)
         {
+            DiagnosticMessage("Stopping replay adapter", LogLevel.Info);
             cts.Cancel();
             thread!.Join();
             OnScanningStopped();
@@ -118,12 +121,10 @@ public class ReplayAdapter : IScannerAdapter
     public event EventHandler? ScanningStopped;
     public event EventHandler? ScanErrorEncountered;
     public event EventHandler<EncoderUpdateArgs>? EncoderUpdated;
-    public event EventHandler<PluginMessageEventArgs>? PluginMessage;
 
     #endregion
 
-    // embedded helper class to read the binary format of some old logscanner implementations
-
+    
     #region Private Methods
 
     private void ThreadMain(CancellationToken ct)
@@ -131,7 +132,9 @@ public class ReplayAdapter : IScannerAdapter
         try
         {
             IsRunning = true;
+            
             FillBuffer();
+            DiagnosticMessage($"Replaying {PlaybackProfiles.Count} recorded profiles", LogLevel.Info);
             var index = 0;
             while (index < PlaybackProfiles.Count)
             {
@@ -140,7 +143,9 @@ public class ReplayAdapter : IScannerAdapter
 
                 if (!AvailableProfiles.Post(profile))
                 {
-                    Logger.Error("Dropped profile.");
+                    // unable to post, buffer is full
+                    // unlikely, since we set the buffer to unlimited capacity
+                    DiagnosticMessage("Dropped profile.", LogLevel.Warn);
                 }
 
 
@@ -151,10 +156,11 @@ public class ReplayAdapter : IScannerAdapter
         catch (OperationCanceledException)
         {
             // perfectly normal exception we get when using the token to cancel
+            DiagnosticMessage("Replay cancelled", LogLevel.Info);
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            // unused
+            DiagnosticMessage($"Replay failed : {e.Message}", LogLevel.Error);
         }
         finally
         {
@@ -168,11 +174,13 @@ public class ReplayAdapter : IScannerAdapter
         string simFile;
         try
         {
+            var msg = $"Using replay file: {Config.File}";
             simFile = Config.File;
+            
         }
         catch (Exception e)
         {
-            Logger.Fatal(e, "Failed to get replay file name from configuration. ");
+            DiagnosticMessage($"Failed to get replay file from configuration: {Config.File}", LogLevel.Fatal);
             throw;
         }
 
@@ -194,7 +202,7 @@ public class ReplayAdapter : IScannerAdapter
         catch (Exception e)
         {
             // anything else
-            Logger.Fatal(e, $"Failed to open/read replay file: {simFile}");
+            DiagnosticMessage($"Failed to read replay file: {Config.File}", LogLevel.Fatal);
             throw;
         }
 
@@ -231,10 +239,6 @@ public class ReplayAdapter : IScannerAdapter
         ScanningStopped?.Raise(this, EventArgs.Empty);
     }
 
+    
     #endregion
-
-    protected virtual void OnAdapterMessage(PluginMessageEventArgs e)
-    {
-        PluginMessage?.Invoke(this, e);
-    }
 }
