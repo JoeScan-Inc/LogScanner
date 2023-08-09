@@ -1,6 +1,6 @@
 {
   "ActiveAdapter": "Replay",
-  "Units": "Inches",
+  "Units": "Millimeters",
   "LiveProfileConfig": {
     "ShowFilters" :  true
   }
