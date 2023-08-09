@@ -43,7 +43,7 @@ public class DefaultConfigLocator : IConfigLocator
     public string GetDefaultConfigLocation()
     {
         // get the path of the executing assembly
-        var executable = Assembly.GetExecutingAssembly().Location;
+        var executable = Environment.ProcessPath;
         var path = Path.GetDirectoryName(executable);
         return standalone ? Path.Combine(path!, "..", "config") : path!;
     }
