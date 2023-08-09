@@ -12,9 +12,9 @@
   },
   {
     "Kind": "PolygonFilter",
-    "ScanHeadId": 2,
+    "ScanHeadId": 1,
     "Units": "Millimeter",
-    "IsEnabled": true,
+    "IsEnabled": false,
     "Vertices": [
       {
         "X": -120,
@@ -48,8 +48,8 @@
   },
   {
     "Kind": "PolygonFilter",
-    "ScanHeadId": 1,
-    "IsEnabled": true,
+    "ScanHeadId": 2,
+    "IsEnabled": false,
     "Units": "Millimeter",
     "Vertices": [
       {

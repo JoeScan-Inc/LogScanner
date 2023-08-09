@@ -101,7 +101,7 @@ public class CoreModule : Module
 
         // the sensor adapter plugins (JS-50Adapter, Replay, Synthetic etc.) all live in 
         // a separate folder. 
-       // RegisterPlugins(builder, GetPluginLoaders("adapters"));
+        RegisterPlugins(builder, GetPluginLoaders("adapters"));
         // extension plugins (things that implement ILogModelConsumerPlugin) live here.
         RegisterPlugins(builder, GetPluginLoaders("extensions"));
     }
@@ -113,22 +113,22 @@ public class CoreModule : Module
         // https://github.com/natemcmaster/DotNetCorePlugins
         var loaders = new List<PluginLoader>();
         // create plugin loaders
-        var pluginsDir = GetPluginsPath(subFolder);
-        if (pluginsDir != null)
-        {
-            foreach (var dir in Directory.GetDirectories(pluginsDir))
-            {
-                var dirName = Path.GetFileName(dir);
-                var pluginDll = Path.Combine(dir, dirName + ".dll");
-                if (File.Exists(pluginDll))
-                {
-                    var loader = PluginLoader.CreateFromAssemblyFile(
-                        pluginDll,
-                        sharedTypes: new[] { typeof(IPluginFactory), typeof(ContainerBuilder) });
-                    loaders.Add(loader);
-                }
-            }
-        }
+        // var pluginsDir = GetPluginsPath(subFolder);
+        // if (pluginsDir != null)
+        // {
+        //     foreach (var dir in Directory.GetDirectories(pluginsDir))
+        //     {
+        //         var dirName = Path.GetFileName(dir);
+        //         var pluginDll = Path.Combine(dir, dirName + ".dll");
+        //         if (File.Exists(pluginDll))
+        //         {
+        //             var loader = PluginLoader.CreateFromAssemblyFile(
+        //                 pluginDll,
+        //                 sharedTypes: new[] { typeof(IPluginFactory), typeof(ContainerBuilder) });
+        //             loaders.Add(loader);
+        //         }
+        //     }
+        // }
 
         return loaders;
     }
@@ -136,19 +136,19 @@ public class CoreModule : Module
     private static void RegisterPlugins(ContainerBuilder builder, List<PluginLoader> loaders)
     {
         // Create an instance of plugin types
-        foreach (var loader in loaders)
-        {
-            var assembly = loader.LoadDefaultAssembly();
-            var types = assembly.GetTypes();
-            foreach (var t in types)
-            {
-                if (typeof(IPluginFactory).IsAssignableFrom(t) && !t.IsAbstract)
-                {
-                    var plugin = Activator.CreateInstance(t) as IPluginFactory;
-                    plugin?.Configure(builder);
-                }
-            }
-        }
+        // foreach (var loader in loaders)
+        // {
+        //     var assembly = loader.LoadDefaultAssembly();
+        //     var types = assembly.GetTypes();
+        //     foreach (var t in types)
+        //     {
+        //         if (typeof(IPluginFactory).IsAssignableFrom(t) && !t.IsAbstract)
+        //         {
+        //             var plugin = Activator.CreateInstance(t) as IPluginFactory;
+        //             plugin?.Configure(builder);
+        //         }
+        //     }
+        // }
     }
 
 

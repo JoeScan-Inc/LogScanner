@@ -11,25 +11,17 @@
     Width="1920"
     Height="1080"
     IconVisibility="Collapsed"
-    PlaceTitleBarOverContent="False"
+    PlaceTitleBarOverContent="True"
     TextElement.FontSize="13"
     TextElement.FontWeight="Regular"
     TextOptions.TextFormattingMode="Ideal"
     TextOptions.TextRenderingMode="Auto"
-    TitleVisibility="Visible"
+    TitleVisibility="Hidden"
     mc:Ignorable="d">
     <Window.Style>
         <Style BasedOn="{StaticResource {x:Type Window}}" TargetType="Window" />
     </Window.Style>
-    <controls:AdonisWindow.TitleBarContent>
-        <DockPanel>
-            <TextBlock
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                DockPanel.Dock="Left"
-                Text="{Binding Title}" />
-        </DockPanel>
-    </controls:AdonisWindow.TitleBarContent>
+   
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -44,20 +36,21 @@
         <ContentControl x:Name="ToolBar" Grid.Row="1" />
         <DockPanel
             Grid.Row="0"
-            Margin="0"
+            Margin="0" MinHeight="70"
             extensions:LayerExtension.IncreaseLayer="True"
             LastChildFill="False">
             <Image
-                Height="45"
-                Margin="20,5"
+                Height="60"
+                Margin="7,5"
                 HorizontalAlignment="Right"
+                RenderOptions.BitmapScalingMode="HighQuality"
                 Source="../Assets/Logo.png" />
             <TextBlock
-                Margin="5,5,120,5"
+                Margin="3,5,120,3"
                 HorizontalAlignment="Right"
-                VerticalAlignment="Center"
+                VerticalAlignment="Bottom"
                 FontFamily="{StaticResource InterThin}"
-                FontSize="33"
+                FontSize="43"
                 TextAlignment="Right">
                 Log Review
             </TextBlock>

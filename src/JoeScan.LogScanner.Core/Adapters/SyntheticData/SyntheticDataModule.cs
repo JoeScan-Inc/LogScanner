@@ -12,7 +12,9 @@ public class SyntheticDataModule : Module
         builder.RegisterType<SyntheticDataAdapter>().As<IScannerAdapter>();
         builder.RegisterType<FakeLogGenerator>().AsSelf();
         builder.Register(c => new ConfigurationBuilder<ISyntheticDataAdapterConfig>()
-            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(),"SyntheticDataAdapter.json"))
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(),
+                "Adapters", "SyntheticData",
+                "SyntheticDataAdapter.json"))
             .Build()).As<ISyntheticDataAdapterConfig>().SingleInstance();
     }
 }

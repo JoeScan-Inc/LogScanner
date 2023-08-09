@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\config\LogScanner.LogReview.Config.json" Link="LogScanner.LogReview.Config.json" />
     <Content Include="Assets\icon.ico" />
   </ItemGroup>
 

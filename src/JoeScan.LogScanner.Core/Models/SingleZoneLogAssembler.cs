@@ -284,10 +284,10 @@ public class SingleZoneLogAssembler : ILogAssembler
         {
             // we switched from Tentative or Collecting back to Idle
             // and throw away all accumulated profiles
-            Logger.Trace($"Switching from {currentState} to {newState}");
+         //   Logger.Trace($"Switching from {currentState} to {newState}");
             if (newState == LogAssemblerState.Idle)
             {
-                Logger.Trace($"New state is {newState} - cleaning up accumulated junk profiles.");
+              //  Logger.Trace($"New state is {newState} - cleaning up accumulated junk profiles.");
                 accumulatedProfiles.Clear();
                 consecutiveNoLogProfiles = 0;
                 // FlagCount = 0;

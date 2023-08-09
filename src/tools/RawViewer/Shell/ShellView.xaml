@@ -64,16 +64,16 @@
                 extensions:LayerExtension.IncreaseLayer="True"
                 LastChildFill="False">
                 <Image
-                    Height="45"
-                    Margin="0,5"
+                    Height="60"
+                    Margin="5,5"
                     HorizontalAlignment="Right"
                     Source="../Assets/Logo.png" />
                 <TextBlock
-                    Margin="5,5,120,5"
+                    Margin="5,5,120,0"
                     HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
+                    VerticalAlignment="Bottom"
                     FontFamily="{StaticResource InterThin}"
-                    FontSize="33"
+                    FontSize="43"
                     TextAlignment="Right">
                     Raw Viewer
                 </TextBlock>
@@ -81,7 +81,7 @@
            
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" MinWidth="60" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="2*" />

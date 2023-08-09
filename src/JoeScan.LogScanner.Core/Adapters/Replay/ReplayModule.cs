@@ -11,7 +11,9 @@ public class ReplayModule : Module
         builder.RegisterType<ReplayAdapter>().As<IScannerAdapter>();
         
         builder.Register(c => new ConfigurationBuilder<IReplayAdapterConfig>()
-            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), "ReplayAdapter.json"))
+            .UseJsonFile(Path.Combine(c.Resolve<IConfigLocator>().GetDefaultConfigLocation(), 
+                "Adapters", "Replay",
+                "ReplayAdapter.json"))
             .Build()).As<IReplayAdapterConfig>().SingleInstance();
     }
 }

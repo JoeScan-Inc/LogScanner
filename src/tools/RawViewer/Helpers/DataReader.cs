@@ -40,7 +40,7 @@ public static class DataReader
                 while (true)
                 {
                     var p = ProfileReaderWriter.Read(br);
-                    p.EncoderValues[0] = -p.EncoderValues[0];
+                 //   p.EncoderValues[0] = -p.EncoderValues[0];
                     var r = BoundingBox.UpdateBoundingBox(UnitConverter.Convert(p!.Units, UnitSystem.Millimeters, p));
                     l.Add(r);
                 }
