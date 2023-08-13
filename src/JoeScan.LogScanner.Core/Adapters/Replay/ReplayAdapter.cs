@@ -134,23 +134,27 @@ public class ReplayAdapter : AdapterBase, IScannerAdapter
             IsRunning = true;
             
             FillBuffer();
-            DiagnosticMessage($"Replaying {PlaybackProfiles.Count} recorded profiles", LogLevel.Info);
-            var index = 0;
-            while (index < PlaybackProfiles.Count)
+            
+            while (true)
             {
-                ct.ThrowIfCancellationRequested();
-                var profile = PlaybackProfiles[index];
-
-                if (!AvailableProfiles.Post(profile))
+                DiagnosticMessage($"Replaying {PlaybackProfiles.Count} recorded profiles", LogLevel.Info);
+                var index = 0;
+                while (index < PlaybackProfiles.Count)
                 {
-                    // unable to post, buffer is full
-                    // unlikely, since we set the buffer to unlimited capacity
-                    DiagnosticMessage("Dropped profile.", LogLevel.Warn);
+                    ct.ThrowIfCancellationRequested();
+                    var profile = PlaybackProfiles[index];
+                    // need to clone profiles, as they are not immutable and we don't want to change the original
+                    if (!AvailableProfiles.Post((Profile)profile.Clone()))
+                    {
+                        // unable to post, buffer is full
+                        // unlikely, since we set the buffer to unlimited capacity
+                        DiagnosticMessage("Dropped profile.", LogLevel.Warn);
+                    }
+
+
+                    index++;
+                    Thread.Sleep(1);
                 }
-
-
-                index++;
-                Thread.Sleep(1);
             }
         }
         catch (OperationCanceledException)
