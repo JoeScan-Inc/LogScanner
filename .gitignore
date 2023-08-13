@@ -325,7 +325,7 @@ __pycache__/
 *.xsd.cs
 client/net/lib/UdpReceiver/logs/NLog_internal_.txt
 
-# Published Plugins
-runtime/
-
+# Published executable files
+output/
+.nuke/temp/
 
