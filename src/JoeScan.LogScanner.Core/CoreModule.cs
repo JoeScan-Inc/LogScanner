@@ -17,6 +17,8 @@ namespace JoeScan.LogScanner.Core;
 
 public class CoreModule : Module
 {
+    private ILogger logger = LogManager.GetCurrentClassLogger();
+   
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterModule<NLogModule>();
@@ -98,84 +100,107 @@ public class CoreModule : Module
                     new IniConfigSource(Path.Combine(configLocation, "core.ini")).Configs["SectionBuilder"]);
             }
         );
-
-        // the sensor adapter plugins (JS-50Adapter, Replay, Synthetic etc.) all live in 
-        // a separate folder. 
-        RegisterPlugins(builder, GetPluginLoaders("adapters"));
-        // extension plugins (things that implement ILogModelConsumerPlugin) live here.
-        RegisterPlugins(builder, GetPluginLoaders("extensions"));
+        logger.Debug("Loading plugins");
+       RegisterPlugins(builder, GetPluginLoaders("extensions"));
+    }
+    private void RegisterPlugins(ContainerBuilder builder, List<PluginLoader> loaders)
+    {
+        // Create an instance of plugin 
+        // https://github.com/natemcmaster/DotNetCorePlugins
+        foreach (var loader in loaders)
+        {
+            var assembly = loader.LoadDefaultAssembly();
+            logger.Debug("Probing assembly {0} for implementations of IPluginFactory", assembly.FullName);
+            var types = assembly.GetTypes();
+            foreach (var t in types)
+            {
+                if (typeof(IPluginFactory).IsAssignableFrom(t) && !t.IsAbstract)
+                {
+                    logger.Debug("Type {0} implements IPluginFactory, trying to activate...", t.FullName);
+                    try
+                    {
+                        var plugin = Activator.CreateInstance(t) as IPluginFactory;
+                        logger.Debug("Type {0} activated. Trying to configure...", t.FullName);
+                        plugin?.Configure(builder);
+                        logger.Debug("Instance of type {0} configured and registered", t.FullName);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error(e, "Error while activating type {0}", t.FullName);
+                        
+                    }
+                }
+            }
+        }
     }
 
-
-    private static List<PluginLoader> GetPluginLoaders(string subFolder)
+    private List<PluginLoader> GetPluginLoaders(string subFolder)
     {
         // plugin loaders are a concept from the .NET Core Plugins library
         // https://github.com/natemcmaster/DotNetCorePlugins
         var loaders = new List<PluginLoader>();
-        // create plugin loaders
-        // var pluginsDir = GetPluginsPath(subFolder);
-        // if (pluginsDir != null)
-        // {
-        //     foreach (var dir in Directory.GetDirectories(pluginsDir))
-        //     {
-        //         var dirName = Path.GetFileName(dir);
-        //         var pluginDll = Path.Combine(dir, dirName + ".dll");
-        //         if (File.Exists(pluginDll))
-        //         {
-        //             var loader = PluginLoader.CreateFromAssemblyFile(
-        //                 pluginDll,
-        //                 sharedTypes: new[] { typeof(IPluginFactory), typeof(ContainerBuilder) });
-        //             loaders.Add(loader);
-        //         }
-        //     }
-        // }
+        //  create plugin loaders
+        var pluginsDir = GetPluginsPath(subFolder);
+        if (pluginsDir != null)
+        {
+            foreach (var dir in Directory.GetDirectories(pluginsDir))
+            {
+                logger.Debug("Found plugin directory {0}", dir);
+                var dirName = Path.GetFileName(dir);
+                var pluginDll = Path.Combine(dir, dirName + ".dll");
+                logger.Debug("Looking for plugin dll {0}", pluginDll);
+                if (File.Exists(pluginDll))
+                {
+                    logger.Debug("Found plugin dll {0}", pluginDll);
+                    var loader = PluginLoader.CreateFromAssemblyFile(
+                        pluginDll,
+                        sharedTypes: new[] { typeof(IPluginFactory), typeof(ContainerBuilder) });
+                    loaders.Add(loader);
+                }
+                else
+                {
+                    logger.Warn("Plugin dll {0} not found, plugin ignored", pluginDll);
+                }
+            }
+        }
 
         return loaders;
     }
 
-    private static void RegisterPlugins(ContainerBuilder builder, List<PluginLoader> loaders)
-    {
-        // Create an instance of plugin types
-        // foreach (var loader in loaders)
-        // {
-        //     var assembly = loader.LoadDefaultAssembly();
-        //     var types = assembly.GetTypes();
-        //     foreach (var t in types)
-        //     {
-        //         if (typeof(IPluginFactory).IsAssignableFrom(t) && !t.IsAbstract)
-        //         {
-        //             var plugin = Activator.CreateInstance(t) as IPluginFactory;
-        //             plugin?.Configure(builder);
-        //         }
-        //     }
-        // }
-    }
+   
 
-
-    private static string? GetPluginsPath(string subFolder)
+    private string? GetPluginsPath(string subFolder)
     {
-        //TODO: write a guide to implementing plugins
-        // adapter and vendor modules to be registered from assemblies
-        // for a deployed system, the location of the adapter plugins (implementing IScannerAdapter) is in a folder named "adapters" ,
-        // for other extensions implementing the ILogModelConsumer interface, the folder is "extensions",
+        // here we decide where we look for plugins
+        
+        // for  extensions implementing the ILogModelConsumer interface, the folder is "extensions",
         // next to the executable,
         // but during development, we rely on a relative path. Hopefully, one or the other exists
-        string? adapterpath = null;
-        var path = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
+        string? pluginPath = null;
+        
+        var path = Path.GetDirectoryName(AppContext.BaseDirectory);
+        logger.Debug("Base directory is {0}", path);
         if (Path.Exists(Path.Combine(path!, subFolder)))
         {
+            logger.Debug("Looking for plugins in {0}", path);
             // we are in a deployed system, the adapters folder is right next to the executable
-            adapterpath = Path.Combine(path!, subFolder);
+            pluginPath = Path.Combine(path!, subFolder);
         }
         else
         {
+            // we are in a development environment, the extensions folder is relative to where the binaries are
             var p = Path.GetFullPath(Path.Combine(path!, @"..\..\..\..\..", "bin", subFolder));
+            logger.Debug("Looking for plugins in {0}", p);
             if (Path.Exists(p))
             {
-                adapterpath = p;
+                pluginPath = p;
+            }
+            else
+            {
+                logger.Error("Could not find plugins path: {0}", p);
             }
         }
 
-        return adapterpath;
+        return pluginPath;
     }
 }
