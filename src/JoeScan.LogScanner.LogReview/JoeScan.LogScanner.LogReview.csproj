@@ -20,6 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\..\config\Default\LogScanner.LogReview.Config.json">
+      <Link>LogScanner.LogReview.Config.json</Link>
+    </Content>
     <Content Include="Assets\icon.ico" />
   </ItemGroup>
 
@@ -56,15 +59,7 @@
     <Resource Include="Assets\icon.png" />
     <Resource Include="Assets\logo.png" />
   </ItemGroup>
-	<Target Name="CopyFiles" AfterTargets="PostBuildEvent">
-		<ItemGroup>
-			<ConfigFiles Include="LogScanner.LogReview.Config.json" />
-		</ItemGroup>
-		<Copy SourceFiles="@(ConfigFiles)" DestinationFolder="C:\ProgramData\LogScanner\Profiles\Default">
-			<Output TaskParameter="CopiedFiles" ItemName="SuccessfullyCopiedFiles" />
-		</Copy>
-
-	</Target>
+	
  
 
 </Project>

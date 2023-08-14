@@ -24,10 +24,6 @@
     <ProjectReference Include="..\..\JoeScan.LogScanner.Core\JoeScan.LogScanner.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="ProblemLogArchiverConfig.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+  
 
 </Project>

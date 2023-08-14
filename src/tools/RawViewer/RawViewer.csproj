@@ -5,10 +5,14 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>..\..\JoeScan.LogScanner.Desktop\Assets\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Assets\logo.png" />
+    <None Include="..\..\JoeScan.LogScanner.Desktop\Assets\icon.ico">
+      <Link>icon.ico</Link>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

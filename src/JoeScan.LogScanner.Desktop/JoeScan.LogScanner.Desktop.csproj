@@ -56,15 +56,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\..\config\Default\LogScanner.Desktop.Config.json">
+      <Link>LogScanner.Desktop.Config.json</Link>
+    </Content>
     <Content Include="Assets\icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="nlog.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="LogScanner.Desktop.Config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
     

@@ -37,7 +37,6 @@ public class DefaultConfigLocator : IConfigLocator
         {
             Logger.Info("Running standalone");
         }
-
     }
 
     public string GetDefaultConfigLocation()
@@ -45,7 +44,19 @@ public class DefaultConfigLocator : IConfigLocator
         // get the path of the executing assembly
         var executable = Environment.ProcessPath;
         var path = Path.GetDirectoryName(executable);
-        return standalone ? Path.Combine(path!, "..", "config") : path!;
+        if (standalone)
+        {
+            // running standalone, so we need to go up a directory and then into config 
+            // and then either into "Default" or the profile name
+            return Path.Combine(path!, "..", "config", ProfileName);
+        }
+        else
+        {
+            // running within IDE, so we need to go up four directories and then into config
+            // *.dll is in bin/Debug/net7.0
+            
+            return Path.Combine(path!, "../../../../..", "config", ProfileName);
+        }
     }
 
     public string GetUserConfigLocation()
