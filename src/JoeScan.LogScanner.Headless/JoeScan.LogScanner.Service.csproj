@@ -13,6 +13,9 @@
     <Compile Remove="Properties\**" />
     <EmbeddedResource Remove="Properties\**" />
     <None Remove="Properties\**" />
+    <None Include="..\..\config\Default\nlog.config">
+      <Link>nlog.config</Link>
+    </None>
     <None Include="..\JoeScan.LogScanner.Desktop\Assets\icon.ico">
       <Link>icon.ico</Link>
     </None>

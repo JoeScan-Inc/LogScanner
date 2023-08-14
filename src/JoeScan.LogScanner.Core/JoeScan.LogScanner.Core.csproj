@@ -16,14 +16,9 @@
     <None Update="rawfilters.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <None Update="Adapters\JS50\js50adapter.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Adapters\SyntheticData\SyntheticDataAdapter.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Adapters\Replay\ReplayAdapter.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    <None Include="..\..\config\Default\nlog.config">
+      <Link>nlog.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
@@ -54,6 +49,24 @@
 
   <ItemGroup>
         <Folder Include="Enums\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\config\Default\core.ini">
+      <Link>core.ini</Link>
+    </Content>
+    <Content Include="..\..\config\Default\js50adapter.json">
+      <Link>Adapters\JS50\js50adapter.json</Link>
+    </Content>
+    <Content Include="..\..\config\Default\rawfilters.json">
+      <Link>rawfilters.json</Link>
+    </Content>
+    <Content Include="..\..\config\Default\ReplayAdapter.json">
+      <Link>Adapters\Replay\ReplayAdapter.json</Link>
+    </Content>
+    <Content Include="..\..\config\Default\SyntheticDataAdapter.json">
+      <Link>Adapters\SyntheticData\SyntheticDataAdapter.json</Link>
+    </Content>
   </ItemGroup>
 
 

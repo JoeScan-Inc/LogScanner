@@ -253,6 +253,7 @@ namespace JoeScan.LogScanner.Core.Models
             ActiveAdapter = adapter;
             if (ActiveAdapter != null)
             {
+                Logger.Info($"Setting active adapter to {ActiveAdapter.Name}");
                 // hook up to new adapter
                 ActiveAdapter.ScanningStarted += ActiveAdapterOnScanningStarted;
                 ActiveAdapter.ScanningStopped += ActiveAdapterOnScanningStopped;

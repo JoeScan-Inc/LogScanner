@@ -37,8 +37,7 @@ class Build : NukeBuild
         .DependsOn(Clean)
         .Executes(() =>
         {
-            DotNetRestore(s=>s.SetProjectFile(Solution)
-                );
+            DotNetRestore(s=>s.SetProjectFile(Solution));
         });
 
     Target Compile => _ => _
@@ -64,6 +63,8 @@ class Build : NukeBuild
                 .SetProcessArgumentConfigurator(_ => _
                     .Add("/p:DebugType=None /p:DebugSymbols=false"))
                 .SetOutput(OutputDirectory));
+            CopyFile(RootDirectory / "src" / "JoeScan.LogScanner.Desktop"  / "nlog.config", OutputDirectory / "nlog.config", FileExistsPolicy.Skip);
+            CopyDirectoryRecursively(RootDirectory / "Config" / "Default", OutputDirectory / "config" / "Default");
         });
     
     Target PublishService => _ => _
@@ -136,7 +137,7 @@ class Build : NukeBuild
                     .DisableSelfContained()
                     .SetOutput(OutputDirectory / "extensions" / "SamplePlugin");
             });
-            CopyFile(RootDirectory / "src" / "JoeScan.LogScanner.Desktop"  / "nlog.config", OutputDirectory / "nlog.config");
+            
         });
     Target Plugins => _ => _
         .DependsOn(PublishProblemLogArchiver)

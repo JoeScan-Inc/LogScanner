@@ -189,7 +189,7 @@ public class CoreModule : Module
         else
         {
             // we are in a development environment, the extensions folder is relative to where the binaries are
-            var p = Path.GetFullPath(Path.Combine(path!, @"..\..\..\..\..", "bin", subFolder));
+            var p = Path.GetFullPath(Path.Combine(path!, @"..\..\..\..\..\output", subFolder));
             logger.Debug("Looking for plugins in {0}", p);
             if (Path.Exists(p))
             {
