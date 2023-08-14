@@ -326,6 +326,6 @@ __pycache__/
 client/net/lib/UdpReceiver/logs/NLog_internal_.txt
 
 # Published executable files
-output/
+dist/
 .nuke/temp/
 

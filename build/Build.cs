@@ -19,7 +19,7 @@ class Build : NukeBuild
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
-    AbsolutePath OutputDirectory => RootDirectory / "output";
+    AbsolutePath OutputDirectory => RootDirectory / "dist";
     
     [Solution] readonly Solution Solution;
     
