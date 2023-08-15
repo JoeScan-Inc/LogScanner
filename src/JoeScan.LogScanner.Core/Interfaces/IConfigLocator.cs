@@ -3,7 +3,6 @@
 public interface IConfigLocator
 {
     string GetDefaultConfigLocation ();
-    string GetUserConfigLocation ();
+    void OverrideDefaultConfigLocation (string path);
 
-    string ProfileName { get; }
 }

@@ -8,59 +8,48 @@ namespace JoeScan.LogScanner.Core.Config;
 public class DefaultConfigLocator : IConfigLocator  
 {
     public ILogger Logger { get; }
-    private const string defaultProfileName = "Default";
-    private bool standalone = true;
-    public string ProfileName { get; private set; } = defaultProfileName;
-
+    
+    public string ConfigLocation { get; private set; } = string.Empty;
+    
     public DefaultConfigLocator(ILogger logger)
     {
         Logger = logger;
-        var parsedOptions =
-            CommandLineParser.ParseOptions(Environment.GetCommandLineArgs().Skip(1).ToArray());
-        if (parsedOptions != null && parsedOptions.Any(q => q.Name.ToLower() == "profile"))
-        {
-            var option = parsedOptions.FirstOrDefault(q => q.Name.ToLower() == "profile");
-            if (option != null && !String.IsNullOrEmpty(option.Value))
-            {
-                ProfileName = option.Value;
-                
-            }
-        }
-        Logger.Info($"Using Profile \"{ProfileName}\"");
+        
         var envVars = Environment.GetEnvironmentVariables();
+        var executable = Environment.ProcessPath;
+        var path = Path.GetDirectoryName(executable);
+        
         if (envVars.Contains("VisualStudioVersion") || envVars.Contains("IDEA_INITIAL_DIRECTORY"))
         {
             Logger.Info("Running within IDE");
-            standalone = false;
+            ConfigLocation =  Path.Combine(path!, "../../../../..", "config", "Default");
+            Logger.Info("Running within IDE, config location is {0}", ConfigLocation);
         }
         else
         {
-            Logger.Info("Running standalone");
+            ConfigLocation = Path.Combine(path!, "..", "config", "Default");
+            Logger.Info("Running standalone, config location is {0}", ConfigLocation);
         }
     }
 
     public string GetDefaultConfigLocation()
     {
         // get the path of the executing assembly
-        var executable = Environment.ProcessPath;
-        var path = Path.GetDirectoryName(executable);
-        if (standalone)
-        {
-            // running standalone, so we need to go up a directory and then into config 
-            // and then either into "Default" or the profile name
-            return Path.Combine(path!, "..", "config", ProfileName);
-        }
-        else
-        {
-            // running within IDE, so we need to go up four directories and then into config
-            // *.dll is in bin/Debug/net7.0
-            
-            return Path.Combine(path!, "../../../../..", "config", ProfileName);
-        }
+        return ConfigLocation;
     }
 
-    public string GetUserConfigLocation()
+    public void OverrideDefaultConfigLocation(string path)
     {
-        return GetDefaultConfigLocation();
+        if (Path.IsPathRooted(path))
+            ConfigLocation = path;
+        else
+        {
+            ConfigLocation = Path.Combine(ConfigLocation, path);
+        }
+        Logger.Info("Overriding config location to {0}", ConfigLocation);
     }
+
+   
+
+    
 }
