@@ -1,4 +1,4 @@
-﻿using Autofac.Features.AttributeFilters;
+﻿using Autofac;
 using JoeScan.LogScanner.Core.Config;
 using JoeScan.LogScanner.Core.Events;
 using JoeScan.LogScanner.Core.Extensions;
@@ -6,11 +6,7 @@ using JoeScan.LogScanner.Core.Geometry;
 using JoeScan.LogScanner.Core.Helpers;
 using JoeScan.LogScanner.Core.Interfaces;
 using NLog;
-using NLog.LayoutRenderers.Wrappers;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Net.Mime;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks.Dataflow;
 
 namespace JoeScan.LogScanner.Core.Models
@@ -108,6 +104,20 @@ namespace JoeScan.LogScanner.Core.Models
 
         #region Lifecycle
 
+        public static LogScannerEngine Create(string? configPath = null)
+        {
+            var builder = new ContainerBuilder();
+            builder.RegisterModule<CoreModule>();
+            var container = builder.Build();
+            using var scope = container.BeginLifetimeScope();
+            if (!string.IsNullOrEmpty(configPath))
+            {
+                var configLocator = scope.Resolve<IConfigLocator>();
+                configLocator.OverrideDefaultConfigLocation(configPath);
+            }
+            return scope.Resolve<LogScannerEngine>();
+        }
+        
         public LogScannerEngine(
             IEnumerable<IScannerAdapter> availableAdapters,
             IFlightsAndWindowFilter filter,

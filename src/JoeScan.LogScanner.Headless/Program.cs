@@ -1,6 +1,4 @@
-﻿using Autofac;
-using JoeScan.LogScanner.Core;
-using JoeScan.LogScanner.Core.Models;
+﻿using JoeScan.LogScanner.Core.Models;
 using System;
 using System.Linq;
 using System.Threading;
@@ -13,14 +11,10 @@ Console.CancelKeyPress += (_, e) =>
     autoResetEvent.Set();
 };
 
-var builder = new ContainerBuilder();
-builder.RegisterModule<CoreModule>();
-var container = builder.Build();
 
-using var scope = container.BeginLifetimeScope();
-var engine= scope.Resolve<LogScannerEngine>();
-engine.SetActiveAdapter(engine.AvailableAdapters.First()); // we only have the replay adapter registered
-engine.Start();
+var engine = LogScannerEngine.Create();
+engine.SetActiveAdapter(engine.AvailableAdapters.First(q=>q.Name.Contains("Replay"))); 
+await engine.Start();
 autoResetEvent.WaitOne();
 engine.Stop();
 
