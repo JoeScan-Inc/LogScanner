@@ -1,0 +1,10 @@
+site_name: Ex Novo LogScanner 
+site_description: Developer and End User Documentation for Ex Novo LogScanner
+site_author: fabian@exnovoscanning.com
+site_url: https://exnovoscanning.com
+
+nav:
+  - Home: index.md
+  - Developer Guide: developer_guide.md
+  - User Guide: user_guide.md
+        
