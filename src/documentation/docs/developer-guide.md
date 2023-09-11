@@ -36,3 +36,5 @@ to see a list of all available targets.
 
 Building within the IDE will also build the solution, but will not publish the UI applications or copy configuration data. However, the UI applications can be run from within the IDE, and will use the configuration data in the ```config/Default``` directory.
 
+## LogModel
+For measured data on the LogModel, see [Logmodel Properties](logmodel/logmodel.md)
