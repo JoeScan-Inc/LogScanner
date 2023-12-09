@@ -3,6 +3,6 @@
   "Units": "Millimeters",
   "ShowAcceptedPoints": "true",
   "ShowRejectedPoints": "false",
-  "ShowModel": "false",
-  "ShowModelPoints": "false"
+  "ShowModel": "true",
+  "ShowModelPoints": "true"
 }

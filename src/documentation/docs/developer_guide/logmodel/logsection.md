@@ -1,5 +1,7 @@
 # LogSection
 ## Section Length and Section Center
+
+
 All valid collected profiles are grouped into `LogSection`s by the `LogModelBuilder`. Sections (or slices) are spaced at a fixed interval. In `core.ini`, the entry `SectionInterval = xx` sets the spacing for the modeler. 
 
 There is one case where a section can be longer than the interval:
@@ -7,30 +9,29 @@ If the last section would be shorter than 1/2 of the SectionInterval, the next-t
 
 Each `LogSection` has a property `SectionCenter`, denoting the z-Value of the center of the section. E.g. for a `SectionInterval` of 100mm, the first section has a center of 50mm, the second section 150mm and so on. 
 
-### Examples:
+!!!example "Example for a Log Length of 3040 mm"
 
-**Log Length 3040mm**
+    | Section No | Section Length | Section Center |
+    | -- | -- | -- |
+    | 1 | 100 mm | 50 mm |
+    | 2 | 100 mm | 150 mm|
+    | .. | .. | ..|
+    | 30 | 140 mm |  2970 mm |
+    
+    In this case, the last section is extended to be 140mm long instead of 100mm.
 
- | Section No | Section Length | Section Center |
- | -- | -- | -- |
- | 1 | 100 mm | 50 mm |
- | 2 | 100 mm | 150 mm|
- | .. | .. | ..|
- | 30 | 140 mm |  2970 mm |
+!!!example "Example for a Log Length of 3060 mm"
 
- In this case, the last section is extended to be 140mm long instead of 100mm.
+    | Section No | Section Length | Section Center |
+    | -- | -- | -- |
+    | 1 | 100 mm | 50 mm |
+    | 2 | 100 mm | 150 mm|
+    | .. | .. | ..|
+    | 30 | 100 mm |  2950 mm |
+    | 31 | 60 mm |  3030 mm |
+     
+     In this case, the last section is only 60mm long. 
 
- **Log Length 3060mm**
-
- | Section No | Section Length | Section Center |
- | -- | -- | -- |
- | 1 | 100 mm | 50 mm |
- | 2 | 100 mm | 150 mm|
- | .. | .. | ..|
- | 30 | 100 mm |  2950 mm |
- | 31 | 60 mm |  3030 mm |
- 
- In this case, the last section is only 60mm long. 
 
 ## Outlier Filter
 LogScanner employs a heuristic model to group points into valid points and outliers. The algorithm in 
@@ -49,18 +50,22 @@ Each `LogSection` is tested for validity, and has a `IsValid` flag. The tests fo
 
 ## Ellipse Model 
 During the build phase, LogScanner calculates the best fitting ellipse through all valid points. This is done via a least squares fit algorithm. The resulting ellipse is stored as a property (`Ellipse`) within the section. As part of that fitting, the RMSE is also calculated and stored in `FitError`. The `FitError` describes, how well the section could be approximated by an ellipse.  
-![Ellipse](img/ellipse.png)
+![Ellipse](img/rawdiameter.png)
 
 ## LogSection Properties
-Each section has a number of properties, calculated as part of the build. Here is a list with explanations
+Each section object  has a number of properties, calculated as part of the build. Here is a list with explanations
 
-### RawDiameterMax and RawDiameterMin
-Length of the semimajor axis and length of the semiminor axis of the fitted ellipse, respectively. Note that this is not in X or Y direction. 
-### DiameterMaxAngle
-Angle of rotation of the semimajor axis in a mathematical system, i.e. positive from the horizontal in counter-clockwise direction. 
-### CentroidX and CentroidY
-Center of the modelled ellipse, in mill coordinate system. 
-### RawDiameterX and RawDiameterY
-Projection of the ellipse onto the mill coordinate system axes. TBD: add illustration. 
-### TotalArea 
-Area of the fitting ellipse. Calculated with the standard ellipse area formula.  
+RawDiameterMax and RawDiameterMin
+:   Length of the semimajor axis and length of the semiminor axis of the fitted ellipse, respectively. Note that this is not in X or Y direction. 
+
+DiameterMaxAngle
+:   Angle of rotation of the semimajor axis in a mathematical system, i.e. positive from the horizontal in counter-clockwise direction. 
+
+CentroidX and CentroidY
+:   Center of the modelled ellipse, in mill coordinate system. 
+
+RawDiameterX and RawDiameterY
+:   Projection of the ellipse onto the mill coordinate system axes. TBD: add illustration. 
+
+TotalArea 
+:   Area of the fitting ellipse. Calculated with the standard ellipse area formula.  

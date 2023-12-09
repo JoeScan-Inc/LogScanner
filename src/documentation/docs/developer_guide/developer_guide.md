@@ -1,5 +1,6 @@
-# Developer Guide
-## Prerequisites
+
+## Building 
+### Prerequisites
 
 LogScanner is a .NET application, based on .NET Core 7. The core library LogScanner.Core, is platform agnostic and can be used in any .NET application. The UI applications are based on WPF and are only available for Windows.
 
@@ -36,5 +37,9 @@ to see a list of all available targets.
 
 Building within the IDE will also build the solution, but will not publish the UI applications or copy configuration data. However, the UI applications can be run from within the IDE, and will use the configuration data in the ```config/Default``` directory.
 
-## LogModel
+## Architecture and Design
+
+In this section, some key concepts of LogScanner are explained. 
+
+### LogModel
 For measured data on the LogModel, see [Logmodel Properties](logmodel/logmodel.md)
