@@ -1,0 +1,50 @@
+site_name: ExNovo LogScanner 
+site_description: Developer and End User Documentation for Ex Novo LogScanner
+site_author: fabian@exnovoscanning.com
+site_url: https://exnovoscanning.com
+
+nav:
+  - Home: index.md
+  - System Design Guide: 
+      - Overview: systemdesign_guide/systemdesign_guide.md
+  - Developer Guide: 
+      - Overview: developer_guide/overview.md
+      - Building: developer_guide/developer_guide.md
+      - Modeling:
+        - LogModel: developer_guide/logmodel/logmodel.md
+        - LogSection: developer_guide/logmodel/logsection.md
+  - User Guide: user_guide/user_guide.md
+        
+extra_css:
+  - stylesheets/extra.css
+
+theme:
+  name: material
+  logo: assets/logo.png
+  font: 
+    text: Roboto
+    code: Roboto Mono
+  features:
+   - navigation.tabs
+   - navigation.sections
+   - navigation.expand
+   - navigation.path
+  icon:
+    annotation: material/arrow-right-circle 
+
+   
+copyright: Copyright &copy; 2023 Ex Novo Scanning
+
+plugins:
+  - offline
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - def_list
+  - attr_list
+  - md_in_html
+  
+

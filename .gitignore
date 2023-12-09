@@ -328,4 +328,5 @@ client/net/lib/UdpReceiver/logs/NLog_internal_.txt
 # Published executable files
 dist/
 .nuke/temp/
+src/documentation/site/
 
