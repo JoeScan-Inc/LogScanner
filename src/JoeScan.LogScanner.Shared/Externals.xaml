@@ -10,7 +10,7 @@
         <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml" />
         <!-- <ResourceDictionary Source="pack://application:,,,/ToastNotifications.Messages;component/Themes/Default.xaml" /> -->
         <ResourceDictionary>
-            <Color x:Key="{x:Static adonisUi:Colors.AccentColor}">#A9AD38</Color>
+            <Color x:Key="{x:Static adonisUi:Colors.AccentColor}">Yellow</Color>
             <CornerRadius x:Key="{x:Static adonisUi:Dimensions.CornerRadius}">3</CornerRadius>
             <Thickness x:Key="{x:Static adonisUi:Dimensions.BorderThickness}">1</Thickness>
         </ResourceDictionary>

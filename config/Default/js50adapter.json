@@ -1,29 +1,5 @@
 ﻿{
-  "ScanRate": 200.0,
-  "DataFormat": "XYHalfLMHalf",
-  "Units": "Inches",
-  "EncoderPulseInterval": 0.2,
-  "ScanHeads": [
-    {
-      "Serial": 21416,
-      "Id": 0,
-      "Name": "Top",
-      "MinLaserOn": 100,
-      "DefaultLaserOn": 100,
-      "MaxLaserOn": 150,
-      "ScanPhaseOffset": 0,
-      "Alignment": {
-        "ShiftX": 0.299,
-        "ShiftY": -6.604,
-        "RollDegrees": 0.232,
-        "Orientation": "CableIsDownstream"
-      },
-      "Window": {
-        "Top": 31,
-        "Bottom": -2,
-        "Left": -15,
-        "Right": 15
-      }
-    }
-  ]
+  "ScanPeriodUs": 3000,
+  "DataFormat": "XYBrightnessQuarter",
+  "ScanSystemDefinition": "logscanner_zmj.json"
 }

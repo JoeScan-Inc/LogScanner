@@ -1,5 +1,5 @@
 {
-  "ActiveAdapter": "Replay",
+  "ActiveAdapter": "JS-50 v16.2.x",
   "Units": "Millimeters",
   "LiveProfileConfig": {
     "ShowFilters" :  true
