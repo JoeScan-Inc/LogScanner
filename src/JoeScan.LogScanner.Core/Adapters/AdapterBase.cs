@@ -5,7 +5,7 @@ namespace JoeScan.LogScanner.Core.Adapters;
 
 public class AdapterBase
 {
-    private ILogger logger;
+    private readonly ILogger logger;
     protected AdapterBase(ILogger logger)
     {
         this.logger = logger;

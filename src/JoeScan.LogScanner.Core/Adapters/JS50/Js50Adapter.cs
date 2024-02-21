@@ -13,6 +13,7 @@ namespace JoeScan.LogScanner.Core.Adapters.JS50;
 
 public  class Js50Adapter : AdapterBase, IScannerAdapter
 {
+    private readonly IConfigLocator configLocator;
     #region Private Fields
 
     private ScanSystem? scanSystem;
@@ -27,30 +28,29 @@ public  class Js50Adapter : AdapterBase, IScannerAdapter
     #region Injected
 
     private IJs50AdapterConfig Config { get; }
-    private readonly ScanSyncReceiverThread encoderUpdater;
 
     #endregion
 
     #region Lifecycle
 
-    public  Js50Adapter(ILogger logger, IJs50AdapterConfig config)
+    public  Js50Adapter(ILogger logger, IJs50AdapterConfig config, IConfigLocator configLocator)
     : base(logger)
     {
+        this.configLocator = configLocator;
         Config = config;
 
-        encoderUpdater = new ScanSyncReceiverThread(logger);
-        var msg = $"Created Js50Adapter using JoeScan Pinchot API version {Pinchot.VersionInformation.Version}";
+        var msg = $"Created Js50Adapter using JoeScan Pinchot API version {JoeScan.Pinchot.VersionInformation.Version}";
         DiagnosticMessage(msg, LogLevel.Info);
-        Units = UnitSystem.Inches;
-        encoderUpdater.EventUpdateFrequencyMs = 100;
-        encoderUpdater.ScanSyncUpdate += EncoderUpdaterOnScanSyncUpdate;
+        Units = UnitSystem.Millimeters;
+        // encoderUpdater.EventUpdateFrequencyMs = 100;
+        // encoderUpdater.ScanSyncUpdate += EncoderUpdaterOnScanSyncUpdate;
     }
 
     #endregion
 
     #region IScannerAdapter Implementation
-    public string Name => $"JS-50 v16.1.x";
-    public UnitSystem Units { get; }
+    public string Name => $"JS-50 v16.2.x";
+    public UnitSystem Units { get; } = UnitSystem.Millimeters;
     public bool IsConfigured { get; private set; }
 
 
@@ -62,23 +62,8 @@ public  class Js50Adapter : AdapterBase, IScannerAdapter
 
     public Task<bool> ConfigureAsync()
     {
-        return Task.Run(() =>
-        {
-            try
-            {
-                encoderUpdater.Start();
-                IsConfigured = true;
-               DiagnosticMessage("Started ScanSyncReceiverThread.", LogLevel.Info);
-            }
-            catch (Exception e)
-            {
-                IsConfigured = false;
-                DiagnosticMessage($"Could not start ScanSyncReceiverThread: {e.Message}", LogLevel.Error);
-            }
-
-            return IsConfigured;
-        });
-
+        IsConfigured = true;
+        return Task.FromResult(true);
     }
 
     // TODO: temporary fix, make Start properly Async
@@ -215,7 +200,7 @@ public  class Js50Adapter : AdapterBase, IScannerAdapter
                 }
                 throw new InvalidOperationException($"Not starting scan thread due to connection error.");
             }
-            DiagnosticMessage($"All scan heads connected.",LogLevel.Info);
+            DiagnosticMessage($"All scan heads connected.", LogLevel.Info);
             foreach (var scanHead in scanSystem.ScanHeads)
             {
                 DiagnosticMessage($"Active scan head: {scanHead.SerialNumber} ({scanHead.ID}) ",LogLevel.Info);
@@ -223,13 +208,18 @@ public  class Js50Adapter : AdapterBase, IScannerAdapter
 
             DiagnosticMessage($"Using DataFormat {Config.DataFormat}.",LogLevel.Info);
             var minScanPeriod = scanSystem!.GetMinScanPeriod();
-            DiagnosticMessage($"ScanSystem reported a MinScanPeriod of {minScanPeriod} μs)",LogLevel.Info);
-           // SendMessage($"Configuration requested ScanRate is {Config.ScanRate} Hz (min Scan Period: {1000.0 / Config.ScanRate:F2} ms)",LogLevel.Info);
-            // if (Config.ScanRate > minScanPeriod)
-            // {
-            //     logger.Warn($"Configuration requested rate ({Config.ScanRate} Hz) is higher than the system max rate ({minScanPeriod} Hz) - using system max rate.");
-            // }
-            scanSystem.StartScanning(minScanPeriod+100, Config.DataFormat);
+            DiagnosticMessage($"ScanSystem reported a MinScanPeriod of {minScanPeriod} μs",LogLevel.Info);
+            DiagnosticMessage($"Configuration requested ScanPeriod is {Config.ScanPeriodUs} μs",LogLevel.Info);
+            if (Config.ScanPeriodUs < minScanPeriod)
+            {
+                DiagnosticMessage($"Configuration requested ScanPeriod {Config.ScanPeriodUs} μs is below the system MinScanPeriod {minScanPeriod} μs"+
+                                  " - using system MinScanPeriod.",LogLevel.Warn);
+            }
+            if (PinchotProfileConverter.IsFakeEncoder)
+            {
+                DiagnosticMessage($"Using fake encoder!",LogLevel.Warn);
+            }
+            scanSystem.StartScanning(Math.Max(minScanPeriod,Config.ScanPeriodUs), Config.DataFormat, ScanningMode.Frame);
             int failedToPost = 0;
             // we seem to have connected and are scanning
             autoResetEvent.Set();
@@ -237,25 +227,30 @@ public  class Js50Adapter : AdapterBase, IScannerAdapter
             {
                 // post all profiles that are due
                 ct.ThrowIfCancellationRequested();
-                foreach (var scanHead in scanSystem.ScanHeads)
-                {
-                    var gotProfile = scanHead.TryTakeNextProfile(out var prof, TimeSpan.FromMilliseconds(1), ct);
+                
+                    var gotProfile = scanSystem.TryTakeFrame(out var frame, TimeSpan.FromMilliseconds(3), ct);
                     if (gotProfile)
                     {
                         //TODO: check the result of Post to see if we lose profiles
                         // due to the downstream processing being too slow
-                        if (!AvailableProfiles.Post(prof.ToLogScannerProfile()))
+                        if (frame.IsComplete)
                         {
-                            failedToPost++;
-                            if (failedToPost >= 100)
+                            for (int i = 0; i < frame.Count; i++)
                             {
-                                string msg = "BufferBlock failed to post new profiles 100 times.";
-                                DiagnosticMessage(msg, LogLevel.Error);
-                                throw new InternalBufferOverflowException(msg);
+                                var postSuccessful = AvailableProfiles.Post(frame[i].ToLogScannerProfile( scanSystem.Units));
+                                if (!postSuccessful)
+                                {
+                                    failedToPost++;
+                                    if (failedToPost >= 100)
+                                    {
+                                        string msg = "BufferBlock failed to post new profiles 100 times.";
+                                        DiagnosticMessage(msg, LogLevel.Error);
+                                        throw new InternalBufferOverflowException(msg);
+                                    }
+                                }
                             }
                         }
                     }
-                }
             }
         }
         catch (OperationCanceledException)
@@ -283,48 +278,13 @@ public  class Js50Adapter : AdapterBase, IScannerAdapter
 
     private ScanSystem SetupScanSystem()
     {
-        var system = new ScanSystem(ScanSystemUnits.Inches);
-        DiagnosticMessage($"Configuration contains {Config.ScanHeads.Count()} heads.",LogLevel.Info);
-
+        var jsSetupFile = Path.Combine(configLocator.GetDefaultConfigLocation(), Config.ScanSystemDefinition);
+        DiagnosticMessage($"Configuration uses Definition file {Config.ScanSystemDefinition}.",LogLevel.Info);
         try
         {
-            foreach (var headConfig in Config.ScanHeads)
-            {
-                DiagnosticMessage($"Creating ScanHead for serial number {headConfig.Serial} with ID {headConfig.Id}.",LogLevel.Info);
-                var scanHead = system.CreateScanHead(headConfig.Serial, headConfig.Id);
-                var conf = new ScanHeadConfiguration();
-                DiagnosticMessage($"Configuring head {scanHead.ID}.",LogLevel.Info);
-                DiagnosticMessage($"Setting Laser Exposure for {scanHead.ID} " +
-                             $"to {headConfig.MinLaserOn}/{headConfig.DefaultLaserOn}/{headConfig.MaxLaserOn} "
-                             + "(min/default/max)",LogLevel.Info);
-                conf.SetLaserOnTime((uint)headConfig.MinLaserOn,(uint) headConfig.DefaultLaserOn, (uint)headConfig.MaxLaserOn);
-                
-                
-                DiagnosticMessage($"Applying configuration to {scanHead.ID}",LogLevel.Info);
-                scanHead.Configure(conf);
-                DiagnosticMessage($"Setting Window for {scanHead.ID} to {headConfig.WindowTop}/"
-                             + $"{headConfig.WindowBottom}/"
-                             + $"{headConfig.WindowLeft}/"
-                             + $"{headConfig.WindowRight}"
-                             + "(Top/Bottom/Left/Right",LogLevel.Info);
-                scanHead.SetWindow(ScanWindow.CreateScanWindowRectangular(headConfig.WindowTop,
-                    headConfig.WindowBottom,
-                    headConfig.WindowLeft,
-                    headConfig.WindowRight));
-                DiagnosticMessage($"Setting Alignment for head {scanHead.ID} to ShiftX: {headConfig.AlignmentShiftX}"
-                            + $" ShiftY: {headConfig.AlignmentShiftY} "
-                            + $" RollDeg: {headConfig.AlignmentRollDegrees}"
-                            + $" Orientation: {headConfig.AlignmentOrientation}", LogLevel.Info);
-                scanHead.SetAlignment(headConfig.AlignmentRollDegrees,
-                    headConfig.AlignmentShiftX,
-                    headConfig.AlignmentShiftY
-                    );
-                system.AddPhase();
-                system.AddPhaseElement(headConfig.Id,Camera.CameraA);
-                system.AddPhaseElement(headConfig.Id,Camera.CameraB);
-            }
-            DiagnosticMessage("Done setting up ScanSystem",LogLevel.Info);
-            return system;
+            var scanSystem = ScanSystemExtensions.CreateFromFile(jsSetupFile);
+            DiagnosticMessage($"ScanSystem created.",LogLevel.Info);
+            return scanSystem;
         }
         catch (Exception e)
         {
