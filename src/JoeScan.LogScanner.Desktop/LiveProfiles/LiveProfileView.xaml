@@ -23,6 +23,33 @@
             Visibility="{Binding PausedIndicatorVisibility}">
             Paused
         </TextBlock>
+        <Grid HorizontalAlignment="Left" VerticalAlignment="Bottom">
+            <Grid.Resources>
+                <Style 
+                    TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                    <Setter Property="FontSize" Value="10"></Setter>
+                    <Setter Property="Margin" Value="3,1"></Setter>
+                </Style>
+            </Grid.Resources>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0">Sequence:</TextBlock>
+            <TextBlock Typography.NumeralAlignment="Tabular" MinWidth="80" Grid.Row="0" Grid.Column="1" Text="{Binding SequenceNumber}" TextAlignment="Right" />
+            
+            <TextBlock Grid.Row="1" Grid.Column="0">Enc. Value:</TextBlock>
+            <TextBlock Typography.NumeralAlignment="Tabular" Grid.Row="1" Grid.Column="1" Text="{Binding EncoderValue}" TextAlignment="Right" />
+            
+            <TextBlock Grid.Row="2" Grid.Column="0">Direction:</TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Direction}" HorizontalAlignment="Right" />
+        </Grid>
+        
         <StackPanel
             HorizontalAlignment="Left"
             VerticalAlignment="Top"

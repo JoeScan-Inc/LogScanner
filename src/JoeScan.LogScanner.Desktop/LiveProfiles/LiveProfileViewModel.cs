@@ -5,6 +5,7 @@ using JoeScan.LogScanner.Desktop.Config;
 using JoeScan.LogScanner.Desktop.Engine;
 using JoeScan.LogScanner.Shared.Enums;
 using JoeScan.LogScanner.Shared.Helpers;
+using JoeScan.Pinchot;
 using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
@@ -37,7 +38,7 @@ public sealed class LiveProfileViewModel : Screen
     private readonly int refreshIntervalMs = 50;
     private bool showFilters = true;
     private readonly List<Annotation> annotations = new List<Annotation>();
-
+    private long lastEncoderValue;
 
     #endregion
 
@@ -69,15 +70,11 @@ public sealed class LiveProfileViewModel : Screen
         scaler = Config.Units == DisplayUnits.Millimeters ? 1.0 : 1 / 25.4;
         showFilters = Config.LiveProfileConfig.ShowFilters;
         SetupPlotModel();
-        dispatcherTimer = new DispatcherTimer
-        {
-            Interval = new TimeSpan(0, 0, 0, 0, refreshIntervalMs)
-        };
+        dispatcherTimer = new DispatcherTimer { Interval = new TimeSpan(0, 0, 0, 0, refreshIntervalMs) };
         dispatcherTimer.Tick += (_, _) => DrawPreview();
         dispatcherTimer.Start();
         displayActionBlock = new ActionBlock<Profile>(StoreProfiles);
         Model.RawProfilesBroadcast.LinkTo(displayActionBlock);
-        
     }
 
     #endregion
@@ -95,6 +92,7 @@ public sealed class LiveProfileViewModel : Screen
             {
                 return;
             }
+
             paused = value;
             PausedIndicatorVisibility = paused ? Visibility.Visible : Visibility.Hidden;
 
@@ -122,6 +120,7 @@ public sealed class LiveProfileViewModel : Screen
                 {
                     LiveView!.Annotations.Clear();
                 }
+
                 LiveView.InvalidatePlot(false);
                 NotifyOfPropertyChange(() => ShowFilters);
                 Config.LiveProfileConfig.ShowFilters = showFilters;
@@ -130,11 +129,14 @@ public sealed class LiveProfileViewModel : Screen
     }
 
     public Visibility PausedIndicatorVisibility { get; set; } = Visibility.Hidden;
+    public long EncoderValue { get; set; }
+    public long SequenceNumber { get; set; }
+
+    public string Direction { get; set; }
+
     #endregion
 
     #region Private Methods
-
-
 
     private void StoreProfiles(Profile profile)
     {
@@ -145,7 +147,7 @@ public sealed class LiveProfileViewModel : Screen
         // we used scan head id and camera as the index
         var t = new Tuple<uint, uint>(profile.ScanHeadId, profile.Camera);
         headCamDict[t] = profile;
-
+        
     }
 
     private void DrawPreview()
@@ -156,13 +158,44 @@ public sealed class LiveProfileViewModel : Screen
         {
             return;
         }
+
         foreach (var key in headCamDict.Keys)
         {
             var series = GetSeries(key);
             series.Points.Clear();
-            series.Points.AddRange(headCamDict[key].Data.Select(q => new ScatterPoint(q.X*scaler, q.Y*scaler)));
+            series.Points.AddRange(headCamDict[key].Data.Select(q => new ScatterPoint(q.X * scaler, q.Y * scaler)));
+            if (key is { Item1: 0, Item2: 1 })
+            {
+                EncoderValue = headCamDict[key].EncoderValues[0];
+                if (lastEncoderValue == 0)
+                {
+                    lastEncoderValue = EncoderValue;
+                }
+            
+                switch (EncoderValue - lastEncoderValue)
+                {
+                    case > 0:
+                        Direction = "Forward";
+                        break;
+                    case < 0:
+                        Direction = "Backward";
+                        break;
+                    default:
+                        Direction = "Stopped";
+                        break;
+                }
+            
+                NotifyOfPropertyChange(() => Direction);
+                lastEncoderValue = EncoderValue;
+            
+                SequenceNumber = headCamDict[key].SequenceNumber;
+                NotifyOfPropertyChange(() => EncoderValue);
+                NotifyOfPropertyChange(() => SequenceNumber);
+            }
+
             LiveView!.InvalidatePlot(true);
         }
+
         headCamDict.Clear();
     }
 
@@ -203,11 +236,11 @@ public sealed class LiveProfileViewModel : Screen
         };
         LiveView.Legends.Add(new Legend
         {
-            LegendPosition = LegendPosition.TopRight,
-            LegendTextColor = OxyColorsForStyle.LegendTextColor
+            LegendPosition = LegendPosition.TopRight, LegendTextColor = OxyColorsForStyle.LegendTextColor
         });
-       
-        Func<double, string> labelFormatter = Config.Units == DisplayUnits.Millimeters ? x => $"{x:F1} mm" : x => $"{x:F2} \"";  
+
+        Func<double, string> labelFormatter =
+            Config.Units == DisplayUnits.Millimeters ? x => $"{x:F1} mm" : x => $"{x:F2} \"";
         var columnAxis = new LinearAxis
         {
             Minimum = -100 * scaler,
@@ -230,8 +263,8 @@ public sealed class LiveProfileViewModel : Screen
 
         var rowAxis = new LinearAxis
         {
-            Minimum = -300 * scaler ,
-            Maximum = 300 * scaler ,
+            Minimum = -300 * scaler,
+            Maximum = 300 * scaler,
             Position = AxisPosition.Bottom,
             PositionAtZeroCrossing = true,
             AxislineStyle = LineStyle.Solid,
@@ -259,14 +292,13 @@ public sealed class LiveProfileViewModel : Screen
                 StrokeThickness = 1.0,
                 LineStyle = LineStyle.Dot
             };
-            filterOutline.Points.AddRange(Filter[f].Outline.Select(q => new DataPoint(q.X*scaler, q.Y*scaler)));
+            filterOutline.Points.AddRange(Filter[f].Outline.Select(q => new DataPoint(q.X * scaler, q.Y * scaler)));
             annotations.Add(filterOutline);
             if (showFilters)
             {
                 LiveView.Annotations.Add(filterOutline);
             }
         }
-
     }
 
     #endregion

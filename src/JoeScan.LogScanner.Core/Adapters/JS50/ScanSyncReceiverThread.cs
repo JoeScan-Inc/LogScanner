@@ -20,7 +20,6 @@ public  class ScanSyncReceiverThread : IDisposable
     private long goodPackets;
     private long badPackets;
     private readonly UdpClient receiverClient;
-    private IPEndPoint groupEndPoint;
     private CancellationTokenSource? cancellationTokenSource;
     private CancellationToken token;
     private Thread? threadMain;
@@ -46,8 +45,10 @@ public  class ScanSyncReceiverThread : IDisposable
     public ScanSyncReceiverThread(ILogger logger)
     {
         this.logger = logger;
-        receiverClient = new UdpClient(new IPEndPoint(IPAddress.Any, ScanSyncClientPort));
-        groupEndPoint = new IPEndPoint(IPAddress.Any, ScanSyncServerPort);
+       
+        receiverClient = new UdpClient();
+        receiverClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+        receiverClient.Client.Bind(new IPEndPoint(IPAddress.Any, ScanSyncClientPort));
 
     }
     ~ScanSyncReceiverThread()
@@ -137,14 +138,18 @@ public  class ScanSyncReceiverThread : IDisposable
             try
             {
                 token.ThrowIfCancellationRequested();
-
+                IPEndPoint iPEndPoint = null;
                 // raw scansync packet
-                var rsp = receiverClient.Receive(ref groupEndPoint);
+                byte[] buf = receiverClient.Receive(ref iPEndPoint);
+                if (!ScanSyncData.IsValidPacketSize(buf))
+                {
+                    continue;
+                }
                 goodPackets++;
-                bytesReceived += rsp.Length;
+                bytesReceived += buf.Length;
                 if (counter++ == EventUpdateFrequencyMs)
                 {
-                    var packet = new ScanSyncPacket(rsp);
+                    var packet = new ScanSyncPacket(buf);
                     ScanSyncUpdate.Raise(this, new EncoderUpdateArgs(
                         packet.ScanSyncData.SerialNumber,
                         packet.ScanSyncData.Sequence,
@@ -189,14 +194,10 @@ public  class ScanSyncReceiverThread : IDisposable
     private class ScanSyncPacket
     {
         private readonly byte[] raw;
+       
 
         public ScanSyncPacket(byte[] raw)
         {
-            if (raw.Length < 32)
-            {
-                throw new ArgumentException("Raw ScanSync Packet invalid.");
-            }
-
             this.raw = raw;
         }
 
@@ -211,10 +212,18 @@ public  class ScanSyncReceiverThread : IDisposable
                 LastTimeStampNanoseconds = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(raw, 20)),
                 EncoderValue = IPAddress.NetworkToHostOrder(BitConverter.ToInt64(raw, 24))
             };
+        
+        
     }
 
     private class ScanSyncData
     {
+        private const int ScanSyncPacketV1ByteSize = 32;
+        private const int ScanSyncPacketV2ByteSize = 76;
+        internal static bool IsValidPacketSize(Span<byte> data)
+        {
+            return data.Length == ScanSyncPacketV1ByteSize || data.Length == ScanSyncPacketV2ByteSize;
+        }
         public int SerialNumber { get; internal init; }
         public int Sequence { get; internal init; }
         public int EncoderTimeStampSeconds { get; internal init; }
