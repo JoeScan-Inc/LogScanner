@@ -40,7 +40,7 @@ public class CoreModule : Module
         builder.RegisterType<RawProfileDumper>().AsSelf().SingleInstance();
 
         builder.RegisterType<DefaultConfigLocator>().As<IConfigLocator>().SingleInstance();
-
+        builder.RegisterType<ScanSyncReceiverThread>().AsSelf().SingleInstance();
 
 
         // we store all configs in a single location, 

@@ -133,14 +133,13 @@ public  class ScanSyncReceiverThread : IDisposable
         // token was canceled, which is the only way to get out
         // of the blocking udpClient.Receive()
         token.Register(() => receiverClient.Close());
-        for (; ; )
-        {
+        for (;;)
             try
             {
                 token.ThrowIfCancellationRequested();
 
                 // raw scansync packet
-                byte[] rsp = receiverClient.Receive(ref groupEndPoint);
+                var rsp = receiverClient.Receive(ref groupEndPoint);
                 goodPackets++;
                 bytesReceived += rsp.Length;
                 if (counter++ == EventUpdateFrequencyMs)
@@ -161,10 +160,8 @@ public  class ScanSyncReceiverThread : IDisposable
             catch (ArgumentException)
             {
                 if (badPackets < 100)
-                {
                     // avoid choking the log
                     logger.Trace("Received bad packet. Ignoring.");
-                }
                 badPackets++;
             }
             catch (OperationCanceledException)
@@ -185,7 +182,6 @@ public  class ScanSyncReceiverThread : IDisposable
                 // Receive failed.
                 break;
             }
-        }
     }
 
     #endregion
@@ -196,7 +192,7 @@ public  class ScanSyncReceiverThread : IDisposable
 
         public ScanSyncPacket(byte[] raw)
         {
-            if (raw.Length != 32)
+            if (raw.Length < 32)
             {
                 throw new ArgumentException("Raw ScanSync Packet invalid.");
             }
@@ -205,7 +201,7 @@ public  class ScanSyncReceiverThread : IDisposable
         }
 
         internal ScanSyncData ScanSyncData =>
-            new ScanSyncData()
+            new()
             {
                 SerialNumber = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(raw, 0)),
                 Sequence = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(raw, 4)),
@@ -215,18 +211,17 @@ public  class ScanSyncReceiverThread : IDisposable
                 LastTimeStampNanoseconds = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(raw, 20)),
                 EncoderValue = IPAddress.NetworkToHostOrder(BitConverter.ToInt64(raw, 24))
             };
-
     }
 
     private class ScanSyncData
     {
-        public int SerialNumber { get; internal set; }
-        public int Sequence { get; internal set; }
-        public int EncoderTimeStampSeconds { get; internal set; }
-        public int EncoderTimeStampNanoseconds { get; internal set; }
-        public int LastTimeStampSeconds { get; internal set; }
-        public int LastTimeStampNanoseconds { get; internal set; }
-        public long EncoderValue { get; internal set; }
+        public int SerialNumber { get; internal init; }
+        public int Sequence { get; internal init; }
+        public int EncoderTimeStampSeconds { get; internal init; }
+        public int EncoderTimeStampNanoseconds { get; internal init; }
+        public int LastTimeStampSeconds { get; internal init; }
+        public int LastTimeStampNanoseconds { get; internal init; }
+        public long EncoderValue { get; internal init; }
     }
 }
 

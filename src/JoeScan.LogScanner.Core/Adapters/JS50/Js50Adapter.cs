@@ -14,6 +14,8 @@ namespace JoeScan.LogScanner.Core.Adapters.JS50;
 public  class Js50Adapter : AdapterBase, IScannerAdapter
 {
     private readonly IConfigLocator configLocator;
+    private readonly ScanSyncReceiverThread encoderUpdater;
+
     #region Private Fields
 
     private ScanSystem? scanSystem;
@@ -33,17 +35,22 @@ public  class Js50Adapter : AdapterBase, IScannerAdapter
 
     #region Lifecycle
 
-    public  Js50Adapter(ILogger logger, IJs50AdapterConfig config, IConfigLocator configLocator)
+    public  Js50Adapter(ILogger logger,
+        IJs50AdapterConfig config,
+        IConfigLocator configLocator,
+        ScanSyncReceiverThread encoderUpdater)
     : base(logger)
     {
         this.configLocator = configLocator;
+        this.encoderUpdater = encoderUpdater;
         Config = config;
 
         var msg = $"Created Js50Adapter using JoeScan Pinchot API version {JoeScan.Pinchot.VersionInformation.Version}";
         DiagnosticMessage(msg, LogLevel.Info);
         Units = UnitSystem.Millimeters;
-        // encoderUpdater.EventUpdateFrequencyMs = 100;
-        // encoderUpdater.ScanSyncUpdate += EncoderUpdaterOnScanSyncUpdate;
+        encoderUpdater.EventUpdateFrequencyMs = 100;
+        encoderUpdater.ScanSyncUpdate += EncoderUpdaterOnScanSyncUpdate;
+        this.encoderUpdater.Start();
     }
 
     #endregion
